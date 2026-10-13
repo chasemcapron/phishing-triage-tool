@@ -40,7 +40,9 @@ export async function runLookup(req: LookupRequest, deps: LookupDeps): Promise<L
   const [safeBrowsing, virusTotal, urlhaus, rdap] = await Promise.all([
     lookupSafeBrowsing(req.urls, { fetch: deps.fetch, apiKey: key(deps.env.GOOGLE_SAFE_BROWSING_API_KEY), now: deps.now }),
     lookupVirusTotal({ hashes: req.hashes, domains, urls }, { fetch: deps.fetch, apiKey: key(deps.env.VIRUSTOTAL_API_KEY), now: deps.now }),
-    lookupUrlhaus({ urls, hosts: domains, hashes: req.hashes }, { fetch: deps.fetch, authKey: key(deps.env.URLHAUS_AUTH_KEY), now: deps.now }),
+    // Host-level URLhaus listings flag shared platforms (github.com hosts malware too), so only
+    // exact URL and payload matches are used.
+    lookupUrlhaus({ urls, hosts: [], hashes: req.hashes }, { fetch: deps.fetch, authKey: key(deps.env.URLHAUS_AUTH_KEY), now: deps.now }),
     lookupRdap(domains, { fetch: deps.fetch, now: deps.now }),
   ])
   return { safeBrowsing, virusTotal, urlhaus, rdap }

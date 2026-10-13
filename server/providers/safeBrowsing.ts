@@ -72,7 +72,14 @@ export async function lookupSafeBrowsing(urls: string[], deps: SafeBrowsingDeps)
       : { status: 'error', message: 'Google Safe Browsing is unavailable right now.', results }
   }
   if (res.status === 429) return { status: 'rate_limited', message: 'Google Safe Browsing limit reached, try again later.', results }
-  if (!res.ok) return { status: 'error', message: `Google Safe Browsing is unavailable right now (HTTP ${res.status}).`, results }
+  if (!res.ok) {
+    // Google's error reason codes (e.g. API_KEY_INVALID) are safe to show and make setup issues obvious.
+    const err = (await readJson(res)) as { error?: { status?: unknown; details?: { reason?: unknown }[] } } | null
+    const reason = [err?.error?.details?.find((d) => typeof d?.reason === 'string')?.reason, err?.error?.status].find(
+      (x): x is string => typeof x === 'string' && /^[A-Z_]{3,40}$/.test(x),
+    )
+    return { status: 'error', message: `Google Safe Browsing is unavailable right now (HTTP ${res.status}${reason ? ` ${reason}` : ''}).`, results }
+  }
 
   const body = (await readJson(res)) as { threats?: { url?: unknown; threatTypes?: unknown }[]; cacheDuration?: unknown } | null
   const threats = Array.isArray(body?.threats) ? body.threats : []

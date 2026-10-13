@@ -160,6 +160,7 @@ describe('VirusTotal', () => {
 
 describe('URLhaus', () => {
   it('posts form fields with the Auth-Key header and maps listings', async () => {
+    // (Host lookups are supported by the client but not used by runLookup; see server/lookup.ts.)
     const f = mockFetch((url, init) => {
       expect((init!.headers as Record<string, string>)['Auth-Key']).toBe('uh')
       const body = new URLSearchParams(String(init!.body))
@@ -183,29 +184,30 @@ describe('URLhaus', () => {
 })
 
 describe('RDAP', () => {
-  it('reads the registration date and tells the two 404s apart', async () => {
+  it('uses the IANA bootstrap, reads registration dates, and handles unknown TLDs', async () => {
     const day = 86_400_000
     const now = Date.parse('2026-10-13T00:00:00Z')
-    const f = mockFetch((url) => {
-      if (url.endsWith('/new.example')) {
-        const r = jsonRes(200, { events: [{ eventAction: 'registration', eventDate: new Date(now - 3 * day).toISOString() }] })
-        Object.defineProperty(r, 'redirected', { value: true })
-        return r
-      }
-      if (url.endsWith('/gone.example')) {
-        const r = jsonRes(404, {})
-        Object.defineProperty(r, 'redirected', { value: true })
-        return r
-      }
-      return jsonRes(404, {})
+    const f = mockFetch((url, init) => {
+      expect((init!.headers as Record<string, string>)['user-agent']).toMatch(/^GonePhishing/)
+      if (url === 'https://data.iana.org/rdap/dns.json') return jsonRes(200, { services: [[['com', 'net'], ['https://rdap.verisign.com/com/v1/']], [['top'], ['http://insecure.example/', 'https://rdap.nic.top/']]] })
+      if (url === 'https://rdap.verisign.com/com/v1/domain/new-login.com') return jsonRes(200, { events: [{ eventAction: 'registration', eventDate: new Date(now - 3 * day).toISOString() }] })
+      if (url === 'https://rdap.verisign.com/com/v1/domain/gone.com') return jsonRes(404, {})
+      if (url === 'https://rdap.nic.top/domain/promo.top') return jsonRes(200, { events: [{ eventAction: 'expiration', eventDate: '2027-01-01T00:00:00Z' }] })
+      return jsonRes(500, {})
     })
-    const r = await lookupRdap(['new.example', 'gone.example', 'nordap.de'], { fetch: f, cache: new TtlCache(), now: () => now })
+    const r = await lookupRdap(['new-login.com', 'gone.com', 'promo.top', 'nordap.de'], { fetch: f, cache: new TtlCache(), now: () => now, freshBootstrap: true })
+    expect(r.status).toBe('ok')
     expect(r.results).toEqual([
-      { domain: 'new.example', status: 'ok', registered: new Date(now - 3 * day).toISOString(), ageDays: 3 },
-      { domain: 'gone.example', status: 'not_registered' },
+      { domain: 'new-login.com', status: 'ok', registered: new Date(now - 3 * day).toISOString(), ageDays: 3 },
+      { domain: 'gone.com', status: 'not_registered' },
+      { domain: 'promo.top', status: 'unknown' },
       { domain: 'nordap.de', status: 'unknown' },
     ])
-    expect(f.mock.calls[0]![1]!.redirect).toBe('follow')
+  })
+
+  it('reports the bootstrap failure code', async () => {
+    const r = await lookupRdap(['x.com'], { fetch: mockFetch(() => jsonRes(403, {})), cache: new TtlCache(), freshBootstrap: true })
+    expect(r).toMatchObject({ status: 'error', message: 'Domain registration data is unavailable right now (HTTP 403).' })
   })
 })
 
