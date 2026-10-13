@@ -86,6 +86,16 @@ describe('email sample details', () => {
     for (const a of atts) expect(a.sha256).toMatch(/^[0-9a-f]{64}$/)
   })
 
+  it('picks varied Simple-view reasons', async () => {
+    const m365 = (await run(byId('m365-credential-phish'))).reasons
+    expect(m365).toHaveLength(3)
+    expect(m365[0]).toMatch(/sender address uses micros0ft-online/)
+    expect(m365.some((r) => /DMARC/.test(r))).toBe(true)
+    expect(m365.filter((r) => /micros0ft-online\.example, which imitates/.test(r))).toHaveLength(1)
+    const invoice = (await run(byId('invoice-attachments'))).reasons
+    expect(invoice.some((r) => /Invoice_88412\.html/.test(r))).toBe(true)
+  })
+
   it('collects defanged-ready IOCs', async () => {
     const iocs = (await run(byId('m365-credential-phish'))).iocs
     expect(iocs.domains).toEqual(expect.arrayContaining(['micros0ft-online.example']))

@@ -76,7 +76,16 @@ export type HtmlParser = (html: string) => Document
  * Parses HTML into an inert document (DOMParser never runs scripts or loads resources
  * and the result is never attached to the page).
  */
-export const inertParser: HtmlParser = (html) => new DOMParser().parseFromString(html, 'text/html')
+export const inertParser: HtmlParser = (html) => new DOMParser().parseFromString(stripStyles(html), 'text/html')
+
+/**
+ * Browsers apply the page CSP to parsed documents, so inline styles in email HTML
+ * would each log a (harmless) CSP violation. Styles carry no links, so drop them first.
+ * This is noise reduction, not sanitization: the parsed document is never rendered.
+ */
+export function stripStyles(html: string): string {
+  return html.replace(/<style\b[\s\S]*?<\/style\s*>/gi, '').replace(/\sstyle\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+}
 
 const collapse = (s: string | null | undefined) => (s ?? '').replace(/\s+/g, ' ').trim()
 

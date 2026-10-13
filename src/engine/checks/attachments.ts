@@ -104,11 +104,14 @@ export async function analyzeAttachments(raw: RawAttachment[], findings: Finding
     if (/[‪-‮⁦-⁩‎‏]/.test(filename) || /\s{4,}\.[a-z0-9]+$/i.test(filename)) {
       add('att-filename-trick', `The attachment name "${filename}" uses hidden characters or padding to disguise its real file type.`, filename)
     }
-    if (parts.length >= 3 && EXEC_EXTS.has(ext) && DOC_EXTS.has(parts.at(-2)!)) {
+    const doubleExt = parts.length >= 3 && EXEC_EXTS.has(ext) && DOC_EXTS.has(parts.at(-2)!)
+    if (doubleExt) {
       add('att-double-ext', `"${filename}" pretends to be a .${parts.at(-2)} file but is really a .${ext} program.`, filename)
     }
-    if (EXEC_EXTS.has(ext)) add('att-executable', `"${filename}" is a program or script that can run code on your computer if opened.`, `${filename} (${a.mimeType})`)
-    else if (DISK_IMAGE_EXTS.has(ext)) add('att-disk-image', `"${filename}" is a disk image, often used to smuggle malware past email filters.`, filename)
+    // A double extension already says "this is a program"; don't count the same file twice.
+    if (EXEC_EXTS.has(ext)) {
+      if (!doubleExt) add('att-executable', `"${filename}" is a program or script that can run code on your computer if opened.`, `${filename} (${a.mimeType})`)
+    } else if (DISK_IMAGE_EXTS.has(ext)) add('att-disk-image', `"${filename}" is a disk image, often used to smuggle malware past email filters.`, filename)
     else if (ONENOTE_EXTS.has(ext)) add('att-onenote', `"${filename}" is a OneNote file, a format abused to hide malicious scripts.`, filename)
     else if (MACRO_EXTS.has(ext)) add('att-macro', `"${filename}" is an Office file that can contain macros (embedded programs).`, filename)
     else if (HTML_EXTS.has(ext) || a.mimeType === 'text/html') {

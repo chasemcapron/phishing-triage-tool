@@ -54,7 +54,6 @@
       "expectedSignals": [
         "att-html",
         "att-double-ext",
-        "att-executable",
         "att-signature-exec",
         "auth-dmarc-none",
         "auth-dkim-none",

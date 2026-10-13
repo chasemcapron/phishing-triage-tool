@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "qa": "node scripts/qa-screens.mjs http://localhost:4173 qa-out"
   },
   "dependencies": {
     "postal-mime": "^4.0.5",

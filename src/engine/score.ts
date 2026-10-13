@@ -14,13 +14,45 @@ export function scoreFindings(findings: Finding[]): { score: number; verdict: Ve
   return { score, verdict, verdictLabel: VERDICT_LABELS[verdict] }
 }
 
+const LINK_LOOKALIKES = new Set(['link-lookalike', 'link-combosquat', 'link-brand-subdomain', 'link-brand-tld'])
+
+/** A link-lookalike reason that only repeats the sender-domain lookalike adds nothing. */
+function redundant(candidate: Finding, chosen: Finding[]): boolean {
+  if (!LINK_LOOKALIKES.has(candidate.kind)) return false
+  return chosen.some((c) => {
+    if (c.kind !== 'sender-lookalike-domain') return false
+    const domain = /@([^\s)>]+)/.exec(c.evidence[0] ?? '')?.[1]
+    return Boolean(domain && candidate.explanation.includes(domain))
+  })
+}
+
 /**
- * Plain-English reasons for the Simple view: forced (reputation) hits first, then the
- * heaviest non-content findings, then content signals if there is still room.
+ * Two or three plain-English reasons for the Simple view, chosen for variety:
+ * forced (reputation) hits first, then the strongest finding from each category,
+ * then the heaviest remaining findings, with weak content signals last.
  */
 export function topReasons(findings: Finding[], max = 3): string[] {
   const ranked = findings
     .filter((f) => f.weight > 0 || f.forceHigh)
-    .sort((a, b) => Number(Boolean(b.forceHigh)) - Number(Boolean(a.forceHigh)) || Number(a.category === 'content') - Number(b.category === 'content') || b.weight - a.weight)
-  return ranked.slice(0, max).map((f) => f.explanation)
+    .sort(
+      (a, b) =>
+        Number(Boolean(b.forceHigh)) - Number(Boolean(a.forceHigh)) ||
+        Number(a.category === 'content') - Number(b.category === 'content') ||
+        b.weight - a.weight,
+    )
+  const chosen: Finding[] = []
+  const seen = new Set<string>()
+  for (const f of ranked) {
+    if (chosen.length >= max) break
+    if (f.category === 'content' || seen.has(f.category) || f.weight < 12 || redundant(f, chosen)) continue
+    chosen.push(f)
+    seen.add(f.category)
+  }
+  for (const f of ranked) {
+    if (chosen.length >= max) break
+    if (!chosen.includes(f) && !redundant(f, chosen)) chosen.push(f)
+  }
+  return chosen
+    .sort((a, b) => Number(Boolean(b.forceHigh)) - Number(Boolean(a.forceHigh)) || b.weight - a.weight)
+    .map((f) => f.explanation)
 }
