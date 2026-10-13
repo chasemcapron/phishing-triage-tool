@@ -111,6 +111,8 @@ export function applyReputation(report: Report, res: LookupResponse, req: Lookup
   }
 
   // Google Safe Browsing: advisory wording, attribution handled by the UI via `source`.
+  // Repeat hits merge into one finding, so word it for the most relevant threat across all hits.
+  const allSbTypes = [...new Set(res.safeBrowsing.results.flatMap((h) => h.threatTypes))]
   for (const hit of res.safeBrowsing.results) {
     const ls = linksForUrl(hit.url)
     for (const l of ls) {
@@ -120,7 +122,7 @@ export function applyReputation(report: Report, res: LookupResponse, req: Lookup
     const shown = ls[0]?.defanged ?? defangUrl(hit.url)
     fs.add(
       'rep-safe-browsing',
-      `Google Safe Browsing lists this link as ${sbDescription(hit.threatTypes)}.`,
+      `Google Safe Browsing lists ${res.safeBrowsing.results.length > 1 ? 'links in this message' : 'this link'} as ${sbDescription(allSbTypes)}.`,
       `${shown} (${hit.threatTypes.join(', ')})`,
       { forceHigh: true, source: 'google-safe-browsing', threatTypes: hit.threatTypes },
     )
