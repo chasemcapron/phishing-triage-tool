@@ -151,9 +151,10 @@ export function applyReputation(report: Report, res: LookupResponse, req: Lookup
     }
     const name = v.kind === 'file' ? (r.email?.attachments.find((a) => a.sha256 === v.indicator)?.filename ?? 'an attachment') : v.kind === 'domain' ? defangHost(v.indicator) : defangUrl(v.indicator)
     const evidence = `${v.kind} ${v.kind === 'url' ? defangUrl(v.indicator) : v.kind === 'domain' ? defangHost(v.indicator) : v.indicator}: ${malicious} malicious, ${suspicious} suspicious${v.label ? ` (${v.label})` : ''}`
-    if (malicious >= LIMITS.vtMaliciousEngines) {
+    const trusted = (v.reputation ?? 0) >= LIMITS.vtTrustedReputation
+    if (malicious >= LIMITS.vtMaliciousEngines && !trusted) {
       fs.add('rep-virustotal-malicious', `${malicious} security vendors on VirusTotal flag ${name} as malicious.`, evidence, { forceHigh: true, source: 'virustotal' })
-    } else if (malicious >= 1 || suspicious >= 2) {
+    } else if ((malicious >= 1 || suspicious >= 2) && (v.reputation ?? 0) <= 0) {
       fs.add('rep-virustotal-suspicious', `A few security vendors on VirusTotal flag ${name} as malicious or suspicious.`, evidence, { source: 'virustotal' })
     }
   }

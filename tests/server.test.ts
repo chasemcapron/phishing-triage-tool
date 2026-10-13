@@ -111,7 +111,7 @@ describe('Safe Browsing v5', () => {
     const limited = await lookupSafeBrowsing(['https://b.example/'], { fetch: mockFetch(() => jsonRes(429, {})), apiKey: 'k', cache: new TtlCache() })
     expect(limited.status).toBe('rate_limited')
     const err = await lookupSafeBrowsing(['https://c.example/'], { fetch: mockFetch(() => jsonRes(403, { error: { message: 'secret detail' } })), apiKey: 'k', cache: new TtlCache() })
-    expect(err).toEqual({ status: 'error', message: 'Google Safe Browsing is unavailable right now.', results: [] })
+    expect(err).toEqual({ status: 'error', message: 'Google Safe Browsing is unavailable right now (HTTP 403).', results: [] })
   })
 
   it('times out', async () => {

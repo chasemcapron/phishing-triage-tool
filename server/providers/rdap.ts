@@ -18,7 +18,7 @@ export interface RdapDeps {
   cache?: TtlCache<RdapResult>
 }
 
-async function one(domain: string, deps: RdapDeps): Promise<RdapResult | 'unavailable'> {
+async function one(domain: string, deps: RdapDeps): Promise<RdapResult | number> {
   const now = (deps.now ?? Date.now)()
   let res: Response
   try {
@@ -30,11 +30,11 @@ async function one(domain: string, deps: RdapDeps): Promise<RdapResult | 'unavai
       deps.timeoutMs ?? 4000,
     )
   } catch {
-    return 'unavailable'
+    return 0
   }
   // A 404 from the registry means "not registered"; from rdap.org itself it means "TLD not supported".
   if (res.status === 404) return { domain, status: res.redirected ? 'not_registered' : 'unknown' }
-  if (!res.ok) return 'unavailable'
+  if (!res.ok) return res.status
   const body = (await readJson(res)) as { events?: { eventAction?: unknown; eventDate?: unknown }[] } | null
   const reg = body?.events?.find((e) => e?.eventAction === 'registration')?.eventDate
   const t = typeof reg === 'string' ? Date.parse(reg) : NaN
@@ -51,11 +51,14 @@ export async function lookupRdap(domains: string[], deps: RdapDeps): Promise<Pro
     const cached = store.get(d, now())
     if (cached) return cached
     const r = await one(d, deps)
-    if (r !== 'unavailable') store.set(d, r, r.status === 'unknown' ? UNKNOWN_TTL : TTL, now())
+    if (typeof r !== 'number') store.set(d, r, r.status === 'unknown' ? UNKNOWN_TTL : TTL, now())
     return r
   })
-  const results = outcomes.filter((o): o is RdapResult => o !== 'unavailable')
+  const results = outcomes.filter((o): o is RdapResult => typeof o !== 'number')
   const skipped = domains.slice(MAX_DOMAINS)
-  if (!results.length) return { status: 'error', message: 'Domain registration data is unavailable right now.', results, skipped }
+  if (!results.length) {
+    const codes = [...new Set(outcomes.filter((o): o is number => typeof o === 'number'))].map((c) => (c ? `HTTP ${c}` : 'timeout')).join(', ')
+    return { status: 'error', message: `Domain registration data is unavailable right now (${codes}).`, results, skipped }
+  }
   return { status: 'ok', results, ...(skipped.length ? { skipped } : {}) }
 }

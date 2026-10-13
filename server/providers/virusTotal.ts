@@ -72,6 +72,7 @@ export async function lookupVirusTotal(
   const skipped: string[] = []
   let limited = false
   let failure: ProviderResult<VirusTotalResult>['status'] | null = null
+  let failCode = 0
 
   for (const job of jobs) {
     const key = `${job.kind}:${job.indicator}`
@@ -107,6 +108,7 @@ export async function lookupVirusTotal(
     }
     if (!res.ok) {
       failure = 'error'
+      failCode = res.status
       skipped.push(job.indicator)
       continue
     }
@@ -127,7 +129,7 @@ export async function lookupVirusTotal(
   }
 
   if (failure && !results.length) {
-    return { status: failure, message: failure === 'timeout' ? 'VirusTotal did not answer in time.' : 'VirusTotal is unavailable right now.', results, skipped }
+    return { status: failure, message: failure === 'timeout' ? 'VirusTotal did not answer in time.' : `VirusTotal is unavailable right now${failCode ? ` (HTTP ${failCode})` : ''}.`, results, skipped }
   }
   if (limited) return { status: 'rate_limited', message: VT_LIMIT_MESSAGE, results, skipped }
   return { status: 'ok', results, ...(skipped.length ? { skipped } : {}) }

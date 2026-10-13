@@ -72,7 +72,7 @@ export async function lookupSafeBrowsing(urls: string[], deps: SafeBrowsingDeps)
       : { status: 'error', message: 'Google Safe Browsing is unavailable right now.', results }
   }
   if (res.status === 429) return { status: 'rate_limited', message: 'Google Safe Browsing limit reached, try again later.', results }
-  if (!res.ok) return { status: 'error', message: 'Google Safe Browsing is unavailable right now.', results }
+  if (!res.ok) return { status: 'error', message: `Google Safe Browsing is unavailable right now (HTTP ${res.status}).`, results }
 
   const body = (await readJson(res)) as { threats?: { url?: unknown; threatTypes?: unknown }[]; cacheDuration?: unknown } | null
   const threats = Array.isArray(body?.threats) ? body.threats : []

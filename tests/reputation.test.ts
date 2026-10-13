@@ -81,6 +81,9 @@ describe('applyReputation', () => {
       return res
     }
     expect(applyReputation(r, mk(3), buildLookupRequest(r)).verdict).toBe('high')
+    const trustedRes = mk(2)
+    trustedRes.virusTotal.results[0]!.reputation = 729
+    expect(applyReputation(r, trustedRes, buildLookupRequest(r)).findings).toEqual([])
     const weak = applyReputation(r, mk(1), buildLookupRequest(r))
     expect(weak.findings.map((f) => f.kind)).toEqual(['rep-virustotal-suspicious'])
     expect(weak.findings[0]!.forceHigh).toBeUndefined()

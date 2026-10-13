@@ -34,6 +34,11 @@ export const LIMITS = {
   newDomainDays: 30,
   /** VirusTotal engines that must say "malicious" for a known-bad (forced High) verdict. */
   vtMaliciousEngines: 2,
+  /**
+   * VirusTotal community reputation at or above which stray engine hits are ignored
+   * (google.com has a lone "malicious" vote but reputation in the hundreds).
+   */
+  vtTrustedReputation: 100,
 } as const
 
 interface CheckDef {
