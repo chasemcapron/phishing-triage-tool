@@ -1,0 +1,5 @@
+export { analyzeEmail, analyzeText, buildReport, InputError, type AnalyzeOptions } from './analyze'
+export { CHECKS, LIMITS, THRESHOLDS, VERDICT_LABELS, type FindingKind } from './config'
+export { scoreFindings, topReasons } from './score'
+export { defangEmail, defangHost, defangUrl } from './util/defang'
+export type * from './types'
