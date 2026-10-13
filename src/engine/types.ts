@@ -17,8 +17,12 @@ export interface Finding {
   evidence: string[]
   /** A known-bad reputation hit forces a High verdict regardless of score. */
   forceHigh?: boolean
-  /** MITRE ATT&CK technique IDs (filled in M4 after verification). */
+  /** MITRE ATT&CK technique IDs (see attack.ts). */
   attack: string[]
+  /** Data source for reputation findings; Google attribution is shown only for 'google-safe-browsing'. */
+  source?: 'google-safe-browsing' | 'virustotal' | 'urlhaus' | 'rdap'
+  /** Threat types for Safe Browsing findings (drives the "learn more" link). */
+  threatTypes?: string[]
 }
 
 export type LinkSource = 'text' | 'html-link' | 'html-form'
@@ -38,6 +42,15 @@ export interface LinkInfo {
   displayTexts: string[]
   sources: LinkSource[]
   flags: FindingKind[]
+  reputation?: LinkReputation
+}
+
+export interface LinkReputation {
+  safeBrowsing?: string[]
+  virusTotal?: { malicious: number; suspicious: number; link?: string; found: boolean }
+  urlhaus?: { status?: string; threat?: string; reference?: string }
+  domainAgeDays?: number
+  domainRegistered?: string
 }
 
 export interface AuthMethodResult {
@@ -96,6 +109,8 @@ export interface AttachmentInfo {
   archiveEntries: string[] | null
   encryptedArchive: boolean
   flags: FindingKind[]
+  virusTotal?: { malicious: number; suspicious: number; link?: string; found: boolean; label?: string }
+  urlhaus?: { threat?: string; reference?: string }
 }
 
 export interface Iocs {
@@ -129,4 +144,15 @@ export interface Report {
   links: LinkInfo[]
   email: EmailDetails | null
   iocs: Iocs
+  /** Present once online reputation checks have run (or were turned off). */
+  reputation?: ReputationSummary
+}
+
+export interface ReputationSummary {
+  state: 'off' | 'done' | 'failed'
+  /** Per-provider status line for the UI. */
+  providers: { name: string; status: string; message?: string }[]
+  /** What was sent (for transparency). */
+  sent: { urls: number; domains: number; hashes: number }
+  checkedAt: string
 }

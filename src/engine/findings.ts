@@ -14,12 +14,18 @@ export function severityFor(weight: number): Severity {
 export class FindingSet {
   private readonly byKind = new Map<FindingKind, Finding>()
 
-  add(kind: FindingKind, explanation: string, evidence: string | string[] = [], opts: { forceHigh?: boolean } = {}): Finding {
+  add(
+    kind: FindingKind,
+    explanation: string,
+    evidence: string | string[] = [],
+    opts: { forceHigh?: boolean; source?: Finding['source']; threatTypes?: string[] } = {},
+  ): Finding {
     const items = (Array.isArray(evidence) ? evidence : [evidence]).filter(Boolean)
     const existing = this.byKind.get(kind)
     if (existing) {
       for (const e of items) if (!existing.evidence.includes(e)) existing.evidence.push(e)
       if (opts.forceHigh) existing.forceHigh = true
+      if (opts.threatTypes) existing.threatTypes = [...new Set([...(existing.threatTypes ?? []), ...opts.threatTypes])]
       return existing
     }
     const def = CHECKS[kind]
@@ -33,6 +39,8 @@ export class FindingSet {
       evidence: [...new Set(items)],
       attack: [],
       ...(opts.forceHigh ? { forceHigh: true } : {}),
+      ...(opts.source ? { source: opts.source } : {}),
+      ...(opts.threatTypes ? { threatTypes: [...new Set(opts.threatTypes)] } : {}),
     }
     this.byKind.set(kind, finding)
     return finding

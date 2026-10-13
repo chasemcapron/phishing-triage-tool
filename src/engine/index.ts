@@ -3,3 +3,8 @@ export { CHECKS, LIMITS, THRESHOLDS, VERDICT_LABELS, type FindingKind } from './
 export { scoreFindings, topReasons } from './score'
 export { defangEmail, defangHost, defangUrl } from './util/defang'
 export type * from './types'
+export { ATTACK_VERSION, reportTechniques, TECHNIQUES, type Technique } from './attack'
+export { defangedIocList, iocJson, ticketSummary } from './export'
+export { fetchLookup, LookupError } from './lookupClient'
+export type { LookupRequest, LookupResponse } from './lookup-contract'
+export { applyReputation, buildLookupRequest, GOOGLE_ATTRIBUTION, isEmptyRequest, learnMoreUrl, offReputation } from './reputation'

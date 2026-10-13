@@ -1,0 +1,47 @@
+import type { LookupRequest, LookupResponse } from '../src/engine/lookup-contract'
+import { type FetchLike } from './http'
+import { lookupRdap } from './providers/rdap'
+import { lookupSafeBrowsing } from './providers/safeBrowsing'
+import { lookupUrlhaus } from './providers/urlhaus'
+import { lookupVirusTotal } from './providers/virusTotal'
+import { isReservedDomain } from './validate'
+
+export interface LookupEnv {
+  GOOGLE_SAFE_BROWSING_API_KEY?: string
+  VIRUSTOTAL_API_KEY?: string
+  URLHAUS_AUTH_KEY?: string
+}
+
+export interface LookupDeps {
+  fetch: FetchLike
+  env: LookupEnv
+  now?: () => number
+}
+
+const hostOf = (url: string) => {
+  try {
+    return new URL(url).hostname
+  } catch {
+    return ''
+  }
+}
+
+/**
+ * Runs every provider in parallel. Reserved/test names (.test, .example, …) are only sent to
+ * Safe Browsing (whose legacy test entries use them); the others would just burn quota.
+ * The server only ever *asks providers about* indicators; it never fetches a submitted URL.
+ */
+export async function runLookup(req: LookupRequest, deps: LookupDeps): Promise<LookupResponse> {
+  const real = (d: string) => !isReservedDomain(d)
+  const domains = req.domains.filter(real)
+  const urls = req.urls.filter((u) => real(hostOf(u)))
+  const key = (v: string | undefined) => (v && v.trim() ? v.trim() : undefined)
+
+  const [safeBrowsing, virusTotal, urlhaus, rdap] = await Promise.all([
+    lookupSafeBrowsing(req.urls, { fetch: deps.fetch, apiKey: key(deps.env.GOOGLE_SAFE_BROWSING_API_KEY), now: deps.now }),
+    lookupVirusTotal({ hashes: req.hashes, domains, urls }, { fetch: deps.fetch, apiKey: key(deps.env.VIRUSTOTAL_API_KEY), now: deps.now }),
+    lookupUrlhaus({ urls, hosts: domains, hashes: req.hashes }, { fetch: deps.fetch, authKey: key(deps.env.URLHAUS_AUTH_KEY), now: deps.now }),
+    lookupRdap(domains, { fetch: deps.fetch, now: deps.now }),
+  ])
+  return { safeBrowsing, virusTotal, urlhaus, rdap }
+}

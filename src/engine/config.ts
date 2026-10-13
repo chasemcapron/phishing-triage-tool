@@ -30,6 +30,10 @@ export const LIMITS = {
   clockSkewSeconds: 300,
   /** Subdomain labels beyond which a host counts as excessive. */
   maxSubdomainLabels: 3,
+  /** Domains registered fewer than this many days ago count as newly registered. */
+  newDomainDays: 30,
+  /** VirusTotal engines that must say "malicious" for a known-bad (forced High) verdict. */
+  vtMaliciousEngines: 2,
 } as const
 
 interface CheckDef {
@@ -106,6 +110,13 @@ export const CHECKS = {
 
   // Text messages
   'sms-reply-to-activate': { weight: 15, category: 'links', title: '"Reply to activate the link" trick' },
+
+  // Reputation and domain age (server lookups). Known-bad hits also force a High verdict.
+  'rep-safe-browsing': { weight: 50, category: 'reputation', title: 'Flagged by Google Safe Browsing' },
+  'rep-urlhaus': { weight: 50, category: 'reputation', title: 'Listed on URLhaus' },
+  'rep-virustotal-malicious': { weight: 45, category: 'reputation', title: 'Flagged malicious on VirusTotal' },
+  'rep-virustotal-suspicious': { weight: 20, category: 'reputation', title: 'Flagged by a few VirusTotal engines' },
+  'domain-new': { weight: 30, category: 'reputation', title: 'Newly registered domain' },
 } as const satisfies Record<string, CheckDef>
 
 export type FindingKind = keyof typeof CHECKS

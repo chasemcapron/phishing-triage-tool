@@ -12,6 +12,7 @@ import { parseAllAuthResults } from './parse/authResults'
 import { extractAddress, firstHeader, parseHeaders } from './parse/headers'
 import { parseReceivedChain } from './parse/received'
 import { scoreFindings, topReasons } from './score'
+import { tagFindings } from './attack'
 import type { AttachmentInfo, EmailDetails, Finding, Iocs, LinkInfo, Report } from './types'
 import { refang } from './util/defang'
 import { domainOfEmail, isNonRoutable, registrable } from './util/domain'
@@ -113,6 +114,7 @@ export function collectIocs(links: LinkInfo[], email: EmailDetails | null, attac
 }
 
 export function buildReport(mode: Report['mode'], findings: Finding[], links: LinkInfo[], email: EmailDetails | null): Report {
+  tagFindings({ mode, findings, links })
   return {
     mode,
     ...scoreFindings(findings),
