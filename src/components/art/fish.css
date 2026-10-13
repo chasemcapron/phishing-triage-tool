@@ -1,0 +1,203 @@
+/* Gone Phishing fish cast. Day values on :root, night on [data-theme='dark'].
+   Each character maps its palette onto local --f-* slots used by shared shape classes. */
+:root {
+  --fish-eye-white: #ffffff;
+  --fish-pupil: #1b2340;
+  --fish-shine: #ffffff;
+  --fish-hi: rgba(255, 255, 255, 0.45);
+  --fish-glow: #7ef0ff;
+  --fish-halo: transparent;
+  --fish-hook: #9aa9b8;
+  --fish-snag: #46607a;
+  --fish-bubble: #8ccfe8;
+  --fish-bubble-fill: rgba(255, 255, 255, 0.55);
+
+  --fish-phish-body: #7d6bd1;
+  --fish-phish-shade: #5a49b0;
+  --fish-phish-belly: #b4a8f0;
+  --fish-phish-lip: #9888e8;
+  --fish-phish-line: #3a2c86;
+  --fish-phish-mouth: #2b1f5c;
+  --fish-phish-spot: #a99cf2;
+  --fish-phish-lure: #ffd166;
+  --fish-phish-flap: #d9921c;
+  --fish-phish-lure-glow: #fff2b8;
+
+  --fish-puffer-body: #ffc04f;
+  --fish-puffer-shade: #f29a32;
+  --fish-puffer-belly: #fff1cc;
+  --fish-puffer-spine: #e8892f;
+  --fish-puffer-spot: #e58f33;
+  --fish-puffer-line: #8f4d0e;
+  --fish-puffer-lip: #ff8f7e;
+  --fish-puffer-under: #f7d58e;
+
+  --fish-calm-body: #52c7aa;
+  --fish-calm-shade: #2fa088;
+  --fish-calm-belly: #d3f5ea;
+  --fish-calm-stripe: rgba(255, 255, 255, 0.55);
+  --fish-calm-line: #1b6f5d;
+  --fish-calm-lip: #ff9a8a;
+  --fish-calm-cheek: #ffb3a6;
+  --fish-calm-under: #a6e2cf;
+
+  --fish-small-1-body: #ff8a6b;
+  --fish-small-1-fin: #e8654a;
+  --fish-small-1-belly: #ffc7b3;
+  --fish-small-2-body: #ffd166;
+  --fish-small-2-fin: #f4a259;
+  --fish-small-2-belly: #fff0bf;
+  --fish-small-3-body: #b9a6ff;
+  --fish-small-3-fin: #8e78ec;
+  --fish-small-3-belly: #e4dcff;
+  --fish-small-4-body: #ff9ec4;
+  --fish-small-4-fin: #ef6fa3;
+  --fish-small-4-belly: #ffd6e6;
+  --fish-small-stripe: rgba(255, 255, 255, 0.75);
+  --fish-small-line: rgba(27, 35, 64, 0.65);
+}
+
+:root[data-theme='dark'] {
+  --fish-eye-white: #eef6ff;
+  --fish-pupil: #0b1430;
+  --fish-hi: rgba(126, 240, 255, 0.5);
+  --fish-halo: rgba(126, 240, 255, 0.28);
+  --fish-hook: #c3d0dc;
+  --fish-snag: #9db3c8;
+  --fish-bubble: rgba(126, 240, 255, 0.75);
+  --fish-bubble-fill: rgba(126, 240, 255, 0.12);
+
+  --fish-phish-body: #5e50b4;
+  --fish-phish-shade: #43378f;
+  --fish-phish-belly: #8679d8;
+  --fish-phish-lip: #7869cc;
+  --fish-phish-line: #231a5e;
+  --fish-phish-mouth: #170f3d;
+  --fish-phish-spot: #7ef0ff;
+  --fish-phish-lure: #fff4c2;
+  --fish-phish-flap: #e0a420;
+  --fish-phish-lure-glow: #7ef0ff;
+
+  --fish-puffer-body: #e3a743;
+  --fish-puffer-shade: #c27a26;
+  --fish-puffer-belly: #f3dcaa;
+  --fish-puffer-spine: #c46f22;
+  --fish-puffer-spot: #b8661f;
+  --fish-puffer-line: #5e3006;
+  --fish-puffer-lip: #e9786a;
+  --fish-puffer-under: #d8b56f;
+
+  --fish-calm-body: #3fae95;
+  --fish-calm-shade: #258572;
+  --fish-calm-belly: #a9e3d3;
+  --fish-calm-stripe: rgba(126, 240, 255, 0.55);
+  --fish-calm-line: #0f4f42;
+  --fish-calm-lip: #e98476;
+  --fish-calm-cheek: #d98a80;
+  --fish-calm-under: #7fc4b1;
+
+  --fish-small-1-body: #d9735b;
+  --fish-small-1-fin: #b2533e;
+  --fish-small-1-belly: #eaa894;
+  --fish-small-2-body: #e2b552;
+  --fish-small-2-fin: #c98a45;
+  --fish-small-2-belly: #f0d9a0;
+  --fish-small-3-body: #9583e0;
+  --fish-small-3-fin: #6f5bc9;
+  --fish-small-3-belly: #c4b8f2;
+  --fish-small-4-body: #e083a8;
+  --fish-small-4-fin: #c35886;
+  --fish-small-4-belly: #f0b6cd;
+  --fish-small-stripe: rgba(126, 240, 255, 0.85);
+  --fish-small-line: rgba(11, 20, 48, 0.75);
+}
+
+/* ---------- Character palettes ---------- */
+.fish { display: block; overflow: visible; }
+.fish--flip { transform: scaleX(-1); }
+:root[data-theme='dark'] .fish-verdict { filter: drop-shadow(0 0 10px var(--fish-halo)); }
+:root[data-theme='dark'] .fish-envelope { filter: drop-shadow(0 0 3px var(--fish-glow)); }
+:root[data-theme='dark'] .fish-puffer { --fish-hi: rgba(255, 255, 255, 0.3); }
+
+.fish-phish {
+  --f-body: var(--fish-phish-body); --f-shade: var(--fish-phish-shade); --f-belly: var(--fish-phish-belly);
+  --f-accent: var(--fish-phish-lip); --f-line: var(--fish-phish-line); --f-spot: var(--fish-phish-spot);
+  --f-mouth: var(--fish-phish-mouth);
+}
+.fish-puffer {
+  --f-body: var(--fish-puffer-body); --f-shade: var(--fish-puffer-shade); --f-belly: var(--fish-puffer-belly);
+  --f-accent: var(--fish-puffer-lip); --f-line: var(--fish-puffer-line); --f-spot: var(--fish-puffer-spot);
+  --f-under: var(--fish-puffer-under);
+}
+.fish-calm {
+  --f-body: var(--fish-calm-body); --f-shade: var(--fish-calm-shade); --f-belly: var(--fish-calm-belly);
+  --f-accent: var(--fish-calm-lip); --f-line: var(--fish-calm-line); --f-stripe: var(--fish-calm-stripe);
+  --f-mouth: var(--fish-calm-line); --f-under: var(--fish-calm-under);
+}
+.fish-small { --f-line: var(--fish-small-line); --f-stripe: var(--fish-small-stripe); }
+.fish-small--1 { --f-body: var(--fish-small-1-body); --f-shade: var(--fish-small-1-fin); --f-belly: var(--fish-small-1-belly); }
+.fish-small--2 { --f-body: var(--fish-small-2-body); --f-shade: var(--fish-small-2-fin); --f-belly: var(--fish-small-2-belly); }
+.fish-small--3 { --f-body: var(--fish-small-3-body); --f-shade: var(--fish-small-3-fin); --f-belly: var(--fish-small-3-belly); }
+.fish-small--4 { --f-body: var(--fish-small-4-body); --f-shade: var(--fish-small-4-fin); --f-belly: var(--fish-small-4-belly); }
+
+/* ---------- Shared shapes ---------- */
+.fish-body { fill: var(--f-body); }
+.fish-shade { fill: var(--f-shade); }
+.fish-belly { fill: var(--f-belly); }
+.fish-under { fill: var(--f-under); }
+.fish-accent { fill: var(--f-accent); }
+.fish-spot { fill: var(--f-spot); }
+.fish-stripe { fill: var(--f-stripe); }
+.fish-mouth { fill: var(--f-mouth); }
+.fish-eye { fill: var(--fish-eye-white); }
+.fish-pupil { fill: var(--fish-pupil); }
+.fish-shine { fill: var(--fish-shine); }
+.fish-lid { fill: var(--f-shade); stroke: var(--f-line); stroke-width: 2.2; stroke-linejoin: round; }
+.fish-cheek { fill: var(--fish-calm-cheek); opacity: 0.85; }
+.fish-tooth { fill: var(--fish-eye-white); stroke: var(--fish-eye-white); stroke-width: 1.4; stroke-linejoin: round; }
+
+.fish-line, .fish-brow, .fish-hi, .fish-stalk, .fish-flap, .fish-hook, .fish-snag, .fish-hook-eye {
+  fill: none; stroke-linecap: round; stroke-linejoin: round;
+}
+.fish-line { stroke: var(--f-line); stroke-width: 2.4; }
+.fish-ray { opacity: 0.45; stroke-width: 1.8; }
+.fish-brow { stroke: var(--f-line); stroke-width: 3.6; }
+.fish-hi { stroke: var(--fish-hi); stroke-width: 4; }
+.fish-small .fish-line { stroke-width: 1.3; }
+.fish-spine { fill: var(--fish-puffer-spine); stroke: var(--fish-puffer-spine); stroke-width: 2.5; stroke-linejoin: round; }
+
+.fish-stalk { stroke: var(--f-shade); stroke-width: 3; }
+.fish-envelope { fill: var(--fish-phish-lure); }
+.fish-flap { stroke: var(--fish-phish-flap); stroke-width: 2; }
+.fish-lure-glow circle { fill: var(--fish-phish-lure-glow); opacity: 0.22; }
+.fish-lure-glow circle + circle { opacity: 0.42; }
+.fish-hook, .fish-hook-eye { stroke: var(--fish-hook); stroke-width: 2.6; }
+.fish-snag { stroke: var(--fish-snag); stroke-width: 1.3; }
+.fish-bubble { fill: var(--fish-bubble-fill); stroke: var(--fish-bubble); stroke-width: 1.6; }
+
+/* ---------- Idle motion (off for reduced motion) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .fish-fin, .fish-tail, .fish-lure, .fish-lure-glow, .fish-blink, .fish-puff, .fish-bubble {
+    transform-box: fill-box;
+  }
+  .fish-fin { transform-origin: 0% 50%; animation: fish-fin 1.8s ease-in-out infinite alternate; }
+  .fish-tail { transform-origin: 0% 50%; animation: fish-tail 2.4s ease-in-out infinite alternate; }
+  .fish-small .fish-tail { transform-origin: 100% 50%; animation-duration: 0.9s; }
+  .fish-lure { transform-origin: 50% 0%; animation: fish-sway 3.2s ease-in-out infinite alternate; }
+  .fish-lure-glow { transform-origin: 50% 50%; animation: fish-glow 2.6s ease-in-out infinite alternate; }
+  .fish-blink { transform-origin: 50% 50%; animation: fish-blink 6s infinite; }
+  .fish-puff { transform-origin: 50% 50%; animation: fish-puff 3.6s ease-in-out infinite; }
+  .fish-bubble { transform-origin: 50% 50%; animation: fish-bubble 3s ease-in infinite; }
+  .fish-bubble + .fish-bubble { animation-delay: 1.5s; }
+}
+@keyframes fish-fin { from { transform: rotate(-8deg); } to { transform: rotate(10deg); } }
+@keyframes fish-tail { from { transform: skewY(-6deg); } to { transform: skewY(6deg); } }
+@keyframes fish-sway { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+@keyframes fish-glow { from { opacity: 0.6; transform: scale(0.9); } to { opacity: 1; transform: scale(1.08); } }
+@keyframes fish-blink { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(0.12); } }
+@keyframes fish-puff { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.035); } }
+@keyframes fish-bubble {
+  0% { transform: translateY(4px); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(-10px); opacity: 0; }
+}

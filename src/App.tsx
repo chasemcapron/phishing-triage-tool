@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { EmailMode } from './components/EmailMode'
-import { IconLock, IconMoon, IconSun } from './components/Icons'
+import { Bobber, Duck, Fisher, LilyPads, LogoMark, SkyBackdrop } from './components/art/PondScene'
+import { DepthGauge, PondFloor } from './components/art/Underwater'
+import { IconMoon, IconSun } from './components/Icons'
+import { FishingLine, PondAmbient } from './components/Pond'
 import { TextMode } from './components/TextMode'
 import { loadEngine } from './engineLoader'
 import { SAMPLES } from './samples'
@@ -23,9 +26,10 @@ function parseHash(): { mode: Mode; sample: SampleRequest | null } {
 
 function readTheme(): Theme {
   try {
-    return localStorage.getItem('theme') === 'light' ? 'light' : 'dark'
+    // Day (light) is the default; only an explicit saved choice turns on night fishing.
+    return localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'
   } catch {
-    return 'dark'
+    return 'light'
   }
 }
 
@@ -80,93 +84,104 @@ export default function App() {
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <header className="site-header">
-        <div className="container header-inner">
-          <div className="brand">
-            <img src="/favicon.svg" alt="" width="28" height="28" />
-            <span className="brand-name">Phishing Triage</span>
+      <div className="pond-page">
+        <div className="sky">
+          <SkyBackdrop />
+          <header className="site-header">
+            <div className="container header-inner">
+              <div className="brand">
+                <LogoMark className="brand-logo" />
+                <span className="brand-name">Gone Phishing</span>
+              </div>
+              <button
+                type="button"
+                className="btn btn-icon theme-toggle"
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                aria-label={theme === 'dark' ? 'Switch to day fishing (light theme)' : 'Switch to night fishing (dark theme)'}
+              >
+                {theme === 'dark' ? <IconSun /> : <IconMoon />}
+              </button>
+            </div>
+          </header>
+          <div className="container hero">
+            <h1>Is this a scam?</h1>
+            <p className="lede">
+              Paste a suspicious link, text or email <strong>before you tap it</strong>. Cast it in and see what bites.
+            </p>
           </div>
-          <button
-            type="button"
-            className="btn btn-ghost btn-icon"
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-          >
-            {theme === 'dark' ? <IconSun /> : <IconMoon />}
-          </button>
-        </div>
-      </header>
-
-      <main id="main" className="container">
-        <div className="intro">
-          <h1>Is this a scam?</h1>
-          <p className="lede">
-            Paste a suspicious link, text message or email <strong>before you tap it</strong>, and get a clear verdict
-            with the reasons behind it.
-          </p>
+          <LilyPads className="sky-lily" />
+          <Duck className="sky-duck" />
+          <div className="fisher-wrap">
+            <Fisher />
+            <Bobber className="fisher-bobber" />
+          </div>
         </div>
 
-        <div className="tabs" role="tablist" aria-label="What do you want to check?" onKeyDown={onTabKey}>
-          {(
-            [
-              ['text', 'Check a link or text'],
-              ['email', 'Analyze an email'],
-            ] as const
-          ).map(([m, label]) => (
-            <button
-              key={m}
-              ref={(el) => {
-                tabRefs.current[m] = el
-              }}
-              id={`tab-${m}`}
-              role="tab"
-              type="button"
-              aria-selected={mode === m}
-              aria-controls={`panel-${m}`}
-              tabIndex={mode === m ? 0 : -1}
-              className="tab"
-              onClick={() => select(m)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <FishingLine />
 
-        <p className="privacy">
-          <IconLock className="icon icon-sm" />
-          <span>
-            Private by design: everything is analyzed in your browser. Nothing you paste is uploaded, and links are never
-            opened.
-          </span>
-        </p>
+        <main id="main" className="pond water-column">
+          <PondAmbient />
+          <DepthGauge labels={9} className="pond-gauge" />
+          <div className="container pond-content">
+            <div className="tabs" role="tablist" aria-label="What do you want to check?" onKeyDown={onTabKey}>
+              {(
+                [
+                  ['text', 'Check a link or text'],
+                  ['email', 'Analyze an email'],
+                ] as const
+              ).map(([m, label]) => (
+                <button
+                  key={m}
+                  ref={(el) => {
+                    tabRefs.current[m] = el
+                  }}
+                  id={`tab-${m}`}
+                  role="tab"
+                  type="button"
+                  aria-selected={mode === m}
+                  aria-controls={`panel-${m}`}
+                  tabIndex={mode === m ? 0 : -1}
+                  className="tab"
+                  onClick={() => select(m)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
 
-        <div id="panel-text" role="tabpanel" aria-labelledby="tab-text" hidden={mode !== 'text'}>
-          <TextMode
-            sample={sample}
-            onSwitchToEmail={(text) => {
-              setHandoff({ text, key: Date.now() })
-              select('email')
-            }}
-          />
-        </div>
-        <div id="panel-email" role="tabpanel" aria-labelledby="tab-email" hidden={mode !== 'email'}>
-          <EmailMode key={handoff?.key ?? 0} initialInput={handoff?.text ?? ''} sample={handoff ? null : sample} />
-        </div>
-      </main>
+            <div id="panel-text" role="tabpanel" aria-labelledby="tab-text" hidden={mode !== 'text'}>
+              <TextMode
+                sample={sample}
+                onSwitchToEmail={(text) => {
+                  setHandoff({ text, key: Date.now() })
+                  select('email')
+                }}
+              />
+            </div>
+            <div id="panel-email" role="tabpanel" aria-labelledby="tab-email" hidden={mode !== 'email'}>
+              <EmailMode key={handoff?.key ?? 0} initialInput={handoff?.text ?? ''} sample={handoff ? null : sample} />
+            </div>
+          </div>
+        </main>
 
-      <footer className="site-footer">
-        <div className="container">
-          <p>
-            Verdicts are advisory. "No red flags found" means none of our checks matched, not that something is
-            guaranteed legitimate. All sample messages are synthetic.
-          </p>
-          <p>
-            <a href="https://github.com/chasemcapron/phishing-triage-tool" rel="noreferrer">
-              Source on GitHub
-            </a>
-          </p>
-        </div>
-      </footer>
+        <PondFloor className="pond-floor">
+          <footer className="site-footer">
+            <p className="footer-brand">
+              <LogoMark className="footer-logo" />
+              <span>Gone Phishing</span>
+            </p>
+            <p>
+              Verdicts are advisory. "No red flags found" means none of our checks matched, not that something is
+              guaranteed legitimate. All sample messages are synthetic.
+            </p>
+            <p>
+              <a href="https://github.com/chasemcapron/phishing-triage-tool" rel="noreferrer">
+                Source on GitHub
+              </a>
+            </p>
+          </footer>
+        </PondFloor>
+      </div>
     </>
   )
 }

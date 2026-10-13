@@ -3,6 +3,7 @@ import type { SampleRequest } from '../App'
 import type { Report } from '../engine'
 import { loadEngine } from '../engineLoader'
 import { SAMPLES } from '../samples'
+import { PrivacyNote } from './Common'
 import { IconInfo } from './Icons'
 import { ResultsView, type View } from './ResultsView'
 
@@ -93,7 +94,7 @@ export function TextMode({ onSwitchToEmail, sample }: { onSwitchToEmail: (text: 
           )}
         </div>
         <div className="samples" role="group" aria-label="Try a sample">
-          <span className="samples-label">Try a sample:</span>
+          <span className="samples-label">Try a sample catch:</span>
           {SAMPLES.filter((s) => s.mode === 'text').map((s) => (
             <button
               key={s.id}
@@ -109,6 +110,7 @@ export function TextMode({ onSwitchToEmail, sample }: { onSwitchToEmail: (text: 
             </button>
           ))}
         </div>
+        <PrivacyNote />
       </form>
       <div aria-live="polite" className="sr-only">
         {report ? `Result: ${report.verdictLabel}` : ''}

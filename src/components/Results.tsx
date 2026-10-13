@@ -2,6 +2,7 @@ import { forwardRef } from 'react'
 import { THRESHOLDS } from '../engine/config'
 import type { Finding, Report } from '../engine'
 import { CopyButton, SeverityBadge } from './Common'
+import { VerdictFish } from './art/Fish'
 import { IconInfo, VerdictIcon } from './Icons'
 
 const VERDICT_SUMMARY: Record<Report['verdict'], string> = {
@@ -17,13 +18,17 @@ export const VerdictCard = forwardRef<HTMLHeadingElement, { report: Report; anal
   return (
     <section className={`verdict verdict-${report.verdict}`} aria-labelledby="verdict-heading">
       <div className="verdict-top">
-        <VerdictIcon verdict={report.verdict} className="icon verdict-icon" />
-        <div>
-          <h2 id="verdict-heading" ref={headingRef} tabIndex={-1} className="verdict-label">
-            {report.verdictLabel}
-          </h2>
+        <div className="verdict-text">
+          <p className="verdict-eyebrow">Your catch</p>
+          <div className="verdict-title">
+            <VerdictIcon verdict={report.verdict} className="icon verdict-icon" />
+            <h2 id="verdict-heading" ref={headingRef} tabIndex={-1} className="verdict-label">
+              {report.verdictLabel}
+            </h2>
+          </div>
           <p className="verdict-summary">{VERDICT_SUMMARY[report.verdict]}</p>
         </div>
+        <VerdictFish verdict={report.verdict} className="verdict-fish" />
       </div>
       {report.reasons.length > 0 && (
         <ul className="reasons">

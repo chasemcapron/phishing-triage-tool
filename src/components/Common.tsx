@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Severity } from '../engine'
-import { IconCheck, IconCopy, SeverityIcon } from './Icons'
+import { IconCheck, IconCopy, IconLock, SeverityIcon } from './Icons'
 
 const SEVERITY_LABEL: Record<Severity, string> = { high: 'High', medium: 'Medium', low: 'Low', info: 'Info' }
 
@@ -96,4 +96,16 @@ export function formatBytes(n: number): string {
   if (n < 1024) return `${n} B`
   if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`
   return `${(n / 1024 / 1024).toFixed(1)} MB`
+}
+
+export function PrivacyNote() {
+  return (
+    <p className="privacy">
+      <IconLock className="icon icon-sm" />
+      <span>
+        Private by design: everything is analyzed in your browser. Nothing you paste is uploaded, and links are never
+        opened.
+      </span>
+    </p>
+  )
 }

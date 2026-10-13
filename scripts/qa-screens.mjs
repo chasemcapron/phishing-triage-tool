@@ -11,7 +11,7 @@ const [base = 'http://localhost:4173', outDir = 'qa-out', chromePath = 'C:/Progr
   process.argv.slice(2)
 mkdirSync(outDir, { recursive: true })
 
-const PAGES = [
+const ALL_PAGES = [
   ['home', '/'],
   ['text-toll', '/#text/smishing-toll'],
   ['text-package', '/#text/smishing-package'],
@@ -21,10 +21,13 @@ const PAGES = [
   ['email-invoice', '/#email/invoice-attachments'],
   ['email-newsletter', '/#email/legit-newsletter'],
 ]
-const DEVICES = [
+// Optional filters for quick iteration: ONLY=home,email-m365 DEVICES=phone
+const PAGES = process.env.ONLY ? ALL_PAGES.filter(([n]) => process.env.ONLY.split(',').includes(n)) : ALL_PAGES
+const ALL_DEVICES = [
   ['phone', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true }],
   ['desktop', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false }],
 ]
+const DEVICES = process.env.DEVICES ? ALL_DEVICES.filter(([n]) => process.env.DEVICES.split(',').includes(n)) : ALL_DEVICES
 const THEMES = (process.env.THEMES ?? 'dark').split(',')
 
 const port = 9300 + Math.floor(Math.random() * 500)

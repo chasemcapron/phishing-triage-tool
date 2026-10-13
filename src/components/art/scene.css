@@ -1,0 +1,423 @@
+/* Gone Phishing: pond scene art. Day palette on :root, night on [data-theme='dark']. */
+:root {
+  /* Layout contract (also used by the integrator) */
+  --pond-water-band: 32px; /* water strip at the bottom of SkyBackdrop */
+  --pond-waterline: 11px; /* where banks / dock posts / bobber meet the water, above the backdrop's bottom */
+  --water-surface: #7fd6ee; /* exact fill of the backdrop's bottom water: continue CSS water from this */
+  --pond-line: rgba(15, 37, 64, 0.62); /* fishing line */
+
+  --sky-top: #9fd8ff;
+  --sky-mid: #c4e9ff;
+  --sky-horizon: #e9f8ff;
+  --sun: #ffd166;
+  --sun-hi: #ffe7a3;
+  --sun-glow: #fff1c2;
+  --cloud: #ffffff;
+  --cloud-shade: #e3f1fb;
+  --bird: #5b7f9e;
+  --star: #ffffff;
+  --moon: #f6f1d5;
+  --moon-crater: #e6dfb8;
+
+  --hill-far: #b7e3b0;
+  --hill-tree: #a2d89e;
+  --hill-pine: #8cce8c;
+  --hill-near: #8fd18a;
+  --grass: #6cc070;
+  --grass-dark: #5aae62;
+  --grass-tuft: #85d488;
+  --flower-a: #fff4b8;
+  --flower-b: #ffc8d6;
+  --reed: #4f9d5a;
+  --reed-dark: #3f8a4c;
+  --cattail: #8a5a3c;
+  --rock: #b9cbd6;
+  --water-rim: #b4ecf8;
+  --glint: #ffffff;
+  --ripple: rgba(255, 255, 255, 0.85);
+  --firefly: #f6ff9e;
+
+  --dock: #c98f5a;
+  --dock-dark: #9c6a3e;
+  --dock-light: #ddaa74;
+  --fisher-hat: #f4a259;
+  --fisher-hat-dark: #dc8644;
+  --fisher-shirt: #4d96ff;
+  --fisher-shirt-dark: #3a7fe6;
+  --fisher-skin: #d99a6c;
+  --fisher-skin-dark: #c4825a;
+  --fisher-hair: #5a3b2e;
+  --fisher-pants: #34495e;
+  --fisher-pants-dark: #283a4c;
+  --fisher-boot: #ffc94d;
+  --fisher-boot-dark: #e0a52c;
+  --cheek: #ff8e7f;
+  --ink: #0f2540;
+  --rod: #2f3e4e;
+  --rod-grip: #b57a46;
+  --reel: #a8bbcc;
+  --bucket: #5cc6b8;
+  --bucket-dark: #3fa597;
+  --lantern: #3d4f63;
+  --lantern-glass: #fff6d8;
+  --lantern-glow: rgba(255, 209, 102, 0);
+
+  --bobber: #ff5a5f;
+  --bobber-dark: #d9434a;
+  --bobber-white: #ffffff;
+
+  --lily: #7cc576;
+  --lily-dark: #5aa95a;
+  --lily-vein: #a5dd9f;
+  --lotus: #ffb3c7;
+  --lotus-c: #ffd166;
+  --frog: #8bd36a;
+  --frog-belly: #d2f3b2;
+  --frog-foot: #6fbd52;
+  --duck: #ffd166;
+  --duck-dark: #f1b23a;
+  --beak: #ff8c42;
+
+  --logo-tile: #1f6aa6;
+  --logo-wave: #2d93c8;
+  --logo-hook: #ffffff;
+  --logo-fish: #ff8552;
+  --logo-fin: #ffd166;
+  --logo-ring: rgba(255, 255, 255, 0);
+}
+
+@media (min-width: 720px) {
+  :root {
+    --pond-water-band: 54px;
+    --pond-waterline: 18px;
+  }
+}
+
+:root[data-theme='dark'] {
+  --water-surface: #164a73;
+  --pond-line: rgba(214, 233, 255, 0.6);
+
+  --sky-top: #0e1b3d;
+  --sky-mid: #172c57;
+  --sky-horizon: #223a6b;
+  --cloud: #243c6b;
+  --cloud-shade: #1c315c;
+
+  --hill-far: #1a3358;
+  --hill-tree: #183852;
+  --hill-pine: #153348;
+  --hill-near: #1a4153;
+  --grass: #1e5449;
+  --grass-dark: #18473f;
+  --grass-tuft: #276553;
+  --flower-a: #4b7186;
+  --flower-b: #4f6587;
+  --reed: #2c6851;
+  --reed-dark: #225644;
+  --cattail: #5e4130;
+  --rock: #3b5670;
+  --water-rim: #22618f;
+  --glint: #7ef0ff;
+  --ripple: rgba(126, 240, 255, 0.55);
+
+  --dock: #8e6747;
+  --dock-dark: #6b4b33;
+  --dock-light: #a37b58;
+  --fisher-hat: #d98e50;
+  --fisher-hat-dark: #b9733b;
+  --fisher-shirt: #3f80dc;
+  --fisher-shirt-dark: #3168ba;
+  --fisher-skin: #bf8664;
+  --fisher-skin-dark: #a77052;
+  --fisher-hair: #3f2a22;
+  --fisher-pants: #27384b;
+  --fisher-pants-dark: #1e2c3c;
+  --fisher-boot: #e0b14a;
+  --fisher-boot-dark: #bf9131;
+  --cheek: #e07c70;
+  --ink: #0b1a2e;
+  --rod: #1b2531;
+  --rod-grip: #8e6240;
+  --reel: #8295aa;
+  --bucket: #3f9088;
+  --bucket-dark: #2f736c;
+  --lantern: #26313f;
+  --lantern-glass: #ffd166;
+  --lantern-glow: rgba(255, 214, 120, 0.13);
+
+  --bobber: #f0545a;
+  --bobber-dark: #c43c43;
+  --bobber-white: #e8eef5;
+
+  --lily: #2f6f55;
+  --lily-dark: #245a45;
+  --lily-vein: #3e8466;
+  --lotus: #d08daa;
+  --frog: #5f9e4a;
+  --frog-belly: #8fbf73;
+  --frog-foot: #4d863b;
+  --duck: #d9b25a;
+  --duck-dark: #bf953f;
+  --beak: #d9773a;
+
+  --logo-tile: #1d5f96;
+  --logo-wave: #2a7db3;
+  --logo-ring: rgba(214, 233, 255, 0.45);
+}
+
+/* ---------- Scene layout ---------- */
+.pond-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  container: pond / size;
+  background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 52%, var(--sky-horizon) 100%);
+}
+:where(.pond-scene) > svg {
+  position: absolute;
+  display: block;
+  overflow: visible;
+}
+.pond-stars {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 64%;
+  opacity: 0;
+}
+.pond-sun {
+  right: clamp(14px, 8cqw, 190px);
+  top: clamp(46px, 11cqh, 70px);
+  width: clamp(66px, 26cqh, 128px);
+  height: auto;
+  aspect-ratio: 1;
+}
+.pond-cloud {
+  height: auto;
+  animation: pond-drift 48s ease-in-out infinite alternate;
+}
+.pond-cloud--1 { left: 46cqw; top: 9cqh; width: clamp(92px, 14cqw, 220px); aspect-ratio: 168 / 88; }
+.pond-cloud--2 { left: 30cqw; top: 4cqh; width: clamp(64px, 8cqw, 130px); aspect-ratio: 90 / 62; animation-duration: 60s; animation-direction: alternate-reverse; }
+.pond-cloud--3 { left: 65cqw; top: 37cqh; width: clamp(84px, 12cqw, 190px); aspect-ratio: 168 / 88; animation-duration: 54s; }
+.pond-cloud--4 { left: 91cqw; top: 56cqh; width: clamp(54px, 6cqw, 100px); aspect-ratio: 90 / 62; animation-duration: 42s; animation-direction: alternate-reverse; }
+.pond-cloud--5 { left: 75cqw; top: 6cqh; width: clamp(50px, 6cqw, 96px); aspect-ratio: 90 / 62; animation-duration: 66s; }
+@container pond (max-width: 719px) {
+  .pond-cloud--1 { left: 74cqw; top: 33cqh; }
+  .pond-cloud--2 { left: 55cqw; top: 3cqh; }
+  .pond-cloud--3 { left: 57cqw; top: 55cqh; }
+  .pond-cloud--4,
+  .pond-cloud--5,
+  .pond-birds,
+  .pond-star--wide { display: none; }
+}
+.pond-birds { left: 57cqw; top: 25cqh; width: clamp(34px, 3.6cqw, 58px); height: auto; aspect-ratio: 60 / 24; }
+.pond-bird { fill: none; stroke: var(--bird); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+:root[data-theme='dark'] .pond-birds { display: none; }
+.pond-hills {
+  left: 0;
+  width: 100%;
+  bottom: calc(var(--pond-water-band) - 10px);
+  height: clamp(70px, max(30cqh, 9.6cqw), 46cqh);
+}
+.pond-water {
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: var(--pond-water-band);
+}
+.pond-water { overflow: hidden; }
+.pond-bank {
+  --bank-w: clamp(116px, 19cqw, 300px);
+  width: var(--bank-w);
+  height: auto;
+  aspect-ratio: 300 / 200;
+  bottom: calc(var(--pond-waterline) - var(--bank-w) * 0.0267);
+}
+.pond-bank--l { left: 0; }
+.pond-bank--r { right: 0; transform: scaleX(-1); }
+
+/* Components placed by the integrator */
+.pond-fisher { display: block; height: auto; aspect-ratio: 320 / 200; overflow: visible; }
+.pond-bobber { display: block; height: auto; aspect-ratio: 64 / 48; overflow: visible; }
+.pond-lily { display: block; height: auto; aspect-ratio: 120 / 48; overflow: visible; }
+.pond-duck { display: block; height: auto; aspect-ratio: 64 / 48; overflow: visible; }
+.pond-logo { display: block; width: 32px; height: 32px; flex: none; }
+
+/* ---------- Fills ---------- */
+.ps-glow2 { fill: #fff; opacity: 0.4; }
+.ps-glow { fill: var(--sun-glow); }
+.ps-disc { fill: var(--sun); }
+.ps-hi { fill: none; stroke: var(--sun-hi); stroke-width: 5; stroke-linecap: round; }
+.pm-glow2 { fill: var(--moon); opacity: 0.07; }
+.pm-glow { fill: var(--moon); opacity: 0.12; }
+.pm-disc { fill: var(--moon); }
+.pm-crater { fill: var(--moon-crater); }
+.ps-night { opacity: 0; }
+.ps-day,
+.ps-night { transform-box: view-box; transform-origin: 60px 60px; transition: opacity 0.6s ease, transform 0.6s ease; }
+.pond-star { fill: var(--star); }
+.pc-body { fill: var(--cloud); }
+.pc-shade { fill: var(--cloud-shade); }
+
+.ph-far { fill: var(--hill-far); }
+.ph-tree { fill: var(--hill-tree); }
+.ph-pine { fill: var(--hill-pine); stroke: var(--hill-pine); stroke-width: 5; stroke-linejoin: round; }
+.ph-near { fill: var(--hill-near); }
+.ph-shore { fill: var(--grass); }
+.ph-flower--a { fill: var(--flower-a); }
+.ph-flower--b { fill: var(--flower-b); }
+.pk-back { fill: var(--grass-dark); }
+.pk-front { fill: var(--grass); }
+.pk-tuft { fill: var(--grass-tuft); }
+.pk-rock { fill: var(--rock); }
+.pb-reed { fill: var(--reed); }
+.pb-stem { fill: none; stroke: var(--reed-dark); stroke-width: 2.6; stroke-linecap: round; }
+.pb-head { fill: var(--cattail); }
+.pond-ripple { fill: none; stroke: var(--ripple); stroke-width: 2; stroke-linecap: round; }
+.pond-ripple-o { fill: none; stroke: var(--ripple); stroke-width: 1.6; }
+.pond-firefly { fill: var(--firefly); opacity: 0; }
+
+.pw-back { fill: var(--water-rim); }
+.pw-front { fill: var(--water-surface); }
+.pw-glint { fill: var(--glint); opacity: 0.7; }
+
+/* Fisher */
+.pf-post,
+.pf-deck { fill: var(--dock); }
+.pf-deck-hi { fill: var(--dock-light); }
+.pf-deck-dk { fill: var(--dock-dark); }
+.pf-post-sub { fill: color-mix(in srgb, var(--dock-dark) 40%, var(--water-surface)); }
+.pf-seam { fill: none; stroke: var(--dock-dark); stroke-width: 1.6; stroke-linecap: round; }
+.pf-glow { fill: var(--lantern-glow); }
+.pf-lantern { fill: var(--lantern); }
+.pf-glass { fill: var(--lantern-glass); }
+.pf-handle { fill: none; stroke: var(--lantern); stroke-width: 1.8; stroke-linecap: round; }
+.pf-bucket { fill: var(--bucket); }
+.pf-bucket-dk { fill: var(--bucket-dark); }
+.pf-tail { fill: var(--logo-fish); }
+.pf-skin { fill: var(--fisher-skin); }
+.pf-skin-dk { fill: var(--fisher-skin-dark); }
+.pf-hair { fill: var(--fisher-hair); }
+.pf-shirt { fill: var(--fisher-shirt); }
+.pf-shirt-dk { fill: var(--fisher-shirt-dark); }
+.pf-hat { fill: var(--fisher-hat); }
+.pf-hat-dk { fill: var(--fisher-hat-dark); }
+.pf-boot { fill: var(--fisher-boot); }
+.pf-boot-dk { fill: var(--fisher-boot-dark); }
+.pf-ink { fill: var(--ink); }
+.pf-cheek { fill: var(--cheek); opacity: 0.55; }
+.pf-smile { fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; }
+.pf-reel { fill: var(--reel); }
+.pf-reel-dk { fill: var(--rod); }
+[class^='pf-s-'] { fill: none; stroke-linecap: round; }
+.pf-s-shirt { stroke: var(--fisher-shirt); }
+.pf-s-shirt-dk { stroke: var(--fisher-shirt-dark); }
+.pf-s-pants { stroke: var(--fisher-pants); }
+.pf-s-pants-dk { stroke: var(--fisher-pants-dark); }
+.pf-s-skin { stroke: var(--fisher-skin); }
+.pf-s-grip { stroke: var(--rod-grip); }
+.pf-s-rod { stroke: var(--rod); }
+.pf-s-line { stroke: var(--pond-line); stroke-width: 0.8; opacity: 0.6; stroke-linejoin: round; }
+.pf-leg { transform-box: view-box; }
+.pf-leg--front { transform-origin: 230px 122px; animation: pond-swing 3.4s ease-in-out infinite alternate; }
+.pf-leg--back { transform-origin: 224px 122px; animation: pond-swing 3.4s ease-in-out -1.7s infinite alternate; }
+
+/* Bobber */
+.pb-red { fill: var(--bobber); }
+.pb-white { fill: var(--bobber-white); }
+.pb-band { fill: var(--bobber-dark); }
+.pb-stem-r { fill: var(--bobber-dark); }
+.pb-eye { fill: none; stroke: var(--bobber-dark); stroke-width: 1.4; }
+.pb-hi { fill: #fff; opacity: 0.75; }
+.pb-sub { fill: var(--water-surface); opacity: 0.7; }
+.pb-float,
+.pd-float { animation: pond-bob 2.6s ease-in-out infinite; }
+.pond-ring {
+  fill: none;
+  stroke: var(--ripple);
+  stroke-width: 1.4;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pond-ring 3.2s ease-out infinite;
+}
+.pond-ring--2 { animation-delay: -1.6s; }
+
+/* Logo */
+.pl-tile { fill: var(--logo-tile); stroke: var(--logo-ring); stroke-width: 1.5; }
+.pl-wave { fill: var(--logo-wave); }
+.pl-hook { fill: none; stroke: var(--logo-hook); stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; }
+.pl-eye-ring { fill: none; stroke: var(--logo-hook); stroke-width: 1.6; }
+.pl-fish { fill: var(--logo-fish); }
+.pl-fin { fill: var(--logo-fin); }
+.pl-eye { fill: #fff; }
+.pl-pupil { fill: #0f2540; }
+
+/* Extras */
+.pp-pad { fill: var(--lily); }
+.pp-pad-dk { fill: var(--lily-dark); }
+.pp-vein { fill: none; stroke: var(--lily-vein); stroke-width: 1.2; stroke-linecap: round; }
+.pp-lotus { fill: var(--lotus); }
+.pp-lotus-c { fill: var(--lotus-c); }
+.pp-frog-b { fill: var(--frog); }
+.pp-belly { fill: var(--frog-belly); }
+.pp-foot { fill: var(--frog-foot); }
+.pp-eye-w { fill: #fff; }
+.pp-eyes { transform-box: fill-box; transform-origin: center; animation: pond-blink 6s infinite; }
+.pd-body { fill: var(--duck); }
+.pd-wing { fill: var(--duck-dark); }
+.pd-beak { fill: var(--beak); }
+.pd-eye-shut,
+.pd-z { display: none; }
+.pd-z { fill: none; stroke: var(--star); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; opacity: 0.8; }
+
+/* ---------- Night ---------- */
+:root[data-theme='dark'] .pond-stars { opacity: 1; }
+:root[data-theme='dark'] .pond-cloud { opacity: 0.8; }
+:root[data-theme='dark'] .ps-day { opacity: 0; transform: translateY(30px) scale(0.8); }
+:root[data-theme='dark'] .ps-night { opacity: 1; }
+:root[data-theme='dark'] .pond-firefly { opacity: 1; animation: pond-firefly 4.2s ease-in-out infinite; }
+:root[data-theme='dark'] .pond-firefly:nth-of-type(2n) { animation-delay: -1.6s; animation-duration: 5.4s; }
+:root[data-theme='dark'] .pond-firefly:nth-of-type(3n) { animation-delay: -3s; }
+:root[data-theme='dark'] .pd-eye-open { display: none; }
+:root[data-theme='dark'] .pd-eye-shut,
+:root[data-theme='dark'] .pd-z { display: inline; }
+:root[data-theme='dark'] .pd-float { animation-duration: 4.2s; }
+:root[data-theme='dark'] .pf-glow { animation: pond-flicker 3s ease-in-out infinite; }
+.pf-glow { transform-box: fill-box; transform-origin: center; }
+
+/* ---------- Motion ---------- */
+.pond-star { animation: pond-twinkle 3.6s ease-in-out infinite; }
+.pond-star:nth-child(3n) { animation-delay: -1.2s; animation-duration: 4.4s; }
+.pond-star:nth-child(4n + 1) { animation-delay: -2.4s; animation-duration: 5.2s; }
+.pw-back { animation: pond-wave 9s linear infinite reverse; }
+.pw-front { animation: pond-wave 6s linear infinite; }
+.pw-glint { animation: pond-glint 4s ease-in-out infinite; }
+.pw-glint:nth-of-type(2n) { animation-delay: -2s; }
+.pw-glint:nth-of-type(3n) { animation-delay: -1s; animation-duration: 5s; }
+
+@keyframes pond-drift { from { transform: translateX(-2.5cqw); } to { transform: translateX(2.5cqw); } }
+@keyframes pond-twinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes pond-wave { from { transform: translateX(0); } to { transform: translateX(56px); } }
+@keyframes pond-glint { 0%, 100% { opacity: 0.75; } 50% { opacity: 0.2; } }
+@keyframes pond-swing { from { transform: rotate(-5deg); } to { transform: rotate(7deg); } }
+@keyframes pond-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(1.6px); } }
+@keyframes pond-ring {
+  0% { transform: scale(0.55); opacity: 0.9; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+@keyframes pond-blink { 0%, 94%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
+@keyframes pond-firefly {
+  0%, 100% { opacity: 0.2; transform: translate(0, 0); }
+  50% { opacity: 1; transform: translate(4px, -6px); }
+}
+@keyframes pond-flicker { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.8; transform: scale(0.94); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pond-art,
+  .pond-art * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

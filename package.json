@@ -10,9 +10,11 @@
     "typecheck": "tsc -b",
     "test": "vitest run",
     "test:watch": "vitest",
-    "qa": "node scripts/qa-screens.mjs http://localhost:4173 qa-out"
+    "qa": "node scripts/qa-screens.mjs http://localhost:4173 qa-out",
+    "qa:flows": "node scripts/qa-flows.mjs http://localhost:4173"
   },
   "dependencies": {
+    "@fontsource-variable/fredoka": "^5.3.0",
     "postal-mime": "^4.0.5",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",

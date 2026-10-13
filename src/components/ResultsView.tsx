@@ -14,8 +14,9 @@ export function ResultsView({ report, view, onViewChange }: { report: Report; vi
   }, [report])
 
   const analyst = view === 'analyst'
+  const wide = analyst && !!report.email
   return (
-    <div className="results">
+    <div className={wide ? 'results results-wide' : 'results'}>
       <div className="results-bar">
         <Segmented
           label="Detail level"
@@ -27,7 +28,7 @@ export function ResultsView({ report, view, onViewChange }: { report: Report; vi
           ]}
         />
       </div>
-      <div className={analyst && report.email ? 'results-grid' : 'results-stack'}>
+      <div className={wide ? 'results-grid' : 'results-stack'}>
         <div className="results-main">
           <VerdictCard ref={headingRef} report={report} analyst={analyst} />
           <WhatToDo report={report} />

@@ -1,0 +1,942 @@
+/* =====================================================================
+   Gone Phishing - underwater world (Underwater.tsx)
+   Day palette on :root, night on :root[data-theme='dark'].
+   --water-surface is the single source of truth for the waterline colour.
+   ===================================================================== */
+
+:root {
+  --water-surface: #7fd6ee;
+  --water-shallow: #4dbbe0;
+  --water-mid: #2d93c8;
+  --water-deep: #1f6aa6;
+  --water-deepest: #164f80;
+
+  --uw-bubble-ring: rgba(255, 255, 255, 0.8);
+  --uw-bubble-fill: rgba(255, 255, 255, 0.16);
+  --uw-bubble-shine: rgba(255, 255, 255, 0.95);
+  --uw-ray: rgba(255, 255, 255, 0.3);
+
+  --seaweed-1: #3fa37a;
+  --seaweed-2: #2f8466;
+  --uw-vein-1: #6cc79a;
+  --uw-vein-2: #48a07f;
+  --uw-rock-1: #6f8ea6;
+  --uw-rock-2: #86a3b8;
+  --uw-shine: rgba(255, 255, 255, 0.4);
+
+  --sand: #f3d9a4;
+  --sand-shade: #e3c286;
+  --sand-ink: #0f2540;
+  --sand-ink-muted: #3b5063;
+  --uw-pebble-1: #b3c1cb;
+  --uw-pebble-2: #93a9b9;
+  --uw-pebble-3: #d6bd92;
+  --uw-shell-1: #ffb4a2;
+  --uw-shell-1-line: #e48a76;
+  --uw-boot: #a96c43;
+  --uw-boot-shade: #8d5533;
+  --uw-boot-cuff: #c88d5d;
+  --uw-boot-sole: #5a3a28;
+  --uw-boot-patch: #f0c26a;
+  --uw-boot-stitch: #fff3dc;
+  --uw-boot-lace: #f7e8c9;
+  --uw-boot-hole: #3a2518;
+  --uw-boot-shine: rgba(255, 236, 210, 0.55);
+  --uw-glass: #bfe9dc;
+  --uw-glass-shine: rgba(255, 255, 255, 0.85);
+  --uw-cork: #c98f5a;
+  --uw-note: #fff8e6;
+  --uw-note-tie: #e0a85a;
+  --uw-snail: #cdb8f0;
+  --uw-snail-line: #9479cc;
+  --uw-snail-mouth: #f3e9ff;
+  --uw-floor-shadow: rgba(160, 112, 40, 0.18);
+  --uw-sprout: #3fa37a;
+  --uw-sprout-2: #67c08a;
+  --uw-crab: #ff8a5c;
+  --uw-crab-dark: #d8603a;
+  --uw-crab-blush: #ffb8a3;
+  --uw-eye: #ffffff;
+  --uw-pupil: #0f2540;
+
+  --uw-gauge-line: rgba(255, 255, 255, 0.55);
+  --uw-gauge-line-strong: rgba(255, 255, 255, 0.85);
+  --uw-gauge-pill: rgba(255, 255, 255, 0.8);
+  --uw-gauge-ink: #123a5e;
+  --uw-gauge-bead: #ffffff;
+  --uw-gauge-bead-ring: #2d93c8;
+
+  --uw-fish-glow: rgba(126, 240, 255, 0.55);
+}
+
+:root[data-theme='dark'] {
+  --water-surface: #164a73;
+  --water-shallow: #134267;
+  --water-mid: #10385b;
+  --water-deep: #0d2e4e;
+  --water-deepest: #0b2440;
+
+  --uw-bubble-ring: rgba(126, 240, 255, 0.55);
+  --uw-bubble-fill: rgba(126, 240, 255, 0.08);
+  --uw-bubble-shine: rgba(210, 250, 255, 0.85);
+  --uw-ray: rgba(200, 225, 255, 0.07);
+
+  --seaweed-1: #24745a;
+  --seaweed-2: #1a5a47;
+  --uw-vein-1: #3f9c7a;
+  --uw-vein-2: #2c7a61;
+  --uw-rock-1: #2b4560;
+  --uw-rock-2: #36526e;
+  --uw-shine: rgba(180, 220, 255, 0.18);
+
+  --sand: #39465e;
+  --sand-shade: #2d394f;
+  --sand-ink: #eef3fb;
+  --sand-ink-muted: #b8c5da;
+  --uw-pebble-1: #4a5d76;
+  --uw-pebble-2: #3d4f68;
+  --uw-pebble-3: #56607a;
+  --uw-shell-1: #b9849a;
+  --uw-shell-1-line: #8e6178;
+  --uw-boot: #6e4a35;
+  --uw-boot-shade: #593a29;
+  --uw-boot-cuff: #82593f;
+  --uw-boot-sole: #36241a;
+  --uw-boot-patch: #a8874e;
+  --uw-boot-stitch: #d9cbb0;
+  --uw-boot-lace: #c9bca2;
+  --uw-boot-hole: #1d130d;
+  --uw-boot-shine: rgba(255, 236, 210, 0.22);
+  --uw-glass: #4f7480;
+  --uw-glass-shine: rgba(200, 235, 255, 0.45);
+  --uw-cork: #7d5a3c;
+  --uw-note: #b9b3a3;
+  --uw-note-tie: #8b6c40;
+  --uw-snail: #6f6394;
+  --uw-snail-line: #4c4270;
+  --uw-snail-mouth: #8e84b0;
+  --uw-floor-shadow: rgba(0, 0, 0, 0.18);
+  --uw-sprout: #2a7d61;
+  --uw-sprout-2: #3f9c7a;
+  --uw-crab: #d9734f;
+  --uw-crab-dark: #a8502f;
+  --uw-crab-blush: #e6977f;
+  --uw-eye: #f3f7ff;
+  --uw-pupil: #0b1a30;
+
+  --uw-gauge-line: rgba(160, 215, 255, 0.32);
+  --uw-gauge-line-strong: rgba(160, 215, 255, 0.55);
+  --uw-gauge-pill: rgba(8, 26, 50, 0.78);
+  --uw-gauge-ink: #cfe6ff;
+  --uw-gauge-bead: #7ef0ff;
+  --uw-gauge-bead-ring: rgba(126, 240, 255, 0.35);
+}
+
+/* ---------------------------------------------------------------- Water */
+/* Stack .water-shallow -> .water-mid -> .water-deep (-> PondFloor): each
+   section ends on exactly the colour the next one starts with. */
+
+.water-shallow,
+.water-mid,
+.water-deep,
+.water-column {
+  position: relative;
+}
+
+.water-shallow {
+  background-color: var(--water-surface);
+  background-image: linear-gradient(to bottom, var(--water-surface), var(--water-shallow));
+}
+
+.water-mid {
+  background-color: var(--water-shallow);
+  background-image: linear-gradient(to bottom, var(--water-shallow), var(--water-mid));
+}
+
+.water-deep {
+  background-color: var(--water-mid);
+  background-image: linear-gradient(to bottom, var(--water-mid), var(--water-deep) 55%, var(--water-deepest));
+}
+
+/* One tall element, surface to floor. */
+.water-column {
+  background-color: var(--water-mid);
+  background-image: linear-gradient(
+    to bottom,
+    var(--water-surface),
+    var(--water-shallow) 24%,
+    var(--water-mid) 52%,
+    var(--water-deep) 78%,
+    var(--water-deepest)
+  );
+}
+
+@supports (background-image: linear-gradient(in oklab, red, blue)) {
+  .water-shallow {
+    background-image: linear-gradient(to bottom in oklab, var(--water-surface), var(--water-shallow));
+  }
+  .water-mid {
+    background-image: linear-gradient(to bottom in oklab, var(--water-shallow), var(--water-mid));
+  }
+  .water-deep {
+    background-image: linear-gradient(to bottom in oklab, var(--water-mid), var(--water-deep) 55%, var(--water-deepest));
+  }
+  .water-column {
+    background-image: linear-gradient(
+      to bottom in oklab,
+      var(--water-surface),
+      var(--water-shallow) 24%,
+      var(--water-mid) 52%,
+      var(--water-deep) 78%,
+      var(--water-deepest)
+    );
+  }
+}
+
+/* -------------------------------------------------------------- Bubbles */
+
+.uw-bubbles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  overflow: clip;
+  pointer-events: none;
+}
+
+/* Each bubble is a full-height column that slides up its own height, so the
+   dot at its foot travels from the bottom of the parent to the top. */
+.uw-bubble {
+  position: absolute;
+  left: var(--x);
+  bottom: 0;
+  width: var(--size);
+  height: 100%;
+  opacity: 0;
+  animation: uw-rise calc(var(--dur) / var(--bubble-speed, 1)) linear calc(var(--delay) / var(--bubble-speed, 1)) infinite;
+}
+
+.uw-bubble__dot {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: var(--size);
+  height: var(--size);
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: max(1.5px, calc(var(--size) / 7)) solid var(--uw-bubble-ring);
+  background: var(--uw-bubble-fill);
+  animation: uw-wobble 2.8s ease-in-out infinite alternate;
+}
+
+.uw-bubble__dot::after {
+  content: '';
+  position: absolute;
+  top: 14%;
+  left: 16%;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background: var(--uw-bubble-shine);
+}
+
+.uw-bubble:nth-child(3n) .uw-bubble__dot {
+  animation-duration: 3.4s;
+  animation-delay: -1.2s;
+}
+.uw-bubble:nth-child(3n + 1) .uw-bubble__dot {
+  animation-duration: 2.3s;
+  animation-delay: -0.6s;
+}
+
+@keyframes uw-rise {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes uw-wobble {
+  from {
+    transform: translateX(calc(var(--drift) * -1));
+  }
+  to {
+    transform: translateX(var(--drift));
+  }
+}
+
+/* ----------------------------------------------------------- Light rays */
+
+.uw-rays {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--rays-height, 100%);
+  overflow: hidden;
+  overflow: clip;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 25%, transparent 96%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 25%, transparent 96%);
+}
+
+.uw-ray {
+  position: absolute;
+  top: -4%;
+  left: var(--x);
+  width: var(--w);
+  min-width: 26px;
+  height: 108%;
+  background: linear-gradient(to bottom, var(--uw-ray), transparent 92%);
+  clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%);
+  transform-origin: 50% 0;
+  transform: skewX(calc(var(--rays-angle) * -1));
+  opacity: var(--o);
+  animation: uw-shimmer var(--dur) ease-in-out var(--delay) infinite alternate;
+}
+
+@keyframes uw-shimmer {
+  from {
+    opacity: calc(var(--o) * 0.45);
+    transform: skewX(calc(var(--rays-angle) * -1)) translateX(-10px);
+  }
+  to {
+    opacity: var(--o);
+    transform: skewX(calc(var(--rays-angle) * -1)) translateX(10px);
+  }
+}
+
+/* -------------------------------------------------------------- Seaweed */
+
+.uw-seaweed {
+  position: absolute;
+  bottom: 0;
+  height: var(--seaweed-height, 220px);
+  width: auto;
+  aspect-ratio: 162 / 300;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.uw-seaweed--left {
+  left: var(--seaweed-offset, 2%);
+}
+
+.uw-seaweed--right {
+  right: var(--seaweed-offset, 2%);
+  transform: scaleX(-1);
+}
+
+.uw-frond {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: uw-sway var(--sway-dur, 6s) ease-in-out var(--sway-delay, 0s) infinite alternate;
+}
+
+.uw-frond__blade {
+  fill: var(--seaweed-1);
+}
+.uw-frond--back .uw-frond__blade {
+  fill: var(--seaweed-2);
+}
+
+.uw-frond__vein {
+  fill: none;
+  stroke: var(--uw-vein-1);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.uw-frond--back .uw-frond__vein {
+  stroke: var(--uw-vein-2);
+}
+
+.uw-rock {
+  fill: var(--uw-rock-1);
+}
+.uw-rock--2 {
+  fill: var(--uw-rock-2);
+}
+.uw-rock__shine {
+  fill: var(--uw-shine);
+}
+
+@keyframes uw-sway {
+  from {
+    transform: skewX(-4deg) rotate(-1.5deg);
+  }
+  to {
+    transform: skewX(4deg) rotate(1.5deg);
+  }
+}
+
+/* ----------------------------------------------------------- Pond floor */
+
+.uw-floor {
+  position: relative;
+  isolation: isolate;
+  min-height: 300px;
+  background-color: var(--water-deepest);
+  overflow-x: clip;
+}
+
+.uw-floor__bed {
+  --boot-x: max(10%, 128px);
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.uw-floor__edge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 120px;
+  display: block;
+}
+
+.uw-floor__dune-back {
+  fill: var(--sand-shade);
+}
+.uw-floor__dune,
+.uw-floor__mound {
+  fill: var(--sand);
+}
+
+.uw-floor__sand {
+  position: absolute;
+  top: 119px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--sand);
+}
+
+/* Seaweed rooted in the sand; it rises over whatever sits above the floor. */
+.uw-floor__weeds {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.uw-floor__content {
+  position: relative;
+  z-index: 2;
+  padding: 172px 16px 28px;
+  color: var(--sand-ink);
+}
+
+.uw-floor__item {
+  position: absolute;
+  display: block;
+  overflow: visible;
+}
+
+.uw-boot {
+  left: var(--boot-x);
+  top: -34px;
+  width: 170px;
+}
+.uw-crab {
+  left: calc(var(--boot-x) + 172px);
+  top: 66px;
+  width: 66px;
+}
+.uw-pebbles--1 {
+  left: max(31%, calc(var(--boot-x) + 252px));
+  top: 80px;
+  width: 96px;
+}
+.uw-bottle {
+  left: max(47%, calc(var(--boot-x) + 360px));
+  top: 76px;
+  width: 84px;
+}
+.uw-scallop {
+  left: max(63%, calc(var(--boot-x) + 460px));
+  top: 72px;
+  width: 54px;
+}
+.uw-pebbles--3 {
+  left: 74%;
+  top: 76px;
+  width: 80px;
+}
+.uw-snail {
+  left: 84%;
+  top: 82px;
+  width: 58px;
+}
+
+@media (max-width: 1099.98px) {
+  .uw-snail {
+    display: none;
+  }
+}
+
+@media (max-width: 899.98px) {
+  .uw-pebbles--1,
+  .uw-pebbles--3 {
+    display: none;
+  }
+  .uw-bottle {
+    left: calc(var(--boot-x) + 252px);
+  }
+  .uw-scallop {
+    left: calc(var(--boot-x) + 352px);
+  }
+}
+
+@media (max-width: 640px) {
+  .uw-floor__weed--l {
+    height: 150px;
+  }
+  .uw-floor__weed--r {
+    height: 118px;
+  }
+  .uw-boot {
+    left: 64px;
+    top: -6px;
+    width: 116px;
+  }
+  .uw-crab {
+    left: 178px;
+    top: 78px;
+    width: 48px;
+  }
+  .uw-bottle {
+    display: none;
+  }
+  .uw-scallop {
+    left: calc(50% + 40px);
+    top: 84px;
+    width: 40px;
+  }
+}
+
+/* Boot */
+.uw-boot__body {
+  fill: var(--uw-boot);
+}
+.uw-boot__shade {
+  fill: var(--uw-boot-shade);
+}
+.uw-boot__cuff {
+  fill: var(--uw-boot-cuff);
+}
+.uw-boot__sole {
+  fill: var(--uw-boot-sole);
+}
+.uw-boot__patch {
+  fill: var(--uw-boot-patch);
+}
+.uw-boot__stitch {
+  fill: none;
+  stroke: var(--uw-boot-stitch);
+  stroke-width: 1.4;
+  stroke-dasharray: 3 2.5;
+}
+.uw-boot__lace {
+  fill: none;
+  stroke: var(--uw-boot-lace);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+.uw-boot__eyelet {
+  fill: none;
+  stroke: var(--uw-boot-sole);
+  stroke-width: 4.4;
+  stroke-linecap: round;
+}
+.uw-boot__hole {
+  fill: var(--uw-boot-hole);
+}
+.uw-boot__shine {
+  fill: none;
+  stroke: var(--uw-boot-shine);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.uw-sprout {
+  fill: var(--uw-sprout);
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: uw-sway 4.8s ease-in-out infinite alternate;
+}
+.uw-sprout--2 {
+  fill: var(--uw-sprout-2);
+  animation-duration: 5.6s;
+  animation-delay: -2s;
+}
+
+/* Crab */
+.uw-crab__body,
+.uw-crab__claw {
+  fill: var(--uw-crab);
+}
+.uw-crab__legs {
+  fill: none;
+  stroke: var(--uw-crab-dark);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.uw-crab__blush {
+  fill: none;
+  stroke: var(--uw-crab-blush);
+  stroke-width: 4.6;
+  stroke-linecap: round;
+}
+.uw-crab__smile {
+  fill: none;
+  stroke: var(--uw-crab-dark);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+.uw-eye {
+  fill: var(--uw-eye);
+}
+.uw-pupil {
+  fill: var(--uw-pupil);
+}
+.uw-crab__claw--wave {
+  transform-box: fill-box;
+  transform-origin: 30% 90%;
+  animation: uw-snip 3.6s ease-in-out infinite;
+}
+.uw-crab__eyes {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: uw-blink 5.2s ease-in-out infinite;
+}
+
+@keyframes uw-snip {
+  0%,
+  62%,
+  100% {
+    transform: rotate(0deg);
+  }
+  70% {
+    transform: rotate(18deg);
+  }
+  78% {
+    transform: rotate(0deg);
+  }
+  86% {
+    transform: rotate(18deg);
+  }
+}
+
+@keyframes uw-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.1);
+  }
+}
+
+/* Shells and pebbles */
+.uw-scallop__shell {
+  fill: var(--uw-shell-1);
+}
+.uw-scallop__hinge {
+  fill: var(--uw-shell-1-line);
+}
+.uw-scallop__ridge {
+  fill: none;
+  stroke: var(--uw-shell-1-line);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+.uw-snail__shell {
+  fill: var(--uw-snail);
+}
+.uw-snail__mouth {
+  fill: var(--uw-snail-mouth);
+}
+.uw-snail__swirl {
+  fill: none;
+  stroke: var(--uw-snail-line);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.uw-floor__shadow {
+  fill: var(--uw-floor-shadow);
+}
+
+/* Message in a bottle */
+.uw-bottle__glass {
+  fill: var(--uw-glass);
+}
+.uw-bottle__cork {
+  fill: var(--uw-cork);
+}
+.uw-bottle__note {
+  fill: var(--uw-note);
+}
+.uw-bottle__tie {
+  fill: none;
+  stroke: var(--uw-note-tie);
+  stroke-width: 2.4;
+}
+.uw-bottle__shine {
+  fill: none;
+  stroke: var(--uw-glass-shine);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+.uw-pebble--1 {
+  fill: var(--uw-pebble-1);
+}
+.uw-pebble--2 {
+  fill: var(--uw-pebble-2);
+}
+.uw-pebble--3 {
+  fill: var(--uw-pebble-3);
+}
+.uw-pebble__shine {
+  fill: var(--uw-shine);
+}
+
+/* ---------------------------------------------------------- Depth gauge */
+
+.uw-gauge {
+  --gauge-pad: 44px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: clamp(10px, 1.6vw, 28px);
+  width: 72px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* The rail */
+.uw-gauge::before {
+  content: '';
+  position: absolute;
+  top: var(--gauge-pad);
+  bottom: var(--gauge-pad);
+  right: 7px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--uw-gauge-line);
+}
+
+.uw-gauge__scale {
+  position: absolute;
+  top: var(--gauge-pad);
+  bottom: var(--gauge-pad);
+  left: 0;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.uw-gauge__major {
+  position: relative;
+  flex: none;
+  height: 0;
+}
+
+.uw-gauge__major::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: -1px;
+  width: 16px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--uw-gauge-line-strong);
+}
+
+.uw-gauge__label {
+  position: absolute;
+  right: 21px;
+  top: 0;
+  transform: translateY(-50%);
+  padding: 2px 7px 2px;
+  border-radius: 999px;
+  background: var(--uw-gauge-pill);
+  color: var(--uw-gauge-ink);
+  font-family: var(--font-display, 'Fredoka Variable', 'Fredoka', system-ui, sans-serif);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.uw-gauge__seg {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: flex-end;
+}
+
+.uw-gauge__seg > i {
+  display: block;
+  width: 8px;
+  height: 1.5px;
+  border-radius: 1px;
+  background: var(--uw-gauge-line);
+}
+
+.uw-gauge__seg > i:nth-child(2) {
+  width: 11px;
+}
+
+/* "You are here" bead: sticks at mid-screen while the gauge scrolls by. */
+.uw-gauge__track {
+  position: absolute;
+  top: var(--gauge-pad);
+  bottom: var(--gauge-pad);
+  right: 0;
+  width: 16px;
+}
+
+.uw-gauge__bead {
+  position: sticky;
+  top: calc(50vh - 8px);
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: var(--uw-gauge-bead);
+  border: 3px solid var(--uw-gauge-bead-ring);
+  box-shadow: 0 1px 4px rgba(11, 36, 64, 0.25);
+}
+
+:root[data-theme='dark'] .uw-gauge__bead {
+  box-shadow: 0 0 10px rgba(126, 240, 255, 0.55);
+}
+
+@media (max-width: 699.98px) {
+  .uw-gauge {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------ Swim lane */
+/* The track slides one lane-width while the body slides back from one
+   (scaled) body-width to the left, so children enter fully from off-screen
+   on the left and leave fully off-screen on the right. 'rtl' mirrors it. */
+
+.uw-lane {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--swim-top, 50%);
+  overflow-x: hidden;
+  overflow-x: clip;
+  pointer-events: none;
+}
+
+.uw-lane--rtl {
+  transform: scaleX(-1);
+}
+
+.uw-lane__track {
+  display: flex;
+  align-items: flex-start;
+  animation: uw-swim-track var(--swim-dur, 40s) linear var(--swim-delay, 0s) infinite;
+}
+
+.uw-lane__body {
+  flex: none;
+  transform-origin: 0 0;
+  transform: translateX(calc(-100% * var(--swim-scale, 1))) scale(var(--swim-scale, 1));
+  animation: uw-swim-body var(--swim-dur, 40s) linear var(--swim-delay, 0s) infinite;
+}
+
+.uw-lane--bob .uw-lane__bob {
+  animation: uw-swim-bob var(--swim-bob-dur, 3s) ease-in-out infinite alternate;
+}
+
+.uw-lane__face {
+  display: block;
+}
+
+.uw-lane--faces-left .uw-lane__face {
+  transform: scaleX(-1);
+}
+
+:root[data-theme='dark'] .uw-lane--glow .uw-lane__face {
+  filter: drop-shadow(0 0 6px var(--uw-fish-glow));
+}
+
+@keyframes uw-swim-track {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes uw-swim-body {
+  from {
+    transform: translateX(calc(-100% * var(--swim-scale, 1))) scale(var(--swim-scale, 1));
+  }
+  to {
+    transform: translateX(0) scale(var(--swim-scale, 1));
+  }
+}
+
+@keyframes uw-swim-bob {
+  from {
+    transform: translateY(-5px) rotate(-1.5deg);
+  }
+  to {
+    transform: translateY(5px) rotate(1.5deg);
+  }
+}
+
+/* -------------------------------------------------------- Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .uw-bubble,
+  .uw-bubble__dot,
+  .uw-ray,
+  .uw-frond,
+  .uw-sprout,
+  .uw-crab__claw--wave,
+  .uw-crab__eyes,
+  .uw-lane__track,
+  .uw-lane__body,
+  .uw-lane--bob .uw-lane__bob {
+    animation: none;
+  }
+
+  .uw-bubble {
+    opacity: 0.4;
+    transform: translateY(calc(var(--rest) * -100%));
+  }
+
+  .uw-lane__track {
+    transform: translateX(var(--swim-rest, 50%));
+  }
+
+  .uw-lane__body {
+    transform: translateX(calc(-50% * var(--swim-scale, 1))) scale(var(--swim-scale, 1));
+  }
+}

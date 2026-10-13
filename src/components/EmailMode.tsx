@@ -4,7 +4,7 @@ import { LIMITS } from '../engine/config'
 import type { Report } from '../engine'
 import { loadEngine } from '../engineLoader'
 import { SAMPLES } from '../samples'
-import { formatBytes } from './Common'
+import { formatBytes, PrivacyNote } from './Common'
 import { IconUpload } from './Icons'
 import { ResultsView, type View } from './ResultsView'
 
@@ -128,7 +128,7 @@ export function EmailMode({ initialInput = '', sample }: { initialInput?: string
         )}
         <div className="actions">
           <button type="submit" className="btn btn-primary btn-lg" disabled={busy}>
-            {busy ? 'Analyzing…' : 'Analyze email'}
+            {busy ? 'Reeling it in…' : 'Analyze email'}
           </button>
           {(input || report || fileName) && (
             <button
@@ -146,7 +146,7 @@ export function EmailMode({ initialInput = '', sample }: { initialInput?: string
           )}
         </div>
         <div className="samples" role="group" aria-label="Try a sample email">
-          <span className="samples-label">Try a sample:</span>
+          <span className="samples-label">Try a sample catch:</span>
           {SAMPLES.filter((s) => s.mode === 'email').map((s) => (
             <button
               key={s.id}
@@ -163,6 +163,7 @@ export function EmailMode({ initialInput = '', sample }: { initialInput?: string
             </button>
           ))}
         </div>
+        <PrivacyNote />
       </form>
       <div aria-live="polite" className="sr-only">
         {report ? `Result: ${report.verdictLabel}` : ''}
