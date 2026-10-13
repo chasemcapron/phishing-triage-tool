@@ -198,6 +198,7 @@ export function LinksTable({ links }: { links: LinkInfo[] }) {
                       displays as <code>{l.unicodeHost}</code>
                     </div>
                   )}
+                  <RepDetails rep={l.reputation} />
                 </td>
                 <td>
                   <Flags flags={l.flags} />
@@ -254,6 +255,24 @@ export function AttachmentsTable({ email }: { email: EmailDetails }) {
                 </td>
                 <td>
                   <Flags flags={a.flags} />
+                  {a.virusTotal && (
+                    <div className="rep-detail">
+                      {a.virusTotal.found ? (
+                        <a href={a.virusTotal.link} target="_blank" rel="noopener noreferrer">
+                          VirusTotal: {a.virusTotal.malicious} malicious{a.virusTotal.label ? ` (${a.virusTotal.label})` : ''}
+                        </a>
+                      ) : (
+                        'Unknown to VirusTotal'
+                      )}
+                    </div>
+                  )}
+                  {a.urlhaus && (
+                    <div className="rep-detail">
+                      <a href={a.urlhaus.reference} target="_blank" rel="noopener noreferrer">
+                        Listed on URLhaus
+                      </a>
+                    </div>
+                  )}
                 </td>
               </tr>
             ))}
@@ -261,5 +280,30 @@ export function AttachmentsTable({ email }: { email: EmailDetails }) {
         </table>
       </div>
     </section>
+  )
+}
+
+function RepDetails({ rep }: { rep: LinkInfo['reputation'] }) {
+  if (!rep) return null
+  const age = rep.domainAgeDays
+  return (
+    <div className="rep-detail">
+      {age !== undefined && <div>registered {age <= 0 ? 'today' : age === 1 ? '1 day ago' : age < 730 ? `${age} days ago` : `${Math.floor(age / 365)} years ago`}</div>}
+      {rep.safeBrowsing && <div>Safe Browsing: {rep.safeBrowsing.join(', ').toLowerCase().replace(/_/g, ' ')}</div>}
+      {rep.virusTotal?.found && (
+        <div>
+          <a href={rep.virusTotal.link} target="_blank" rel="noopener noreferrer">
+            VirusTotal: {rep.virusTotal.malicious} malicious
+          </a>
+        </div>
+      )}
+      {rep.urlhaus && (
+        <div>
+          <a href={rep.urlhaus.reference} target="_blank" rel="noopener noreferrer">
+            URLhaus: {rep.urlhaus.threat ?? 'listed'}
+          </a>
+        </div>
+      )}
+    </div>
   )
 }

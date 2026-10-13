@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import type { SampleRequest } from '../App'
 import { LIMITS } from '../engine/config'
-import type { Report } from '../engine'
 import { loadEngine } from '../engineLoader'
+import { useReport } from '../online'
 import { SAMPLES } from '../samples'
 import { formatBytes, PrivacyNote } from './Common'
 import { IconUpload } from './Icons'
@@ -11,7 +11,7 @@ import { ResultsView, type View } from './ResultsView'
 export function EmailMode({ initialInput = '', sample }: { initialInput?: string; sample: SampleRequest | null }) {
   const [input, setInput] = useState(initialInput)
   const [fileName, setFileName] = useState<string | null>(null)
-  const [report, setReport] = useState<Report | null>(null)
+  const { report, checking, focusKey, show } = useReport()
   const [view, setView] = useState<View>('analyst')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -22,15 +22,15 @@ export function EmailMode({ initialInput = '', sample }: { initialInput?: string
     setError(null)
     if (typeof source === 'string' && !source.trim()) {
       setError('Paste the email source or choose an .eml file first.')
-      setReport(null)
+      void show(null)
       return
     }
     setBusy(true)
     const { analyzeEmail, InputError } = await loadEngine()
     try {
-      setReport(await analyzeEmail(source))
+      void show(await analyzeEmail(source))
     } catch (e) {
-      setReport(null)
+      void show(null)
       setError(e instanceof InputError ? e.message : 'Could not read that message. Is it the full raw source?')
     } finally {
       setBusy(false)
@@ -136,7 +136,7 @@ export function EmailMode({ initialInput = '', sample }: { initialInput?: string
               className="btn btn-secondary btn-lg"
               onClick={() => {
                 setInput('')
-                setReport(null)
+                void show(null)
                 setError(null)
                 setFileName(null)
               }}
@@ -168,7 +168,7 @@ export function EmailMode({ initialInput = '', sample }: { initialInput?: string
       <div aria-live="polite" className="sr-only">
         {report ? `Result: ${report.verdictLabel}` : ''}
       </div>
-      {report && <ResultsView report={report} view={view} onViewChange={setView} />}
+      {report && <ResultsView report={report} view={view} onViewChange={setView} checking={checking} focusKey={focusKey} />}
     </div>
   )
 }

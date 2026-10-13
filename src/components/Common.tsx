@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useOnline } from '../online'
 import type { Severity } from '../engine'
 import { IconCheck, IconCopy, IconLock, SeverityIcon } from './Icons'
 
@@ -99,13 +100,37 @@ export function formatBytes(n: number): string {
 }
 
 export function PrivacyNote() {
+  const { online, setOnline } = useOnline()
   return (
-    <p className="privacy">
+    <div className="privacy">
       <IconLock className="icon icon-sm" />
-      <span>
-        Private by design: everything is analyzed in your browser. Nothing you paste is uploaded, and links are never
-        opened.
-      </span>
-    </p>
+      <div className="privacy-body">
+        <p>
+          Your message is analyzed in your browser and links are never opened.{' '}
+          {online ? (
+            <>
+              For online checks, only the links (without anything after <code>?</code> or <code>#</code>), their domains and
+              attachment fingerprints (SHA-256) are sent to Google Safe Browsing, VirusTotal, URLhaus and domain registries,
+              which may keep them. The message text and headers never leave your device. Reputation data can be incomplete
+              or wrong.
+            </>
+          ) : (
+            <>Online checks are off: nothing leaves your device.</>
+          )}
+        </p>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={online}
+          className="online-switch"
+          onClick={() => setOnline(!online)}
+        >
+          <span className="online-switch__track" aria-hidden="true">
+            <span className="online-switch__thumb" />
+          </span>
+          Online reputation checks: {online ? 'on' : 'off'}
+        </button>
+      </div>
+    </div>
   )
 }

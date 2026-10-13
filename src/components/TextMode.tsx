@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { SampleRequest } from '../App'
-import type { Report } from '../engine'
 import { loadEngine } from '../engineLoader'
+import { useReport } from '../online'
 import { SAMPLES } from '../samples'
 import { PrivacyNote } from './Common'
 import { IconInfo } from './Icons'
@@ -11,19 +11,19 @@ const LOOKS_LIKE_EMAIL = /^(?:delivered-to|received|return-path|from|arc-seal|au
 
 export function TextMode({ onSwitchToEmail, sample }: { onSwitchToEmail: (text: string) => void; sample: SampleRequest | null }) {
   const [input, setInput] = useState('')
-  const [report, setReport] = useState<Report | null>(null)
+  const { report, checking, focusKey, show } = useReport()
   const [view, setView] = useState<View>('simple')
   const [empty, setEmpty] = useState(false)
 
   const run = async (text: string) => {
     if (!text.trim()) {
       setEmpty(true)
-      setReport(null)
+      void show(null)
       return
     }
     setEmpty(false)
     const { analyzeText } = await loadEngine()
-    setReport(analyzeText(text))
+    void show(analyzeText(text))
   }
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export function TextMode({ onSwitchToEmail, sample }: { onSwitchToEmail: (text: 
               className="btn btn-secondary btn-lg"
               onClick={() => {
                 setInput('')
-                setReport(null)
+                void show(null)
                 setEmpty(false)
               }}
             >
@@ -115,7 +115,7 @@ export function TextMode({ onSwitchToEmail, sample }: { onSwitchToEmail: (text: 
       <div aria-live="polite" className="sr-only">
         {report ? `Result: ${report.verdictLabel}` : ''}
       </div>
-      {report && <ResultsView report={report} view={view} onViewChange={setView} />}
+      {report && <ResultsView report={report} view={view} onViewChange={setView} checking={checking} focusKey={focusKey} />}
     </div>
   )
 }

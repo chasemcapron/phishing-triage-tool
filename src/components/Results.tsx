@@ -4,6 +4,7 @@ import type { Finding, Report } from '../engine'
 import { CopyButton, SeverityBadge } from './Common'
 import { VerdictFish } from './art/Fish'
 import { IconInfo, VerdictIcon } from './Icons'
+import { AttackChips, GoogleAdvisory, SourceNote } from './Reputation'
 
 const VERDICT_SUMMARY: Record<Report['verdict'], string> = {
   high: 'Several strong warning signs. Treat this as a scam.',
@@ -26,6 +27,7 @@ export const VerdictCard = forwardRef<HTMLHeadingElement, { report: Report; anal
   headingRef,
 ) {
   const [mouthX, mouthY, ratio] = MOUTH[report.verdict]
+  const sbFinding = report.findings.find((f) => f.source === 'google-safe-browsing')
   const catchVars = { '--mouth-x': mouthX, '--mouth-y': mouthY, '--fish-ratio': ratio } as CSSProperties
   return (
     <section className={`verdict verdict-${report.verdict}`} aria-labelledby="verdict-heading">
@@ -58,6 +60,7 @@ export const VerdictCard = forwardRef<HTMLHeadingElement, { report: Report; anal
           ))}
         </ul>
       )}
+      {sbFinding && report.reasons.includes(sbFinding.explanation) && <GoogleAdvisory threatTypes={sbFinding.threatTypes} />}
       {analyst && (
         <p className="verdict-meta">
           Risk score <strong>{report.score}</strong> · Suspicious at {THRESHOLDS.suspicious}, High at {THRESHOLDS.high} ·{' '}
@@ -130,6 +133,7 @@ export function FindingsList({ findings }: { findings: Finding[] }) {
             </span>
           </div>
           <p className="finding-explain">{f.explanation}</p>
+          <SourceNote finding={f} />
           {f.evidence.length > 0 && (
             <ul className="evidence">
               {f.evidence.map((e) => (
@@ -139,6 +143,7 @@ export function FindingsList({ findings }: { findings: Finding[] }) {
               ))}
             </ul>
           )}
+          <AttackChips ids={f.attack} />
         </li>
       ))}
     </ol>
