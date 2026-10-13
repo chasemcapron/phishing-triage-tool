@@ -6,8 +6,8 @@ import { validateLookupRequest } from './validate.js'
 
 // Best-effort per-instance limits (user chose in-memory over a third-party store).
 const limiter = new SlidingWindowLimiter([
-  { windowMs: 60_000, max: 10 },
-  { windowMs: 3_600_000, max: 60 },
+  { windowMs: 60_000, max: 30 },
+  { windowMs: 3_600_000, max: 300 },
 ])
 
 export interface HandlerDeps {

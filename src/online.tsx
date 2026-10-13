@@ -3,6 +3,10 @@ import type { Report } from './engine'
 import { loadEngine } from './engineLoader'
 
 const KEY = 'onlineChecks'
+const CACHE_MS = 5 * 60_000
+
+/** Lookup responses by request, so re-running a sample doesn't spend the rate limit again. */
+const responses = new Map<string, { at: number; res: Awaited<ReturnType<Awaited<ReturnType<typeof loadEngine>>['fetchLookup']>> }>()
 
 interface OnlineState {
   online: boolean
@@ -67,7 +71,10 @@ export function useReport() {
       ctrl.current = c
       setChecking(true)
       try {
-        const res = await eng.fetchLookup(req, { signal: c.signal })
+        const key = JSON.stringify(req)
+        const hit = responses.get(key)
+        const res = hit && Date.now() - hit.at < CACHE_MS ? hit.res : await eng.fetchLookup(req, { signal: c.signal })
+        if (!hit || hit.res !== res) responses.set(key, { at: Date.now(), res })
         if (!c.signal.aborted) setReport(eng.applyReputation(local, res, req))
       } catch (e) {
         if (!c.signal.aborted) {
