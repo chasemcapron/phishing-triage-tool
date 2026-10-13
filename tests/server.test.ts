@@ -4,6 +4,7 @@ import { TtlCache } from '../server/cache'
 import { handleLookup } from '../server/handler'
 import { lookupRdap } from '../server/providers/rdap'
 import { lookupSafeBrowsing, threatMatchesInput } from '../server/providers/safeBrowsing'
+import { decodeSearchUrlsResponse, encodeSearchUrlsResponse } from '../server/protobuf'
 import { lookupUrlhaus } from '../server/providers/urlhaus'
 import { lookupVirusTotal, VT_LIMIT_MESSAGE } from '../server/providers/virusTotal'
 import { QuotaBudget, SlidingWindowLimiter } from '../server/rateLimit'
@@ -91,9 +92,20 @@ describe('Safe Browsing v5', () => {
     expect(threatMatchesInput('evil.example/a/', 'https://notevil.example/a/')).toBe(false)
   })
 
-  it('sends the key in a header, uses alt=json, and caches', async () => {
+  it('decodes the protobuf response (v5 has no JSON output)', async () => {
+    const body = encodeSearchUrlsResponse([{ url: 'testsafebrowsing.appspot.com/s/malware.html', types: [1, 0] }], 300)
+    const f = mockFetch(() => new Response(body as unknown as BodyInit, { status: 200, headers: { 'content-type': 'application/x-protobuf' } }))
+    const r = await lookupSafeBrowsing(['https://testsafebrowsing.appspot.com/s/malware.html', 'https://www.google.com/'], { fetch: f, apiKey: 'k', cache: new TtlCache() })
+    expect(r).toEqual({ status: 'ok', results: [{ url: 'https://testsafebrowsing.appspot.com/s/malware.html', threatTypes: ['MALWARE'] }] })
+    expect(decodeSearchUrlsResponse(new Uint8Array()).threats).toEqual([])
+    expect(() => decodeSearchUrlsResponse(new Uint8Array([0x0a, 0x05, 0x01]))).toThrow()
+    const bad = await lookupSafeBrowsing(['https://x.example/'], { fetch: mockFetch(() => new Response(new Uint8Array([0x0a, 0x09]) as unknown as BodyInit, { status: 200 })), apiKey: 'k', cache: new TtlCache() })
+    expect(bad.status).toBe('error')
+  })
+
+  it('sends the key in a header and caches', async () => {
     const f = mockFetch((url) => {
-      expect(url).toContain('/v5/urls:search?alt=json')
+      expect(url).toContain('/v5/urls:search?alt=proto&urls=')
       expect(url).not.toContain('KEY123')
       return jsonRes(200, { threats: [{ url: 'testsafebrowsing.appspot.com/s/phishing.html', threatTypes: ['SOCIAL_ENGINEERING', 'THREAT_TYPE_UNSPECIFIED'] }], cacheDuration: '300s' })
     })

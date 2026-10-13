@@ -3,6 +3,7 @@
 import type { ProviderResult, SafeBrowsingHit } from '../../src/engine/lookup-contract.js'
 import { TtlCache } from '../cache.js'
 import { fetchWithTimeout, readJson, TimeoutError, type FetchLike } from '../http.js'
+import { decodeSearchUrlsResponse } from '../protobuf.js'
 
 const ENDPOINT = 'https://safebrowsing.googleapis.com/v5/urls:search'
 const VALID_THREATS = new Set(['MALWARE', 'SOCIAL_ENGINEERING', 'UNWANTED_SOFTWARE', 'POTENTIALLY_HARMFUL_APPLICATION'])
@@ -61,11 +62,12 @@ export async function lookupSafeBrowsing(urls: string[], deps: SafeBrowsingDeps)
   if (!pending.length) return { status: 'ok', results }
 
   // Key goes in a header (not the query string) so it can never end up in URL logs.
-  const qs = new URLSearchParams({ alt: 'json' })
+  // v5 answers only in protobuf: alt=json is rejected ("Unsupported Output Format") and json is the default.
+  const qs = new URLSearchParams({ alt: 'proto' })
   for (const u of pending) qs.append('urls', u)
   let res: Response
   try {
-    res = await fetchWithTimeout(deps.fetch, `${ENDPOINT}?${qs}`, { method: 'GET', headers: { 'X-Goog-Api-Key': deps.apiKey, accept: 'application/json' } }, deps.timeoutMs ?? 5000)
+    res = await fetchWithTimeout(deps.fetch, `${ENDPOINT}?${qs}`, { method: 'GET', headers: { 'X-Goog-Api-Key': deps.apiKey, accept: 'application/x-protobuf' } }, deps.timeoutMs ?? 5000)
   } catch (e) {
     return e instanceof TimeoutError
       ? { status: 'timeout', message: 'Google Safe Browsing did not answer in time.', results }
@@ -81,9 +83,21 @@ export async function lookupSafeBrowsing(urls: string[], deps: SafeBrowsingDeps)
     return { status: 'error', message: `Google Safe Browsing is unavailable right now (HTTP ${res.status}${reason ? ` ${reason}` : ''}).`, results }
   }
 
-  const body = (await readJson(res)) as { threats?: { url?: unknown; threatTypes?: unknown }[]; cacheDuration?: unknown } | null
-  const threats = Array.isArray(body?.threats) ? body.threats : []
-  const ttl = parseDuration(body?.cacheDuration)
+  let threats: { url?: unknown; threatTypes?: unknown }[]
+  let ttl: number
+  if ((res.headers.get('content-type') ?? '').includes('json')) {
+    const body = (await readJson(res)) as { threats?: { url?: unknown; threatTypes?: unknown }[]; cacheDuration?: unknown } | null
+    threats = Array.isArray(body?.threats) ? body.threats : []
+    ttl = parseDuration(body?.cacheDuration)
+  } else {
+    try {
+      const decoded = decodeSearchUrlsResponse(new Uint8Array(await res.arrayBuffer()))
+      threats = decoded.threats
+      ttl = decoded.cacheMs ?? DEFAULT_TTL
+    } catch {
+      return { status: 'error', message: 'Google Safe Browsing sent an unreadable answer.', results }
+    }
+  }
   const found = new Map<string, Set<string>>()
   for (const t of threats) {
     if (typeof t?.url !== 'string' || !Array.isArray(t.threatTypes)) continue
