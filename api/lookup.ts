@@ -1,6 +1,6 @@
 // Reputation + domain-age lookups for links, domains and attachment hashes.
 // Only indicators reach this function, never email bodies or headers; nothing is logged or stored.
-import { handleLookup } from '../server/handler'
+import { handleLookup } from '../server/handler.js'
 
 const deps = () => ({ fetch: (input: string, init?: RequestInit) => fetch(input, init), env: process.env })
 

@@ -1,10 +1,10 @@
-import type { LookupRequest, LookupResponse } from '../src/engine/lookup-contract'
-import { type FetchLike } from './http'
-import { lookupRdap } from './providers/rdap'
-import { lookupSafeBrowsing } from './providers/safeBrowsing'
-import { lookupUrlhaus } from './providers/urlhaus'
-import { lookupVirusTotal } from './providers/virusTotal'
-import { isReservedDomain } from './validate'
+import type { LookupRequest, LookupResponse } from '../src/engine/lookup-contract.js'
+import { type FetchLike } from './http.js'
+import { lookupRdap } from './providers/rdap.js'
+import { lookupSafeBrowsing } from './providers/safeBrowsing.js'
+import { lookupUrlhaus } from './providers/urlhaus.js'
+import { lookupVirusTotal } from './providers/virusTotal.js'
+import { isReservedDomain } from './validate.js'
 
 export interface LookupEnv {
   GOOGLE_SAFE_BROWSING_API_KEY?: string

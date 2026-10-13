@@ -1,4 +1,4 @@
-import { LOOKUP_LIMITS, type LookupRequest } from '../src/engine/lookup-contract'
+import { LOOKUP_LIMITS, type LookupRequest } from '../src/engine/lookup-contract.js'
 
 export type Validated = { ok: true; value: LookupRequest } | { ok: false; error: string }
 

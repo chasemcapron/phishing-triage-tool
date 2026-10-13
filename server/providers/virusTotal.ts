@@ -1,9 +1,9 @@
 // VirusTotal API v3, GET lookups only (never submits URLs or files for scanning).
 // Public API quota: 4 requests/minute, 500/day.
-import type { ProviderResult, VirusTotalResult, VirusTotalStats } from '../../src/engine/lookup-contract'
-import { TtlCache } from '../cache'
-import { fetchWithTimeout, readJson, TimeoutError, type FetchLike } from '../http'
-import { QuotaBudget } from '../rateLimit'
+import type { ProviderResult, VirusTotalResult, VirusTotalStats } from '../../src/engine/lookup-contract.js'
+import { TtlCache } from '../cache.js'
+import { fetchWithTimeout, readJson, TimeoutError, type FetchLike } from '../http.js'
+import { QuotaBudget } from '../rateLimit.js'
 
 const API = 'https://www.virustotal.com/api/v3'
 const GUI = 'https://www.virustotal.com/gui'

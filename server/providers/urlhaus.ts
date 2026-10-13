@@ -1,8 +1,8 @@
 // URLhaus (abuse.ch) API v1. Every request needs the Auth-Key header (since mid-2025).
 // https://urlhaus-api.abuse.ch/
-import type { ProviderResult, UrlhausResult } from '../../src/engine/lookup-contract'
-import { TtlCache } from '../cache'
-import { fetchWithTimeout, mapLimit, readJson, TimeoutError, type FetchLike } from '../http'
+import type { ProviderResult, UrlhausResult } from '../../src/engine/lookup-contract.js'
+import { TtlCache } from '../cache.js'
+import { fetchWithTimeout, mapLimit, readJson, TimeoutError, type FetchLike } from '../http.js'
 
 const API = 'https://urlhaus-api.abuse.ch/v1'
 const TTL = 30 * 60_000

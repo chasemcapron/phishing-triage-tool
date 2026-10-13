@@ -1,8 +1,8 @@
 // Google Safe Browsing v5 urls.search (v4 Lookup is deprecated; support ends 2027-03-31).
 // https://developers.google.com/safe-browsing/reference/rest/v5/urls/search
-import type { ProviderResult, SafeBrowsingHit } from '../../src/engine/lookup-contract'
-import { TtlCache } from '../cache'
-import { fetchWithTimeout, readJson, TimeoutError, type FetchLike } from '../http'
+import type { ProviderResult, SafeBrowsingHit } from '../../src/engine/lookup-contract.js'
+import { TtlCache } from '../cache.js'
+import { fetchWithTimeout, readJson, TimeoutError, type FetchLike } from '../http.js'
 
 const ENDPOINT = 'https://safebrowsing.googleapis.com/v5/urls:search'
 const VALID_THREATS = new Set(['MALWARE', 'SOCIAL_ENGINEERING', 'UNWANTED_SOFTWARE', 'POTENTIALLY_HARMFUL_APPLICATION'])

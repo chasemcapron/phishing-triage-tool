@@ -1,8 +1,8 @@
-import { LOOKUP_LIMITS } from '../src/engine/lookup-contract'
-import { json, type FetchLike } from './http'
-import { runLookup, type LookupEnv } from './lookup'
-import { SlidingWindowLimiter } from './rateLimit'
-import { validateLookupRequest } from './validate'
+import { LOOKUP_LIMITS } from '../src/engine/lookup-contract.js'
+import { json, type FetchLike } from './http.js'
+import { runLookup, type LookupEnv } from './lookup.js'
+import { SlidingWindowLimiter } from './rateLimit.js'
+import { validateLookupRequest } from './validate.js'
 
 // Best-effort per-instance limits (user chose in-memory over a third-party store).
 const limiter = new SlidingWindowLimiter([

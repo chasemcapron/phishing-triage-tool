@@ -1,8 +1,8 @@
 // Domain registration date via RDAP. rdap.org redirects to the registry's RDAP server
 // for the TLD; we query the registry about the domain and never contact the domain itself.
-import type { ProviderResult, RdapResult } from '../../src/engine/lookup-contract'
-import { TtlCache } from '../cache'
-import { fetchWithTimeout, mapLimit, readJson, type FetchLike } from '../http'
+import type { ProviderResult, RdapResult } from '../../src/engine/lookup-contract.js'
+import { TtlCache } from '../cache.js'
+import { fetchWithTimeout, mapLimit, readJson, type FetchLike } from '../http.js'
 
 const BOOTSTRAP = 'https://rdap.org/domain/'
 const TTL = 24 * 3600_000
