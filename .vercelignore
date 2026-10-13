@@ -1,0 +1,6 @@
+# Files the Vercel CLI must never upload (it does not read .gitignore).
+BRIEF.md
+.env*
+!.env.example
+node_modules
+dist
