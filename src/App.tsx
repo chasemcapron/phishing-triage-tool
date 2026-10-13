@@ -91,7 +91,6 @@ export default function App() {
             <div className="container header-inner">
               <div className="brand">
                 <LogoMark className="brand-logo" />
-                <span className="brand-name">Gone Phishing</span>
               </div>
               <button
                 type="button"
@@ -104,7 +103,8 @@ export default function App() {
             </div>
           </header>
           <div className="container hero">
-            <h1>Is this a scam?</h1>
+            <h1 className="hero-title">Gone Phishing</h1>
+            <p className="hero-sub">Is this a scam?</p>
             <p className="lede">
               Paste a suspicious link, text or email <strong>before you tap it</strong>. Cast it in and see what bites.
             </p>

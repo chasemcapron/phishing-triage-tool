@@ -1,4 +1,4 @@
-import { forwardRef } from 'react'
+import { forwardRef, type CSSProperties } from 'react'
 import { THRESHOLDS } from '../engine/config'
 import type { Finding, Report } from '../engine'
 import { CopyButton, SeverityBadge } from './Common'
@@ -11,14 +11,36 @@ const VERDICT_SUMMARY: Record<Report['verdict'], string> = {
   none: 'Nothing matched our checks, but that is not a guarantee. New scams can look clean.',
 }
 
+/**
+ * Where each verdict fish's lip is, as fractions of its viewBox (x, y), plus its height/width
+ * ratio, so the hook can sit in the mouth. Values come from the shapes in art/Fish.tsx.
+ */
+const MOUTH: Record<Report['verdict'], [number, number, number]> = {
+  high: [0.215, 0.6, 136 / 160],
+  suspicious: [0.235, 0.64, 130 / 150],
+  none: [0.16, 0.58, 124 / 150],
+}
+
 export const VerdictCard = forwardRef<HTMLHeadingElement, { report: Report; analyst: boolean }>(function VerdictCard(
   { report, analyst },
   headingRef,
 ) {
+  const [mouthX, mouthY, ratio] = MOUTH[report.verdict]
+  const catchVars = { '--mouth-x': mouthX, '--mouth-y': mouthY, '--fish-ratio': ratio } as CSSProperties
   return (
     <section className={`verdict verdict-${report.verdict}`} aria-labelledby="verdict-heading">
-      <div className="verdict-top">
-        <div className="verdict-text">
+      {/* The catch: the fish hangs from the fishing line by its lip, wearing the verdict as a tag. */}
+      <div className="catch" style={catchVars}>
+        <span className="catch-cord" aria-hidden="true" />
+        <div className="catch-fish" aria-hidden="true">
+          <VerdictFish verdict={report.verdict} className="catch-fish__art" />
+          <svg className="catch-hook" viewBox="0 0 24 36" aria-hidden="true" focusable="false">
+            <circle className="fishing-hook__eye" cx="16" cy="4.5" r="3" />
+            <path className="fishing-hook__metal" d="M16 7.5V26A5 5 0 0 1 6 26V20.5L9.4 23.6" />
+            <path className="fishing-hook__shine" d="M17.4 11V22" />
+          </svg>
+        </div>
+        <div className="catch-tag">
           <p className="verdict-eyebrow">Your catch</p>
           <div className="verdict-title">
             <VerdictIcon verdict={report.verdict} className="icon verdict-icon" />
@@ -28,7 +50,6 @@ export const VerdictCard = forwardRef<HTMLHeadingElement, { report: Report; anal
           </div>
           <p className="verdict-summary">{VERDICT_SUMMARY[report.verdict]}</p>
         </div>
-        <VerdictFish verdict={report.verdict} className="verdict-fish" />
       </div>
       {report.reasons.length > 0 && (
         <ul className="reasons">

@@ -21,6 +21,11 @@ export function FishingLine() {
     if (!line || !page) return
     let raf = 0
     let hooked: HTMLElement | null = null
+    const unhook = () => {
+      hooked?.style.removeProperty('--hook-x')
+      hooked?.style.removeProperty('--hooked')
+      hooked = null
+    }
 
     const update = () => {
       raf = 0
@@ -46,13 +51,16 @@ export function FishingLine() {
       line.style.setProperty('--line-len', `${len.toFixed(1)}px`)
       line.style.setProperty('--line-surf', `${Math.max(0, surf).toFixed(1)}px`)
       line.dataset.ready = 'true'
-      if (hooked !== target) {
-        hooked?.style.removeProperty('--hook-x')
-        hooked?.style.removeProperty('--hooked')
-        hooked = target
+      // A verdict card carries a .catch: the cord continues inside the card down to the fish's lip,
+      // so the page-level hook is hidden and the hook position is measured against the catch.
+      const anchor = target.querySelector<HTMLElement>('.catch') ?? target
+      line.dataset.target = anchor === target ? 'card' : 'catch'
+      if (hooked !== anchor) {
+        unhook()
+        hooked = anchor
       }
-      target.style.setProperty('--hook-x', `${(f.right - t.left).toFixed(1)}px`)
-      target.style.setProperty('--hooked', '1')
+      anchor.style.setProperty('--hook-x', `${(f.right - anchor.getBoundingClientRect().left).toFixed(1)}px`)
+      anchor.style.setProperty('--hooked', '1')
     }
     const schedule = () => {
       if (!raf) raf = requestAnimationFrame(update)
@@ -75,8 +83,7 @@ export function FishingLine() {
       window.removeEventListener('resize', schedule)
       window.removeEventListener('scroll', schedule)
       page.removeEventListener('animationend', schedule)
-      hooked?.style.removeProperty('--hook-x')
-      hooked?.style.removeProperty('--hooked')
+      unhook()
     }
   }, [])
 

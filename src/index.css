@@ -205,7 +205,7 @@ code {
 /* Sky + header + hero + dock. The SkyBackdrop fills it (z-index 0). */
 .sky {
   position: relative;
-  height: 280px;
+  height: 340px;
 }
 .site-header {
   position: relative;
@@ -250,16 +250,25 @@ code {
   position: relative;
   z-index: 2;
   padding-top: 6px;
+  text-align: center;
 }
-.hero h1 {
+.hero-title {
+  font-family: var(--display);
   color: var(--hero-ink);
-  font-size: clamp(1.9rem, 8.2vw, 4.1rem);
+  font-size: clamp(2.5rem, 13vw, 6.2rem);
   font-weight: 650;
-  line-height: 1.05;
-  letter-spacing: -0.01em;
+  line-height: 0.98;
+  letter-spacing: -0.015em;
+}
+.hero-sub {
+  margin-top: 4px;
+  font-family: var(--display);
+  color: var(--hero-ink);
+  font-size: clamp(1.15rem, 4.6vw, 1.9rem);
+  font-weight: 550;
 }
 .lede {
-  margin-top: 6px;
+  margin: 6px auto 0;
   color: var(--hero-muted);
   font-size: 1rem;
   line-height: 1.4;
@@ -321,6 +330,13 @@ code {
 .fishing-line[data-ready] {
   opacity: 1;
 }
+/* Hooked to a catch: the card draws the last stretch of line and the hook in the fish's lip. */
+.fishing-line[data-target='catch'] .fishing-hook {
+  display: none;
+}
+.fishing-line[data-target='catch'] .fishing-line__cord {
+  bottom: 0;
+}
 .fishing-line__cord {
   position: absolute;
   left: -0.75px;
@@ -353,8 +369,7 @@ code {
   opacity: 0.8;
 }
 /* Ring on the hooked card that the hook passes through. */
-.tabs::before,
-.verdict::before {
+.tabs::before {
   content: '';
   position: absolute;
   top: -12px;
@@ -772,12 +787,6 @@ code {
   --sev-bg: var(--none-bg);
   --sev-border: var(--none-border);
 }
-.verdict-top {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px 12px;
-  align-items: start;
-}
 .verdict-eyebrow {
   font-family: var(--display);
   font-weight: 600;
@@ -812,36 +821,90 @@ code {
   margin-top: 8px;
   font-size: 1.05rem;
 }
-.verdict-fish.fish {
-  width: 92px;
-  margin: -4px -4px 0 0;
+/* ---- The catch: the verdict fish hangs from the line by its lip, wearing the verdict tag ---- */
+.catch {
+  --fish-w: clamp(220px, 66vw, 300px);
+  --fish-top: 12px;
+  --fish-h: calc(var(--fish-w) * var(--fish-ratio, 0.85));
+  position: relative;
+  /* The whole fish stays visible; the tag overlaps just its belly, as if tied on. */
+  padding-top: calc(var(--fish-top) + var(--fish-h) * 0.9);
 }
-/* Phone: the fish sits beside the eyebrow + label; the summary gets the full width. */
-@media (max-width: 639px) {
-  .verdict-text {
-    display: contents;
+.catch-cord {
+  position: absolute;
+  left: calc(var(--hook-x, 30%) - 0.75px);
+  /* Start above the card edge so it meets the page-level line, end in the fish's lip. */
+  top: -48px;
+  height: calc(48px + var(--fish-top) + var(--fish-h) * var(--mouth-y) - 26px);
+  width: 1.5px;
+  background: var(--line-under);
+  opacity: var(--hooked, 0);
+}
+.catch-fish {
+  position: absolute;
+  top: var(--fish-top);
+  width: var(--fish-w);
+  /* Mouth under the line; clamped so the fish never leaves the card. */
+  left: clamp(0px, calc(var(--hook-x, 30%) - var(--fish-w) * var(--mouth-x)), calc(100% - var(--fish-w)));
+  transform-origin: calc(var(--mouth-x) * 100%) calc(var(--mouth-y) * 100%);
+  rotate: 14deg;
+}
+.catch-fish__art.fish {
+  width: 100%;
+}
+/* The phish brings its own old hook; on the line it is replaced by ours. */
+.catch-fish .fish-snag,
+.catch-fish .fish-hook,
+.catch-fish .fish-hook-eye {
+  display: none;
+}
+.catch-hook {
+  position: absolute;
+  left: calc(var(--mouth-x) * 100%);
+  top: calc(var(--mouth-y) * 100%);
+  width: 26px;
+  height: 39px;
+  /* The hook's bend (x≈9, y≈30 of 24×36) sits at the lip; counter-rotate so it hangs straight. */
+  translate: -9.7px -32.5px;
+  rotate: -14deg;
+  transform-origin: 9.7px 32.5px;
+  overflow: visible;
+}
+.catch-tag {
+  position: relative;
+  z-index: 1;
+  max-width: 30rem;
+  margin: 0 auto;
+  padding: 16px 18px 18px;
+  background: var(--surface);
+  border: 2px solid var(--sev-border);
+  border-radius: var(--radius-lg, 18px);
+  box-shadow: var(--shadow-card);
+  text-align: left;
+}
+/* Tag eyelet, like a weigh-in tag tied onto the catch. */
+.catch-tag::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--sev-border);
+  background: var(--sev-bg);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .catch-fish {
+    animation: catch-swing 3.6s ease-in-out infinite alternate;
   }
-  .verdict-top {
-    grid-template-columns: minmax(0, 1fr) auto;
-    row-gap: 0;
+}
+@keyframes catch-swing {
+  from {
+    rotate: 10deg;
   }
-  .verdict-eyebrow {
-    grid-column: 1;
-    grid-row: 1;
-  }
-  .verdict-title {
-    grid-column: 1;
-    grid-row: 2;
-    align-self: center;
-  }
-  .verdict-fish.fish {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    align-self: center;
-  }
-  .verdict-summary {
-    grid-column: 1 / -1;
-    grid-row: 3;
+  to {
+    rotate: 17deg;
   }
 }
 .reasons {
@@ -1246,12 +1309,12 @@ td.hash {
   .verdict {
     padding: 24px 26px;
   }
-  .verdict-top {
-    align-items: center;
+  .catch {
+    --fish-w: clamp(280px, 40vw, 380px);
+    --fish-top: 16px;
   }
-  .verdict-fish.fish {
-    width: 132px;
-    margin: -8px 0 -8px 8px;
+  .catch-tag {
+    padding: 18px 24px 20px;
   }
   .panel {
     padding: 18px 20px;
@@ -1260,7 +1323,7 @@ td.hash {
 
 @media (min-width: 720px) {
   .sky {
-    height: 470px;
+    height: 540px;
   }
   .header-inner {
     min-height: 76px;
@@ -1274,7 +1337,7 @@ td.hash {
     font-size: 1.55rem;
   }
   .hero {
-    padding-top: 40px;
+    padding-top: 8px;
   }
   .lede {
     margin-top: 12px;
@@ -1339,8 +1402,7 @@ td.hash {
       opacity 0.4s ease;
     animation: line-sway 4.8s ease-in-out infinite alternate;
   }
-  .tabs::before,
-  .verdict::before {
+  .tabs::before {
     transition: opacity 0.4s ease 0.45s;
   }
   .verdict {
