@@ -1,0 +1,13 @@
+:root {
+  color-scheme: dark;
+  --bg: #0b1020;
+  --fg: #e6e9f2;
+  --muted: #9aa3b8;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+}
+body { margin: 0; }
+main { max-width: 40rem; margin: 0 auto; padding: 3rem 1rem; }
+h1 { margin: 0 0 0.5rem; font-size: 2rem; }
+.status { color: var(--muted); font-family: ui-monospace, monospace; font-size: 0.875rem; }

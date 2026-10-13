@@ -1,0 +1,50 @@
+Delivered-To: alex.rivera@university.example
+Received: by 2001:db8:4f::33 with SMTP id r7csp552190pxa;
+        Mon, 12 Oct 2026 09:15:44 -0700 (PDT)
+Return-Path: <northwind_hr-recruiting@gmail.com>
+Received: from mail-sor-f41.google.com (mail-sor-f41.google.com. [198.51.100.41])
+        by mx.google.com with SMTPS id d3-20020a05.2026.10.12.09.15.43
+        for <alex.rivera@university.example>
+        (Google Transport Security);
+        Mon, 12 Oct 2026 09:15:43 -0700 (PDT)
+Received-SPF: pass (google.com: domain of northwind_hr-recruiting@gmail.com designates 198.51.100.41 as permitted sender) client-ip=198.51.100.41;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@gmail.com header.s=20230601 header.b=Q2v9xT1a;
+       spf=pass (google.com: domain of northwind_hr-recruiting@gmail.com designates 198.51.100.41 as permitted sender) smtp.mailfrom=northwind_hr-recruiting@gmail.com;
+       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com
+Received: by 2001:db8:77::5 with SMTP id f9mr4410221wrx.12;
+        Mon, 12 Oct 2026 09:15:41 -0700 (PDT)
+From: "Northwind Traders HR Department" <northwind_hr-recruiting@gmail.com>
+Reply-To: "Hiring Manager" <offers@northwind-careers.test>
+To: alex.rivera@university.example
+Subject: Remote Data Entry Position - Offer Letter ($42/hr, no interview needed)
+Date: Mon, 12 Oct 2026 16:15:40 +0000
+Message-ID: <CAF8xQ2vT9mE4kWp1rLz@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+Dear Applicant,
+
+Congratulations! Your resume was selected from our university career portal
+for a Remote Data Entry Assistant position with Northwind Traders. No
+interview is required. Pay is $42/hr, 10-15 flexible hours per week.
+
+To complete onboarding, reply to this email within 24 hours with:
+  - Full legal name and date of birth
+  - Social Security Number (for payroll)
+  - Bank name, account number and routing number for direct deposit
+
+We will mail you a check for $2,850 to purchase your work equipment from our
+approved vendor. Deposit the check, then send the balance to the vendor via
+Zelle or Apple gift cards. Equipment ships the same day.
+
+You may also complete the onboarding form here:
+https://northwind-careers.test/onboarding/form
+
+Respond urgently, as positions are limited.
+
+Regards,
+Daniel Brooks
+Senior Talent Acquisition Manager
+Northwind Traders

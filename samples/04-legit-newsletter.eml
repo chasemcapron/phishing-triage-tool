@@ -1,0 +1,70 @@
+Delivered-To: jordan.lee@university.example
+Received: by 2001:db8:4f::21 with SMTP id k14csp1790233pxv;
+        Mon, 12 Oct 2026 06:00:09 -0700 (PDT)
+Return-Path: <bounces+u82731@news.contoso.example>
+Received: from o1.news.contoso.example (o1.news.contoso.example. [198.51.100.10])
+        by mx.google.com with ESMTPS id h5-20020a05.2026.10.12.06.00.08
+        for <jordan.lee@university.example>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Oct 2026 06:00:08 -0700 (PDT)
+Received-SPF: pass (google.com: domain of bounces+u82731@news.contoso.example designates 198.51.100.10 as permitted sender) client-ip=198.51.100.10;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@news.contoso.example header.s=s1 header.b=Ab3dE9fQ;
+       spf=pass (google.com: domain of bounces+u82731@news.contoso.example designates 198.51.100.10 as permitted sender) smtp.mailfrom=bounces+u82731@news.contoso.example;
+       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=news.contoso.example
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=news.contoso.example;
+        h=from:to:subject:date:message-id:list-unsubscribe; s=s1;
+        bh=c3ludGhldGljYm9keWhhc2hmb3J0ZXN0aW5nb25seQ==;
+        b=Ab3dE9fQc3ludGhldGljc2lnbmF0dXJlZm9ydGVzdGluZ29ubHlub3RyZWFs
+Received: from news-app-03.internal.contoso.example (unknown [10.20.3.17])
+        by o1.news.contoso.example (Postfix) with ESMTP id 9C2B7
+        for <jordan.lee@university.example>; Mon, 12 Oct 2026 13:00:05 +0000 (UTC)
+From: "Contoso Weekly" <newsletter@news.contoso.example>
+To: jordan.lee@university.example
+Subject: Contoso Weekly: three stories from the field team
+Date: Mon, 12 Oct 2026 13:00:04 +0000
+Message-ID: <weekly-2026-41.u82731@news.contoso.example>
+List-Unsubscribe: <https://news.contoso.example/unsubscribe/u82731>, <mailto:unsubscribe@news.contoso.example>
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="nl_2026_41"
+
+--nl_2026_41
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+Hi Jordan,
+
+Here's what the Contoso field team has been up to this week.
+
+1. How we cut warehouse energy use by 18%
+   https://www.contoso.example/blog/warehouse-energy
+
+2. Meet the new regional leads
+   https://www.contoso.example/blog/regional-leads
+
+3. Upcoming community events in your area
+   https://www.contoso.example/events
+
+Thanks for reading,
+The Contoso communications team
+
+You're receiving this because you subscribed at contoso.example.
+Unsubscribe: https://news.contoso.example/unsubscribe/u82731
+
+--nl_2026_41
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+<html><body style="font-family:Georgia,serif;max-width:600px">
+<p>Hi Jordan,</p>
+<p>Here's what the Contoso field team has been up to this week.</p>
+<h2><a href="https://www.contoso.example/blog/warehouse-energy">How we cut warehouse energy use by 18%</a></h2>
+<h2><a href="https://www.contoso.example/blog/regional-leads">Meet the new regional leads</a></h2>
+<h2>Upcoming community events: <a href="https://www.contoso.example/events">www.contoso.example/events</a></h2>
+<p>Thanks for reading,<br>The Contoso communications team</p>
+<p style="font-size:12px;color:#666">You're receiving this because you subscribed at contoso.example.
+<a href="https://news.contoso.example/unsubscribe/u82731">Unsubscribe</a></p>
+</body></html>
+
+--nl_2026_41--

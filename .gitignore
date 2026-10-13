@@ -1,0 +1,22 @@
+node_modules
+dist
+*.local
+*.tsbuildinfo
+
+# Secrets: never commit. Only .env.example is tracked.
+.env*
+!.env.example
+
+# Vercel
+.vercel
+
+# Editors / OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+*.log
+
+# Private project notes
+BRIEF.md

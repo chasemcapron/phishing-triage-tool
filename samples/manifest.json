@@ -1,0 +1,108 @@
+{
+  "_note": "All samples are synthetic: reserved domains (.example, .test), documentation IPs (192.0.2.0/24, 198.51.100.0/24, 203.0.113.0/24, 2001:db8::/32) and fictional people. expectedVerdict is the local-only result (no reputation lookups); M2 tests assert it. expectedSignals lists the findings each sample is designed to trigger.",
+  "samples": [
+    {
+      "id": "m365-credential-phish",
+      "file": "01-m365-credential-phish.eml",
+      "mode": "email",
+      "title": "Microsoft 365 password-expiry phish",
+      "expectedVerdict": "high",
+      "expectedSignals": [
+        "dmarc-fail",
+        "spf-softfail",
+        "dkim-none",
+        "forged-auth-results-below-provider",
+        "lookalike-homoglyph (micros0ft -> microsoft)",
+        "display-name-brand (\"Microsoft 365\" from non-Microsoft domain)",
+        "reply-to-mismatch",
+        "return-path-mismatch",
+        "message-id-domain-mismatch",
+        "link-text-href-mismatch (shows login.microsoftonline.com)",
+        "redirect-parameter",
+        "raw-ip-host",
+        "http-login-page",
+        "received-timestamp-out-of-order",
+        "urgency-language",
+        "generic-greeting"
+      ]
+    },
+    {
+      "id": "fake-recruiter",
+      "file": "02-fake-recruiter.eml",
+      "mode": "email",
+      "title": "Fake recruiter job offer",
+      "expectedVerdict": "high",
+      "expectedSignals": [
+        "free-webmail-claiming-organization (gmail.com, display name \"Northwind Traders HR\")",
+        "reply-to-mismatch (northwind-careers.test)",
+        "requests-sensitive-info (SSN, bank account)",
+        "payment-request (check / gift cards / Zelle)",
+        "urgency-language",
+        "generic-greeting"
+      ],
+      "notes": "SPF/DKIM/DMARC all pass: proves authentication alone is not a verdict. The Gmail local part contains '_' and '-', which Gmail does not allow, so the address cannot belong to a real account."
+    },
+    {
+      "id": "invoice-attachments",
+      "file": "03-invoice-attachments.eml",
+      "mode": "email",
+      "title": "Overdue invoice with HTML and .pdf.exe attachments",
+      "expectedVerdict": "high",
+      "expectedSignals": [
+        "attachment-html",
+        "attachment-double-extension (Invoice_88412.pdf.exe)",
+        "attachment-type-signature-mismatch (declared application/pdf, starts with MZ)",
+        "dmarc-none",
+        "dkim-none",
+        "payment-request (wire transfer, changed banking details)",
+        "urgency-language"
+      ],
+      "notes": "Uses the Microsoft 365 / Exchange Online Authentication-Results format, which has no authserv-id. The parser must handle this."
+    },
+    {
+      "id": "legit-newsletter",
+      "file": "04-legit-newsletter.eml",
+      "mode": "email",
+      "title": "Ordinary newsletter (control)",
+      "expectedVerdict": "none",
+      "expectedSignals": [],
+      "notes": "Control sample. SPF/DKIM/DMARC pass and align, links match their display text, the private IP is on an internal first hop (normal), and the greeting is personal. Any finding above trivial weight here is a false positive."
+    },
+    {
+      "id": "smishing-toll",
+      "file": "05-smishing-toll.txt",
+      "mode": "text",
+      "title": "Unpaid toll text (smishing)",
+      "expectedVerdict": "high",
+      "expectedSignals": [
+        "bare-domain-extracted (no scheme)",
+        "combosquatting (ezpass-tollpay-services)",
+        "urgency-language",
+        "payment-request"
+      ]
+    },
+    {
+      "id": "smishing-package",
+      "file": "06-smishing-package.txt",
+      "mode": "text",
+      "title": "Package delivery text (smishing)",
+      "expectedVerdict": "high",
+      "expectedSignals": [
+        "brand-in-subdomain (usps.com-redelivery.test)",
+        "raw-ip-host",
+        "http-only",
+        "urgency-language"
+      ]
+    },
+    {
+      "id": "safe-browsing-test",
+      "file": "07-safe-browsing-test.txt",
+      "mode": "text",
+      "title": "Google Safe Browsing test URLs (real reputation hit)",
+      "expectedVerdict": "high",
+      "requiresReputation": true,
+      "expectedSignals": ["safe-browsing-match"],
+      "notes": "Google's official test URLs, not actually malicious. A local-only run will not reach High; with Safe Browsing configured, the match forces High. Still to confirm in M4: which of these two URLs the Lookup API actually matches today."
+    }
+  ]
+}

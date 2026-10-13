@@ -1,0 +1,4 @@
+Demo of a real reputation hit. These are Google's official Safe Browsing test addresses. They are not actually malicious; they exist so tools can confirm their Safe Browsing integration works.
+
+https://testsafebrowsing.appspot.com/s/phishing.html
+http://malware.testing.google.test/testing/malware/
