@@ -82,30 +82,6 @@ export const IconMoon = (p: IconProps) => (
     <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
   </Svg>
 )
-export const IconPumpkin = (p: IconProps) => (
-  <Svg {...p}>
-    <path d="M12 7.5c-1.6-1-3.4-1.2-5-.6C3.8 8 2.6 11 3.2 14.6 3.8 18.4 6.6 20.6 9.6 20c.9-.2 1.7-.5 2.4-.5s1.5.3 2.4.5c3 .6 5.8-1.6 6.4-5.4.6-3.6-.6-6.6-3.8-7.7-1.6-.6-3.4-.4-5 .6z" />
-    <path d="M12 7.5V5q0-1.6 2-2.2M9.2 7.4c-1.5 3-1.5 9.4.4 12.5M14.8 7.4c1.5 3 1.5 9.4-.4 12.5" />
-  </Svg>
-)
-export const IconLeaf = (p: IconProps) => (
-  <Svg {...p}>
-    <path d="M5.5 18.5C4 11 9 4.5 20 4c.4 10.6-5.6 16-13 15" />
-    <path d="M3 21l11-11" />
-  </Svg>
-)
-export const IconSnowflake = (p: IconProps) => (
-  <Svg {...p}>
-    <path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7" />
-    <path d="M9.5 3.5 12 5.5l2.5-2M9.5 20.5 12 18.5l2.5 2M3.6 10.4 6.6 9.6l-.6-3M20.4 13.6l-3-.8.6 3M3.6 13.6l3-.8-.6 3M20.4 10.4l-3 .8.6-3" />
-  </Svg>
-)
-export const IconSparkle = (p: IconProps) => (
-  <Svg {...p}>
-    <path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z" />
-    <path d="M19 16v4M17 18h4" />
-  </Svg>
-)
 export const IconUpload = (p: IconProps) => (
   <Svg {...p}>
     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />

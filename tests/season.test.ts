@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { resolveSeason, seasonForDate, seasonFromUrl } from '../src/season'
+import { readSeasonChoice, resolveSeason, saveSeasonChoice, seasonForDate, seasonFromUrl } from '../src/season'
 
 const d = (m: number, day: number) => new Date(2026, m - 1, day, 12)
 
@@ -37,5 +37,17 @@ describe('resolveSeason', () => {
     expect(resolveSeason('auto', d(12, 25))).toBe('winter')
     expect(resolveSeason('fall', d(12, 25))).toBe('fall')
     expect(resolveSeason('none', d(10, 31))).toBe('none')
+  })
+})
+
+describe('saved choice', () => {
+  it('only remembers "off" from the frog, and drops picks saved by the old season picker', () => {
+    saveSeasonChoice('none')
+    expect(readSeasonChoice()).toBe('none')
+    saveSeasonChoice('auto')
+    expect(readSeasonChoice()).toBe('auto')
+    localStorage.setItem('season', 'winter')
+    expect(readSeasonChoice()).toBe('auto')
+    expect(localStorage.getItem('season')).toBeNull()
   })
 })

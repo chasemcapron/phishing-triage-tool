@@ -5,7 +5,6 @@ import { SeasonSky } from './components/art/Seasonal'
 import { PondFloor } from './components/art/Underwater'
 import { IconMoon, IconSun } from './components/Icons'
 import { FishingLine, PondAmbient } from './components/Pond'
-import { SeasonPicker } from './components/SeasonPicker'
 import { TextMode } from './components/TextMode'
 import { loadEngine } from './engineLoader'
 import { SAMPLES } from './samples'
@@ -85,7 +84,7 @@ export default function App() {
   const pickSeason = (c: SeasonChoice) => {
     setSeasonChoice(c)
     saveSeasonChoice(c)
-    // A ?season= link only sets the starting look; an explicit pick replaces it.
+    // A ?season= link only sets the starting look; tapping the frog replaces it.
     const url = new URL(window.location.href)
     if (url.searchParams.has('season')) {
       url.searchParams.delete('season')
@@ -145,7 +144,6 @@ export default function App() {
           <SeasonSky season={season} />
           <header className="site-header">
             <div className="container header-inner">
-              <SeasonPicker choice={seasonChoice} season={season} onChange={pickSeason} />
               <button
                 type="button"
                 className="btn btn-icon theme-toggle"
