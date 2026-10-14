@@ -15,13 +15,12 @@ const STORAGE_KEY = 'season'
 
 const isSeason = (v: unknown): v is Season => typeof v === 'string' && (SEASONS as readonly string[]).includes(v)
 
-/** Halloween Oct 15–31, fall the rest of Sep 1–Nov 30, winter Dec 1–Jan 31, otherwise none (local time). */
+/** Halloween in October, fall in November, winter in December, otherwise none (local time). */
 export function seasonForDate(d: Date): Season {
   const m = d.getMonth() + 1
-  const day = d.getDate()
-  if (m === 10 && day >= 15) return 'halloween'
-  if (m >= 9 && m <= 11) return 'fall'
-  if (m === 12 || m === 1) return 'winter'
+  if (m === 10) return 'halloween'
+  if (m === 11) return 'fall'
+  if (m === 12) return 'winter'
   return 'none'
 }
 

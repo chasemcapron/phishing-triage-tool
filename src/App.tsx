@@ -86,6 +86,18 @@ export default function App() {
     }
   }
 
+  // Easter egg: tap the frog to swap back to the original pond, and again to bring the season back.
+  const [frogHop, setFrogHop] = useState(0)
+  const onFrog = () => {
+    pickSeason(season === 'none' ? 'auto' : 'none')
+    setFrogHop((n) => n + 1)
+  }
+  useEffect(() => {
+    if (!frogHop) return
+    const t = setTimeout(() => setFrogHop(0), 500)
+    return () => clearTimeout(t)
+  }, [frogHop])
+
   // Start fetching the engine right after first paint.
   useEffect(() => {
     void loadEngine()
@@ -144,7 +156,7 @@ export default function App() {
               Paste a suspicious link or text message <strong>before you tap it</strong>. Cast it in and see what bites.
             </p>
           </div>
-          <LilyPads className="sky-lily" />
+          <LilyPads className="sky-lily" onFrogClick={onFrog} hop={frogHop > 0} />
           <Duck className="sky-duck" />
           <div className="fisher-wrap">
             <Fisher />

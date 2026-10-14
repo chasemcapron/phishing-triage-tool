@@ -5,16 +5,14 @@ const d = (m: number, day: number) => new Date(2026, m - 1, day, 12)
 
 describe('seasonForDate', () => {
   it.each([
-    [d(8, 31), 'none'],
-    [d(9, 1), 'fall'],
-    [d(10, 14), 'fall'],
-    [d(10, 15), 'halloween'],
+    [d(9, 30), 'none'],
+    [d(10, 1), 'halloween'],
     [d(10, 31), 'halloween'],
     [d(11, 1), 'fall'],
     [d(11, 30), 'fall'],
     [d(12, 1), 'winter'],
-    [d(1, 31), 'winter'],
-    [d(2, 1), 'none'],
+    [d(12, 31), 'winter'],
+    [d(1, 1), 'none'],
     [d(6, 15), 'none'],
   ])('%s -> %s', (date, season) => {
     expect(seasonForDate(date)).toBe(season)

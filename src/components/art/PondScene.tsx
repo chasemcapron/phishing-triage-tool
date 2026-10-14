@@ -382,8 +382,11 @@ export function LogoMark({ className }: ArtProps) {
 
 /* ---------- Extras ---------- */
 
-/** Two lily pads, a lotus and a tiny frog. viewBox 0 0 120 48; waterline y = 36. */
-export function LilyPads({ className }: ArtProps) {
+/**
+ * Two lily pads, a lotus and a tiny frog. viewBox 0 0 120 48; waterline y = 36.
+ * onFrogClick: an easter egg (mouse/touch only; the season picker is the accessible control).
+ */
+export function LilyPads({ className, onFrogClick, hop }: ArtProps & { onFrogClick?: () => void; hop?: boolean }) {
   return (
     <Art className={cls('pond-lily', className)} viewBox="0 0 120 48">
       <ellipse className="pond-ripple-o" cx="44" cy="39" rx="34" ry="5" />
@@ -403,7 +406,9 @@ export function LilyPads({ className }: ArtProps) {
         <JackOLantern x={95} y={31} s={0.78} />
         <JackOLantern x={61} y={33.6} s={0.5} />
       </g>
-      <g className="pp-frog">
+      <g className={cls('pp-frog', onFrogClick && 'pp-frog--egg', hop ? 'is-hopping' : undefined)} onClick={onFrogClick}>
+        {/* Invisible, larger hit area: the frog itself is only ~12px wide on screen. */}
+        {onFrogClick && <circle className="pp-frog-hit" cx="40" cy="27" r="22" />}
         <path className="pp-frog-b" d="M30 35Q28 22 40 21Q52 22 50 35Z" />
         <circle className="pp-frog-b" cx="34.4" cy="20.6" r="4.4" />
         <circle className="pp-frog-b" cx="45.6" cy="20.6" r="4.4" />
