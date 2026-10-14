@@ -16,10 +16,7 @@ const ALL_PAGES = [
   ['text-toll', '/#text/smishing-toll'],
   ['text-package', '/#text/smishing-package'],
   ['text-sb', '/#text/safe-browsing-test'],
-  ['email-m365', '/#email/m365-credential-phish'],
-  ['email-recruiter', '/#email/fake-recruiter'],
-  ['email-invoice', '/#email/invoice-attachments'],
-  ['email-newsletter', '/#email/legit-newsletter'],
+  // Email mode is paused (EMAIL_ENABLED in App.tsx); its pages come back with it.
   // No sample lands on Suspicious, so this one is typed in (a lookalike on a reserved .test name).
   ['text-suspicious', '/#text', 'Sign in to keep your account: https://paypa1-login.test/'],
   // A real fake store (Oct 2026). Live, the browser domain-age fallback should lift it to High.

@@ -457,6 +457,13 @@ code {
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   box-shadow: 0 -8px 24px -14px rgba(10, 60, 110, 0.35);
 }
+/* One mode only: the single tab spans the card head like a title. */
+.tabs-single {
+  grid-template-columns: 1fr;
+}
+.tabs-single .tab {
+  cursor: default;
+}
 .tab {
   min-height: 48px;
   border: 0;

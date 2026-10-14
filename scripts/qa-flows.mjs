@@ -114,9 +114,17 @@ check(
   'analyst toggle shows findings + links table',
   (await ev(`return !!document.querySelector('#findings-heading') && !!document.querySelector('#links-table-heading')`)) === true,
 )
-// Email-looking text in text mode → handoff notice
+// Email-looking text in text mode → notice (handoff to the email tab when it is enabled)
+const emailTab = await ev(`return !!document.querySelector('#tab-email')`)
 await setValue('#text-input', 'Received: from a.example by b.example; Tue, 13 Oct 2026 10:00:00 +0000\nFrom: "PayPal" <x@gmail.com>\nSubject: hi\n\nbody')
 await sleep(300)
+check('email-looking text shows a notice', (await ev(`return !!document.querySelector('.notice')`)) === true)
+if (!emailTab) {
+  check('email mode paused: single tab, no email panel', (await ev(`return document.querySelectorAll('[role=tab]').length === 1 && !document.querySelector('#panel-email')`)) === true)
+  await ev(`location.hash = '#email/fake-recruiter'; return 1`)
+  await sleep(800)
+  check('#email deep link falls back to text mode', (await ev(`return document.querySelector('#tab-text').getAttribute('aria-selected')`)) === 'true')
+} else {
 check('email-looking text shows handoff notice', (await ev(`return !!document.querySelector('.notice .link-btn')`)) === true)
 await click('.notice .link-btn')
 await sleep(300)
@@ -146,6 +154,7 @@ check('End moves to email tab', (await ev(`return document.activeElement?.id`)) 
 await key('Home', 'Home', 36)
 await sleep(200)
 check('Home moves to text tab', (await ev(`return document.activeElement?.id`)) === 'tab-text')
+}
 // Theme toggle: light → dark, persists across reload, then back
 await click('.site-header .btn-icon')
 await sleep(200)
@@ -158,9 +167,11 @@ await click('.site-header .btn-icon')
 await sleep(200)
 check('theme toggles back to light', (await ev(`return document.documentElement.dataset.theme + ' ' + localStorage.getItem('theme')`)) === 'light light')
 // Deep links
-await ev(`location.hash = '#email/fake-recruiter'; return 1`)
-await sleep(1500)
-check('hashchange deep link loads email sample', (await verdict()) === 'High risk — likely phishing')
+if (emailTab) {
+  await ev(`location.hash = '#email/fake-recruiter'; return 1`)
+  await sleep(1500)
+  check('hashchange deep link loads email sample', (await verdict()) === 'High risk — likely phishing')
+}
 await send('Page.navigate', { url: base + '/#text/smishing-toll' })
 await sleep(1800)
 check('#text/<id> deep link loads text sample', (await verdict()) === 'High risk — likely phishing')

@@ -9,7 +9,7 @@ import { ResultsView, type View } from './ResultsView'
 
 const LOOKS_LIKE_EMAIL = /^(?:delivered-to|received|return-path|from|arc-seal|authentication-results|x-[\w-]+):\s/im
 
-export function TextMode({ onSwitchToEmail, sample }: { onSwitchToEmail: (text: string) => void; sample: SampleRequest | null }) {
+export function TextMode({ onSwitchToEmail, sample }: { onSwitchToEmail?: (text: string) => void; sample: SampleRequest | null }) {
   const [input, setInput] = useState('')
   const { report, checking, focusKey, show } = useReport()
   const [view, setView] = useState<View>('simple')
@@ -66,7 +66,12 @@ export function TextMode({ onSwitchToEmail, sample }: { onSwitchToEmail: (text: 
             Paste a link or message first.
           </p>
         )}
-        {looksLikeEmail && (
+        {looksLikeEmail && !onSwitchToEmail && (
+          <p className="notice">
+            <IconInfo className="icon icon-sm" /> This looks like an email's source. Its links and wording will be checked, but not who sent it.
+          </p>
+        )}
+        {looksLikeEmail && onSwitchToEmail && (
           <p className="notice">
             <IconInfo className="icon icon-sm" /> This looks like an email's source.{' '}
             <button type="button" className="link-btn" onClick={() => onSwitchToEmail(input)}>

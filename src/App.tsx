@@ -9,6 +9,19 @@ import { loadEngine } from './engineLoader'
 import { SAMPLES } from './samples'
 
 type Mode = 'text' | 'email'
+
+/**
+ * Email analysis is paused: real-world mail (gateways, forwarding, mailing lists) still produced
+ * too many false alarms. The engine, UI and tests stay in the repo; set this to true to bring
+ * the tab back.
+ */
+const EMAIL_ENABLED = false
+const MODES: readonly (readonly [Mode, string])[] = EMAIL_ENABLED
+  ? [
+      ['text', 'Check a link or text'],
+      ['email', 'Analyze an email'],
+    ]
+  : [['text', 'Check a link or text']]
 type Theme = 'dark' | 'light'
 
 export interface SampleRequest {
@@ -19,7 +32,7 @@ export interface SampleRequest {
 /** "#email", "#text", or a deep link to a sample such as "#email/m365-credential-phish". */
 function parseHash(): { mode: Mode; sample: SampleRequest | null } {
   const [, m, id] = /^#(text|email)(?:\/([\w-]+))?$/.exec(window.location.hash) ?? []
-  const mode: Mode = m === 'email' ? 'email' : 'text'
+  const mode: Mode = m === 'email' && EMAIL_ENABLED ? 'email' : 'text'
   const sample = SAMPLES.find((s) => s.id === id && s.mode === mode)
   return { mode, sample: sample ? { id: sample.id, key: Date.now() } : null }
 }
@@ -72,7 +85,7 @@ export default function App() {
   }
 
   const onTabKey = (e: KeyboardEvent) => {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft' || e.key === 'Home' || e.key === 'End') {
+    if (EMAIL_ENABLED && (e.key === 'ArrowRight' || e.key === 'ArrowLeft' || e.key === 'Home' || e.key === 'End')) {
       e.preventDefault()
       const next: Mode = e.key === 'Home' ? 'text' : e.key === 'End' ? 'email' : mode === 'text' ? 'email' : 'text'
       select(next, true)
@@ -106,7 +119,7 @@ export default function App() {
             <h1 className="hero-title">Gone Phishing</h1>
             <p className="hero-sub">Is this a scam?</p>
             <p className="lede">
-              Paste a suspicious link, text or email <strong>before you tap it</strong>. Cast it in and see what bites.
+              Paste a suspicious link or text message <strong>before you tap it</strong>. Cast it in and see what bites.
             </p>
           </div>
           <LilyPads className="sky-lily" />
@@ -122,13 +135,8 @@ export default function App() {
         <main id="main" className="pond water-column">
           <PondAmbient />
           <div className="container pond-content">
-            <div className="tabs" role="tablist" aria-label="What do you want to check?" onKeyDown={onTabKey}>
-              {(
-                [
-                  ['text', 'Check a link or text'],
-                  ['email', 'Analyze an email'],
-                ] as const
-              ).map(([m, label]) => (
+            <div className={MODES.length > 1 ? 'tabs' : 'tabs tabs-single'} role="tablist" aria-label="What do you want to check?" onKeyDown={onTabKey}>
+              {MODES.map(([m, label]) => (
                 <button
                   key={m}
                   ref={(el) => {
@@ -151,15 +159,21 @@ export default function App() {
             <div id="panel-text" role="tabpanel" aria-labelledby="tab-text" hidden={mode !== 'text'}>
               <TextMode
                 sample={sample}
-                onSwitchToEmail={(text) => {
-                  setHandoff({ text, key: Date.now() })
-                  select('email')
-                }}
+                onSwitchToEmail={
+                  EMAIL_ENABLED
+                    ? (text) => {
+                        setHandoff({ text, key: Date.now() })
+                        select('email')
+                      }
+                    : undefined
+                }
               />
             </div>
-            <div id="panel-email" role="tabpanel" aria-labelledby="tab-email" hidden={mode !== 'email'}>
-              <EmailMode key={handoff?.key ?? 0} initialInput={handoff?.text ?? ''} sample={handoff ? null : sample} />
-            </div>
+            {EMAIL_ENABLED && (
+              <div id="panel-email" role="tabpanel" aria-labelledby="tab-email" hidden={mode !== 'email'}>
+                <EmailMode key={handoff?.key ?? 0} initialInput={handoff?.text ?? ''} sample={handoff ? null : sample} />
+              </div>
+            )}
           </div>
         </main>
 
