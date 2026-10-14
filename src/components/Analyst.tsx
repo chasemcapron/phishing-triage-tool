@@ -62,10 +62,18 @@ export function AuthTable({ email }: { email: EmailDetails }) {
         <p className="muted">No Authentication-Results header found.</p>
       ) : (
         <>
-          <p className="small">
-            Trusted header from <strong>{auth.provider}</strong>
-            {auth.providerVerified ? ' (matches the server that received the message)' : ' (could not match it to the receiving server)'}.
-          </p>
+          {auth.gateway ? (
+            <p className="small">
+              Trusted header from <strong>{auth.provider}</strong>, which checked the message when it arrived from the internet and then
+              relayed it to {auth.gateway.downstream.provider}. That later check (SPF {auth.gateway.downstream.spf ?? 'none'}, DKIM{' '}
+              {auth.gateway.downstream.dkim ?? 'none'}, DMARC {auth.gateway.downstream.dmarc ?? 'none'}) is expected to fail after a gateway relay.
+            </p>
+          ) : (
+            <p className="small">
+              Trusted header from <strong>{auth.provider}</strong>
+              {auth.providerVerified ? ' (matches the server that received the message)' : ' (could not match it to the receiving server)'}.
+            </p>
+          )}
           <div className="table-wrap">
             <table>
               <thead>

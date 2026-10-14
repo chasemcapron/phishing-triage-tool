@@ -9,7 +9,7 @@ import { checkSender } from './checks/sender'
 import { FindingSet } from './findings'
 import { extractHtmlLinks, extractTextLinks, htmlToText, inertParser, normalizeLinks, type HtmlParser } from './links/extract'
 import { parseAllAuthResults } from './parse/authResults'
-import { extractAddress, firstHeader, parseHeaders } from './parse/headers'
+import { extractAddress, firstHeader, headerValues, parseHeaders, type RawHeader } from './parse/headers'
 import { parseReceivedChain } from './parse/received'
 import { scoreFindings, topReasons } from './score'
 import { tagFindings } from './attack'
@@ -60,7 +60,10 @@ export async function analyzeEmail(raw: string | ArrayBuffer | Uint8Array, opts:
   const messageId = firstHeader(headers, 'message-id')
 
   const hops = parseReceivedChain(headers)
-  const auth = summarizeAuth(parseAllAuthResults(headers), hops)
+  const auth = summarizeAuth(parseAllAuthResults(headers), hops, {
+    recipientDomains: recipientDomains(headers),
+    ptr: /(?:^|;)\s*PTR:([^;\s]+)/i.exec(firstHeader(headers, 'x-forefront-antispam-report') ?? '')?.[1]?.toLowerCase() ?? null,
+  })
   const findings = new FindingSet()
 
   checkAuth(auth, findings, registrable(domainOfEmail(from?.address)))
@@ -124,4 +127,18 @@ export function buildReport(mode: Report['mode'], findings: Finding[], links: Li
     email,
     iocs: collectIocs(links, email),
   }
+}
+
+/** Registrable domains the message was delivered to. Only used to recognize the recipient's own mail servers. */
+function recipientDomains(headers: RawHeader[]): string[] {
+  const text = [
+    ...['to', 'cc', 'delivered-to', 'x-original-to', 'envelope-to'].flatMap((n) => headerValues(headers, n)),
+    ...headerValues(headers, 'received').flatMap((v) => [...v.matchAll(/\bfor\s+<([^>]+)>/gi)].map((m) => m[1]!)),
+  ].join(' ')
+  const out = new Set<string>()
+  for (const m of text.matchAll(/[\w.+-]+@([\w-]+(?:\.[\w-]+)+)/g)) {
+    const d = registrable(m[1]!.toLowerCase())
+    if (d) out.add(d)
+  }
+  return [...out]
 }

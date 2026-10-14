@@ -1,0 +1,71 @@
+Received: from DS4PPF3D6E0544B.namprd11.prod.outlook.com
+ (2603:10b6:f:fc02::1f) by CH0PR11MB5457.namprd11.prod.outlook.com with HTTPS;
+ Tue, 13 Oct 2026 17:01:15 +0000
+Received: from CYXPR03CA0039.namprd03.prod.outlook.com (2603:10b6:930:d2::24)
+ by DS4PPF3D6E0544B.namprd11.prod.outlook.com (2603:10b6:f:fc02::1f) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.496.23; Tue, 13 Oct
+ 2026 17:01:10 +0000
+Received: from CY5PEPF00000E74.namprd02.prod.outlook.com
+ (2603:10b6:930:d2:cafe::83) by CYXPR03CA0039.outlook.office365.com
+ (2603:10b6:930:d2::24) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.496.5 via Frontend Transport; Tue, 13
+ Oct 2026 17:01:10 +0000
+Authentication-Results: mx.microsoft.com 1; spf=fail (sender IP is
+ 192.0.2.105) smtp.mailfrom=bounce.email.alumni.example; dkim=fail (body
+ hash did not verify) header.d=s12.y.mc.salesforce.com;dmarc=fail action=none
+ header.from=Alumni.example;compauth=none reason=405
+Received-SPF: Fail (protection.outlook.com: domain of
+ bounce.email.alumni.example does not designate 192.0.2.105 as permitted
+ sender) receiver=protection.outlook.com; client-ip=192.0.2.105;
+ helo=mail-in1.it.university.example;
+Received: from mail-in1.it.university.example (192.0.2.105) by
+ CY5PEPF00000E74.mail.protection.outlook.com (10.167.247.36) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.522.6
+ via Frontend Transport; Tue, 13 Oct 2026 17:01:10 +0000
+Received: from mx0a-00000000.pphosted.com (mx0a-00000000.pphosted.com [198.51.100.245])
+	by mail-in1.it.university.example (Postfix) with ESMTPS id AA23671F4A
+	for <student@university.example>; Tue, 13 Oct 2026 12:01:09 -0500 (CDT)
+Received: from pps.filterd (m0000000.ppops.net [127.0.0.1])
+	by mx0b-00000000.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69DGv7d71209527
+	for <student@university.example>; Tue, 13 Oct 2026 12:01:09 -0500
+Authentication-Results-Original: ppops.net;	spf=pass
+ smtp.mailfrom=bounce-45IQKHO555EEFKN7AXYSWCCNG4.120049@bounce.email.alumni.example;
+	dkim=pass header.s=fbldkim12 header.d=s12.y.mc.salesforce.com;	dmarc=pass
+ header.from=alumni.example
+Received: from mta.email.alumni.example (mta.email.alumni.example [203.0.113.252])
+	by mx0b-00000000.pphosted.com (PPS) with ESMTPS id 4h9rm700xn-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT)
+	for <student@university.example>; Tue, 13 Oct 2026 12:01:04 -0500 (CDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=fbldkim12; d=s12.y.mc.salesforce.com;
+ h=From:To:Subject:Date:List-Unsubscribe:List-Unsubscribe-Post:MIME-Version:
+ Reply-To:Message-ID:Content-Type;
+ bh=4mW8v90dK8Ce/Nqr8+mZZM20sWF8dNTQnp92i056BPQ=;
+ b=ge5k0vZw8SlfhCELkZwBSLurxquu6N63FkcsCWD9NJrvkgHszJIEgKtQxLDH+sUBeQ0IL4
+Received: by mta.email.alumni.example id hpphsu39mjc1 for <student@university.example>; Tue, 13 Oct 2026 17:01:03 +0000 (envelope-from <bounce-45IQKHO555EEFKN7AXYSWCCNG4.120049@bounce.email.alumni.example>)
+From: "Class Ring Program" <ClassRing@Alumni.example>
+To: <student@university.example>
+Subject: Choosing Your Ring Experience: Ring Day or Ring Pickup?
+Date: Tue, 13 Oct 2026 11:01:03 -0600
+List-Unsubscribe: <https://click.email.alumni.example/subscription_center.aspx?jwt=abc>, <mailto:leave-BZ5SIFGREX6UFNPQ2WEI6TSKXY.120049@leave.email.alumni.example>
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+Reply-To: "Class Ring Program" <reply-WBQQX4XFI7QE7CUF7ZJVD5OHXY.120049@email.alumni.example>
+X-SFMC-Stack: 12
+Message-ID: <edb04cd8-c13a-41f2-91a7-ef2482a44a9e@iad4s12mta0389.xt.local>
+X-Proofpoint-Banner-Trigger: inbound
+X-Proofpoint-SPF-Result: pass
+X-Proofpoint-DMARC-Result: pass
+Return-Path:
+ bounce-45IQKHO555EEFKN7AXYSWCCNG4.120049@bounce.email.alumni.example
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-Forefront-Antispam-Report:
+ CIP:192.0.2.105;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail-in1.it.university.example;PTR:mail-in1.it.university.example;CAT:NONE;DIR:INB;
+MIME-Version: 1.0
+Content-Type: text/html; charset="utf-8"
+
+<html><body>
+<p>[EXTERNAL EMAIL] This message came from outside the university.</p>
+<p>Howdy! Choose how you'd like to receive your class ring this fall.</p>
+<p><a href="https://click.email.alumni.example/?qs=ringday">Learn about Ring Day</a> or
+<a href="https://click.email.alumni.example/?qs=pickup">schedule a pickup</a>.</p>
+</body></html>

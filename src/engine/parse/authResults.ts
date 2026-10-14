@@ -53,6 +53,8 @@ export function parseAllAuthResults(headers: RawHeader[]): AuthResultsHeader[] {
   for (const h of headers) {
     if (h.name === 'authentication-results') {
       out.push({ ...parseAuthResultsValue(h.value, 'auth'), index: authIndex++, trusted: false })
+    } else if (h.name === 'authentication-results-original') {
+      out.push({ ...parseAuthResultsValue(h.value, 'auth'), index: authIndex++, trusted: false, original: true })
     } else if (h.name === 'arc-authentication-results') {
       out.push({ ...parseAuthResultsValue(h.value, 'arc'), index: -1, trusted: false })
     }
@@ -76,7 +78,7 @@ export function providerName(header: AuthResultsHeader): string {
   const id = header.authservId
   if (!id) return looksLikeMicrosoft(header) ? 'Microsoft 365 / Exchange Online' : 'Unknown (no authserv-id)'
   if (id === 'mx.google.com') return 'Google (mx.google.com)'
-  if (/(^|\.)protection\.outlook\.com$/.test(id)) return `Microsoft 365 (${id})`
+  if (/(^|\.)(protection\.outlook|microsoft)\.com$/.test(id)) return `Microsoft 365 (${id})`
   if (/yahoo|aol/.test(id)) return `Yahoo / AOL (${id})`
   if (/icloud|apple/.test(id)) return `iCloud (${id})`
   return id

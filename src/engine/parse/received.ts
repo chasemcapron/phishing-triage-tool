@@ -1,3 +1,4 @@
+import { PROVIDER_FAMILIES } from '../data/lists'
 import type { Hop } from '../types'
 import { classifyIp, isIPv4, isIPv6, registrable } from '../util/domain'
 import type { RawHeader } from './headers'
@@ -56,9 +57,17 @@ export function parseReceivedValue(value: string): Omit<Hop, 'index' | 'delaySec
   }
 }
 
-const orgOf = (host: string | null) => {
+/** The organization a host belongs to; every domain of one mail provider counts as one. */
+export const orgOf = (host: string | null) => {
   if (!host || host.startsWith('[')) return null
-  return registrable(host)
+  const d = registrable(host)
+  return (d && PROVIDER_FAMILIES.find((f) => f.includes(d))?.[0]) ?? d
+}
+
+/** Reverse-DNS name the receiving server recorded, as in "from helo (name.example. [192.0.2.1])". */
+export function reverseName(hop: Pick<Hop, 'raw'>): string | null {
+  const m = /^\s*from\s+\S+\s+\(([a-z0-9][a-z0-9.-]*[a-z0-9])\.?\s+\[/i.exec(hop.raw)
+  return m ? m[1]!.toLowerCase() : null
 }
 
 /**

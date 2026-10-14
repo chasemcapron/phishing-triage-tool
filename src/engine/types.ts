@@ -67,6 +67,17 @@ export interface AuthResultsHeader {
   methods: AuthMethodResult[]
   raw: string
   trusted: boolean
+  /** Renamed by the receiving provider (Microsoft keeps earlier ones as Authentication-Results-Original). */
+  original?: boolean
+}
+
+export interface GatewayAuth {
+  /** Gateway vendor, or the organization's own domain when it runs its own mail server. */
+  name: string
+  /** The gateway server that took the message in from the internet. */
+  host: string
+  /** What the mailbox provider concluded after the gateway relayed (and often changed) the message. */
+  downstream: { provider: string; spf: string | null; dkim: string | null; dmarc: string | null }
 }
 
 export interface AuthSummary {
@@ -79,6 +90,8 @@ export interface AuthSummary {
   dkim: string | null
   dmarc: string | null
   headers: AuthResultsHeader[]
+  /** Set when the recipient's own email gateway checked the message before the mailbox provider did. */
+  gateway?: GatewayAuth
 }
 
 export type IpClass = 'public' | 'private' | 'loopback' | 'link-local' | 'cgnat' | 'documentation' | 'reserved'

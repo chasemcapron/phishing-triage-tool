@@ -62,6 +62,7 @@ export const CHECKS = {
   'auth-extra-results': { weight: 8, category: 'auth', title: 'Extra authentication header from another server' },
   'auth-unverified-provider': { weight: 5, category: 'auth', title: 'Authentication header source not confirmed' },
   'auth-missing': { weight: 0, category: 'auth', title: 'No authentication results' },
+  'auth-via-gateway': { weight: 0, category: 'auth', title: "Checked by your organization's email gateway" },
 
   // Sender identity
   'sender-lookalike-domain': { weight: 40, category: 'sender', title: 'Sender domain imitates a brand' },

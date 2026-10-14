@@ -26,7 +26,7 @@ export const MTA_MESSAGE_ID_DOMAINS = new Set([
   'outlook.com', 'gmail.com', 'google.com', 'amazonses.com', 'sendgrid.net', 'mcsv.net', 'mailchimp.com',
   'mailgun.org', 'sparkpostmail.com', 'mandrillapp.com', 'exacttarget.com', 'salesforce.com', 'hubspot.com',
   'yahoo.com', 'icloud.com', 'zendesk.com', 'freshdesk.com', 'postmarkapp.com', 'mtasv.net', 'sendinblue.com',
-  'brevo.com', 'constantcontact.com', 'ccsend.com', 'klaviyomail.com',
+  'brevo.com', 'constantcontact.com', 'ccsend.com', 'klaviyomail.com', 'xt.local',
 ])
 
 export const EXEC_EXTS = new Set([
@@ -52,3 +52,27 @@ export const RISKY_TLDS = new Set([
   'shop', 'store', 'online', 'site', 'website', 'top', 'xyz', 'icu', 'cyou', 'sbs', 'cfd', 'bond', 'buzz',
   'vip', 'click', 'lat', 'rest', 'monster', 'cam', 'boutique', 'sale', 'deals', 'win', 'fun', 'space',
 ])
+
+/**
+ * Domains one mail provider uses for its own servers. A hop between two of them is internal,
+ * not a handoff between organizations (Microsoft passes mail from outlook.com to office365.com).
+ */
+export const PROVIDER_FAMILIES: string[][] = [
+  ['outlook.com', 'office365.com', 'microsoft.com', 'office.com', 'exchangelabs.com'],
+  ['google.com', 'gmail.com', 'googlemail.com'],
+  ['yahoo.com', 'yahoodns.net', 'aol.com'],
+  ['icloud.com', 'me.com', 'apple.com'],
+]
+
+/**
+ * Email security gateways organizations put in front of their mailboxes: the domains their
+ * servers use, and the authserv-ids their Authentication-Results headers carry.
+ */
+export const GATEWAYS: { name: string; hosts: string[]; authserv: string[] }[] = [
+  { name: 'Proofpoint', hosts: ['pphosted.com', 'ppe-hosted.com', 'proofpoint.com'], authserv: ['ppops.net', 'pphosted.com', 'proofpoint.com'] },
+  { name: 'Mimecast', hosts: ['mimecast.com', 'mimecast-offshore.com'], authserv: ['mimecast.com'] },
+  { name: 'Cisco Secure Email', hosts: ['iphmx.com'], authserv: ['iphmx.com'] },
+  { name: 'Barracuda', hosts: ['barracudanetworks.com', 'cudasvc.com'], authserv: ['barracudanetworks.com'] },
+  { name: 'Broadcom Email Security', hosts: ['messagelabs.com'], authserv: ['messagelabs.com'] },
+  { name: 'Trend Micro', hosts: ['trendmicro.com', 'trendmicro.eu'], authserv: ['trendmicro.com'] },
+]

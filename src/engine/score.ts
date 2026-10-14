@@ -8,8 +8,12 @@ export function scoreFindings(findings: Finding[]): { score: number; verdict: Ve
     if (f.category === 'content') content += f.weight
     else other += f.weight
   }
-  const score = other + Math.min(content, CONTENT_CAP)
+  let score = other + Math.min(content, CONTENT_CAP)
   const forced = findings.some((f) => f.forceHigh)
+  // Authentication can break in transit (forwarding, gateways, mailing lists), so failed checks
+  // and relay oddities alone stop at Suspicious: High needs a warning sign of another kind.
+  const corroborated = findings.some((f) => f.weight >= 12 && !['auth', 'relay', 'content'].includes(f.category))
+  if (!forced && !corroborated) score = Math.min(score, THRESHOLDS.high - 1)
   const verdict: Verdict = forced || score >= THRESHOLDS.high ? 'high' : score >= THRESHOLDS.suspicious ? 'suspicious' : 'none'
   return { score, verdict, verdictLabel: VERDICT_LABELS[verdict] }
 }
