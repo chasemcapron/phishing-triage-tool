@@ -24,7 +24,7 @@ The demo uses a real fake store that took a friend's card details at checkout in
 - **Report it in one tap.** Official forms open in a new tab: Google Safe Browsing (with the link pre-filled), the FTC, and the FBI's IC3 for scams that can cost money.
 - **Send it to someone.** "Copy a summary to send someone" gives a plain-English summary. Every link in it is defanged so the other person's phone can't make it tappable.
 - **Analyst view.** Every finding with its weight, severity, evidence and MITRE ATT&CK techniques, plus a links table, defanged IOCs, JSON export and a Markdown ticket summary.
-- **Day or night.** It opens in day mode, with a night-fishing toggle that is remembered. The brief asked for dark by default; day was chosen in design review because it suits the cartoon pond.
+- **Day or night.** It opens in day mode, with a night-fishing toggle that is remembered. Dark was the original plan; day was chosen in design review because it suits the cartoon pond.
 
 ## Architecture
 
@@ -100,6 +100,9 @@ The lookalike checks compare domains against **~50 commonly impersonated brands*
 | --- | --- |
 | "Wrong number" opener ("Hi, is this Emily?"), the start of investment and romance scams | 25 |
 | Asks you to call a number about an account or charge | 20 |
+| ...and the "charge" is a renewal or subscription with an amount and an offer to cancel or refund it | +12 |
+| Asks you to buy gift cards and send photos of the backs or the codes | 25 |
+| Asks you to pass on a code you just received ("send me the 6-digit code you got") | 25 |
 
 ### Online reputation and domain age
 
@@ -119,7 +122,8 @@ Two thresholds are there because false positives turned up during testing. `goog
 - **Why strip queries:** query strings often carry personal tokens, such as password-reset links, tracking IDs and the recipient's email address. The trade-off is that a phishing page identified only by its query string may be missed. The same rule applies to the Google report link.
 - **A visible switch.** The privacy note under the input states exactly what is sent and has an **online checks on/off** switch. With it off, nothing leaves the device.
 - **The domain-age fallback.** Some registries block cloud servers (the `.shop` registry answers Vercel with HTTP 429 every time). When that happens, the browser asks that registry directly for the domain's registration date. Only the domain name is sent. The CSP allows exactly those 17 registry hosts.
-- **No storage, no logging.** Nothing submitted is stored or logged on the server. Responses are `Cache-Control: no-store`. The browser keeps lookup results for 5 minutes, in memory only.
+- **Who receives it.** Google Safe Browsing (`urls:search` sends the stripped URL itself; the more private hash-prefix mode needs a local hash database), VirusTotal and URLhaus. VirusTotal is only ever read: the tool never submits a URL for scanning, which would make it public. Credentials in links (`user:pass@`) are removed too.
+- **No storage, no logging.** Nothing submitted is stored or logged by the app. Vercel's platform logs keep standard request metadata (IP, path, status), never request bodies. Responses are `Cache-Control: no-store`. The browser keeps lookup results for 5 minutes, in memory only.
 
 ## Security of the app itself
 
@@ -129,7 +133,7 @@ Two thresholds are there because false positives turned up during testing. `goog
 | Other headers | HSTS (2 years, preload), `nosniff`, `Referrer-Policy: no-referrer`, `X-Frame-Options: DENY`, COOP `same-origin`, Permissions-Policy denying camera, microphone, geolocation, payment and USB |
 | Verified | [Mozilla Observatory](https://developer.mozilla.org/en-US/observatory/analyze?host=phishing-triage-tool.vercel.app): **A+ (130/130, 12/12 tests)**. Lighthouse (mobile): **Performance 96, Accessibility 100, Best Practices 100, SEO 100** (October 14, 2026) |
 | No SSRF | The server never requests a user-supplied URL; it only calls four fixed provider hosts |
-| API abuse | Same-origin only (`Origin` and `Sec-Fetch-Site`), strict validation (http/https URLs, domains and SHA-256 hashes only), 32 KB body cap, per-provider timeouts, per-IP limit of 30/min and 300/hour |
+| API abuse | Cross-site browser requests are rejected (`Origin` and `Sec-Fetch-Site`), so other websites can't spend the quotas. That is not authentication: scripts can still call the API, and the per-IP limit is what covers them. Strict validation (http/https URLs, domains and SHA-256 hashes only), 32 KB body cap, per-provider timeouts, per-IP limit of 30/min and 300/hour |
 | Provider quotas | VirusTotal's 4/min and 500/day public quota is budgeted on the server: hashes first, then domains, then at most 2 URLs. Results are cached (Safe Browsing within Google's limits of 30 min for hits and 1 h for misses, URLhaus 30 min, VirusTotal 6–12 h, RDAP 24 h). When a limit is hit, the tool says so ("VirusTotal limit reached, try again in a minute") |
 | Safe rendering | Nothing from the input is ever rendered as HTML; every displayed value is escaped by React. IOC exports and ticket summaries are defanged and Markdown-escaped |
 | Secrets | API keys live only in Vercel environment variables, never with a `VITE_` prefix, so they're never shipped to the browser. `.env*` is gitignored except `.env.example`. A scan of the full git history finds no keys |
@@ -155,11 +159,11 @@ Two thresholds are there because false positives turned up during testing. `goog
 
 The trade-off is that shortened links can't be expanded. The tool says the destination is hidden.
 
-**Abuse of the tool itself.** The lookup API is the only server surface. It accepts only validated indicators from same-origin pages, rate-limits per IP, and has nothing to store or leak. The in-memory rate limiter is per server instance, so the limit is approximate when Vercel scales out. That's acceptable for a portfolio project; a shared store such as Upstash Redis would make it exact.
+**Abuse of the tool itself.** The lookup API is the only server surface. It accepts only validated indicators, rejects cross-site browser requests, rate-limits per IP, and has nothing to store or leak. The in-memory rate limiter is per server instance, so the limit is approximate when Vercel scales out. That's acceptable for a portfolio project; a shared store such as Upstash Redis would make it exact.
 
 ## Email analysis (paused)
 
-The brief included full email analysis: SPF, DKIM and DMARC from `Authentication-Results`, the `Received` relay chain, sender lookalikes, attachments with magic-byte sniffing, and .eml parsing with `postal-mime`. That engine is built and tested: 4 synthetic samples, forged-header detection, and recognition of organizations' email gateways (Proofpoint, Mimecast and others in front of Microsoft 365).
+The original plan included full email analysis: SPF, DKIM and DMARC from `Authentication-Results`, the `Received` relay chain, sender lookalikes, attachments with magic-byte sniffing, and .eml parsing with `postal-mime`. That engine is built and tested: 4 synthetic samples, forged-header detection, and recognition of organizations' email gateways (Proofpoint, Mimecast and others in front of Microsoft 365).
 
 It is **switched off in the UI** (`EMAIL_ENABLED` in [`src/App.tsx`](src/App.tsx)). Real legitimate mail still produced High-risk false alarms. Gateways, forwarding and mailing lists routinely break SPF and DKIM in transit, and judging that safely needs a much larger corpus of real mail than this project had time for. The code and tests stay in the repo.
 
@@ -189,6 +193,8 @@ This is a non-commercial portfolio project and follows each provider's terms for
 - **Shortened links** stay hidden, because the tool never visits links.
 - **Registries rate-limit.** A registry can briefly refuse domain-age lookups from a busy network (the `.shop` registry did after a day of testing from one machine). The panel then shows domain age as unavailable, and every other check still runs.
 - **Brand coverage** is a curated list of about 50 brands, not every company.
+- **Conversation scams without a link** are mostly missed. Gift-card and code-relay requests, wrong-number openers and fake renewals with a callback number are caught, but job/task offers, crypto "mentors" and "Hi Mum, new number" texts usually score nothing. A red-team set of 32 synthetic scams and 20 legitimate texts flags 24 of the scams and none of the legitimate texts.
+- **English only.** Spanish and other languages get the link checks but none of the wording checks.
 - **Query-string stripping** can miss phishing pages that differ only in their query string.
 - **VirusTotal's free quota** of 4 lookups a minute is shared by all users, so heavy use shows "limit reached" for that provider. The other checks keep working.
 - **The rate limit is approximate**, because it's kept in memory per server instance.
@@ -208,7 +214,7 @@ This is a non-commercial portfolio project and follows each provider's terms for
 npm install
 npm run dev          # frontend only (online checks show "unavailable")
 npx vercel dev       # frontend + /api functions
-npm test             # 252 Vitest tests: engine, every sample, server, scoring
+npm test             # 255 Vitest tests: engine, every sample, server, scoring
 npm run build        # type-checks app and tests, then builds
 ```
 
@@ -243,3 +249,7 @@ samples/         synthetic samples + manifest of expected results
 tests/           Vitest suites
 scripts/         QA and media scripts
 ```
+
+## License
+
+[MIT](LICENSE). The license covers this project's code and its original artwork; brand names belong to their owners and ATT&CK content stays under MITRE's terms.

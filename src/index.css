@@ -451,7 +451,13 @@ code {
 .tabs-single {
   grid-template-columns: 1fr;
 }
-.tabs-single .tab {
+.tabs-single .tab,
+.tabs-single .tab:hover,
+.tabs-single .tab[aria-selected='true'] {
+  /* A heading, not a pill: a filled pill here looked like a second "Check it" button. */
+  background: transparent;
+  color: var(--text);
+  font-size: 1.2rem;
   cursor: default;
 }
 .tab {

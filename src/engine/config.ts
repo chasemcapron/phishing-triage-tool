@@ -125,6 +125,9 @@ export const CHECKS = {
   'sms-reply-to-activate': { weight: 15, category: 'links', title: '"Reply to activate the link" trick' },
   'sms-wrong-number': { weight: 25, category: 'sender', title: '"Wrong number" opener' },
   'sms-callback-number': { weight: 20, category: 'links', title: 'Asks you to call a number' },
+  'sms-callback-charge': { weight: 12, category: 'links', title: 'Fake charge with a number to cancel it' },
+  'sms-gift-card-codes': { weight: 25, category: 'sender', title: 'Asks for gift card codes' },
+  'sms-code-relay': { weight: 25, category: 'sender', title: 'Asks you to pass on a code you received' },
 
   // Reputation and domain age (server lookups). Known-bad hits also force a High verdict.
   'rep-safe-browsing': { weight: 50, category: 'reputation', title: 'Flagged by Google Safe Browsing' },

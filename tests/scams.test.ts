@@ -54,15 +54,60 @@ describe('scams without a link', () => {
     expect(r.verdict).toBe('suspicious')
   })
 
+  it('adds weight to a fake renewal with a number to cancel it', () => {
+    for (const t of [
+      'Microsoft Security: A charge of $399.99 for Microsoft Defender renewal was approved. If you did not authorize this, call 1-844-555-0187 to cancel.',
+      'Your Geek Squad subscription auto-renewed for $289.99 today. To dispute this charge contact billing at +1 (888) 555-0110.',
+    ]) {
+      const r = analyzeText(t)
+      expect(r.findings.map((f) => f.kind), t).toEqual(expect.arrayContaining(['sms-callback-number', 'sms-callback-charge']))
+      expect(r.verdict, t).toBe('suspicious')
+    }
+  })
+
+  it('spots requests for gift card codes and for a code you just received', () => {
+    const gift = analyzeText(
+      "My love, I'm stuck at the oil rig. Please buy 4 Apple gift cards of $200 each and send me pictures of the backs so I can pay the shipping fee.",
+    )
+    expect(gift.findings.map((f) => f.kind)).toContain('sms-gift-card-codes')
+    expect(gift.verdict).toBe('suspicious')
+    const relay = analyzeText("Hey, it's Sam from church. I accidentally sent my Google verification code to your number. Can you send me the 6-digit code you just got?")
+    expect(relay.findings.map((f) => f.kind)).toContain('sms-code-relay')
+    expect(relay.verdict).toBe('suspicious')
+  })
+
   it('leaves ordinary texts alone', () => {
     for (const t of [
       'Hey, are you coming to dinner tonight?',
       'Call me at 555-201-3344 when you land',
       'Hi Sam, this is Dr. Lee’s office confirming your appointment Tuesday at 3pm.',
       'Is this weekend still good for the move?',
+      'G-482913 is your Google verification code.',
+      'Chase: Your one-time code is 55120. It expires in 10 minutes. Never share this code.',
+      'Your Apple Account code is: 384021. Do not share it with anyone.',
+      'Can you send me the wifi code? Forgot it again',
+      'Thanks for the Target gift card! Sending you pics of the party tonight',
+      'Your Spotify Premium subscription renewed for $11.99. Cancel anytime in your account settings.',
+      "Capital One: A purchase of $54.21 at TRADER JOES was made on your card ending 1234. If this wasn't you, call the number on the back of your card.",
+      'Venmo: Your account was accessed from a new device. If this was you, no action is needed. https://venmo.com/account/security',
+      "I'll pay you back on Cash App tonight, here's the video https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     ]) {
       expect(analyzeText(t).verdict, t).toBe('none')
     }
+  })
+})
+
+describe('payment app lookalikes', () => {
+  it('flags Venmo, Cash App and Coinbase lookalike links', () => {
+    for (const t of [
+      'Venmo: A payment of $500.00 is pending. Confirm your identity: https://venmo-secure-verify.test/login',
+      'Cash App: You have received $750 from a refund settlement. Claim it today at https://cashapp-claim.xyz/r/8812',
+    ]) {
+      expect(analyzeText(t).verdict, t).toBe('high')
+    }
+    const coinbase = analyzeText('Coinbase: unusual withdrawal attempt. Secure your wallet at https://coinbase-recovery.test/')
+    expect(coinbase.findings.map((f) => f.kind)).toEqual(expect.arrayContaining(['link-combosquat', 'link-brand-mention']))
+    expect(coinbase.verdict).not.toBe('none')
   })
 })
 

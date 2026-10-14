@@ -139,6 +139,27 @@ export const BRANDS: Brand[] = [
     domains: ['linkedin.com', 'lnkd.in'],
     mentions: ['linkedin'],
   },
+  // Payment apps: mentions are anchored to the start of a line ("Venmo: ...") so a friend
+  // saying "I'll send it on Cash App" next to an unrelated link doesn't count as a claim.
+  // Zelle is left out: banks send real Zelle texts from their own domains.
+  {
+    name: 'Venmo',
+    keywords: ['venmo'],
+    domains: ['venmo.com'],
+    mentions: ['^venmo\\b'],
+  },
+  {
+    name: 'Cash App',
+    keywords: ['cashapp'],
+    domains: ['cash.app', 'cashapp.com', 'cash.me', 'squareup.com'],
+    mentions: ['^cash ?app\\b'],
+  },
+  {
+    name: 'Coinbase',
+    keywords: ['coinbase'],
+    domains: ['coinbase.com'],
+    mentions: ['^coinbase\\b','coinbase (?:support|security|account|wallet)'],
+  },
   {
     name: 'E-ZPass',
     keywords: ['ezpass'],

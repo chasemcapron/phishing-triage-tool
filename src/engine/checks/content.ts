@@ -90,6 +90,19 @@ const WRONG_NUMBER =
 const CALLBACK = /\b(?:call|contact|dial|phone|reach)\b[^.\n]{0,40}?((?:\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4})\b/i
 const ACCOUNT_TALK =
   /\b(account|card|order|charge[ds]?|payment|refund|subscription|locked|suspended|fraud|unauthori[sz]ed|renewal|invoice|security|support|geek squad|norton|mcafee|paypal|amazon|apple|microsoft|bank)\b/i
+// Fake renewal/refund receipts: real card alerts with a number say "call the number on the
+// back of your card", not "call us to cancel this $399 renewal". All three parts must appear.
+const RENEWAL = /\b(?:auto-?renew\w*|renew(?:al|ed)|subscription|membership)\b/i
+const AMOUNT = /\$\s?\d/
+const CANCEL = /\b(?:cancel\w*|dispute|refund\w*)\b/i
+// Gift cards are untraceable; asking for photos of the backs (or the codes) is the tell.
+const GIFT_CARD = /\bgift ?cards?\b/i
+const GIFT_CODES =
+  /\b(?:(?:photos?|pictures?|pics?|snapshots?) of (?:the |both |each |all )?(?:backs?|(?:gift )?cards?|codes?|receipts?|pins?)\b|(?:send|text|give) (?:me|us) the (?:codes?|numbers?|pins?|card numbers?)|(?:codes?|numbers?|pins?) (?:on|from) the back|scratch (?:off )?the)/i
+// "Send me the code you just got": taking over an account by relaying a one-time code.
+// A plain "send me the code" (wifi, door) needs a sign it is a code the person just received.
+const CODE_RELAY =
+  /\b(?:send|forward|tell|give|share|text|read)\s+(?:me|us)\s+(?:back\s+)?(?:the|that|this|your)\s+(?:(?:(?:\d|four|five|six|eight)[- ]digit\s+(?:verification\s+|security\s+|login\s+)?code)|(?:verification|security|confirmation|login|one-time|otp|google|whatsapp|facebook|apple)\s+code|code\s+(?:you|that|which)\s+(?:just\s+)?(?:got|received|was sent|came|we sent))/i
 
 export function checkSmsTricks(text: string, findings: FindingSet): void {
   const opener = WRONG_NUMBER.exec(text.slice(0, 240))
@@ -106,6 +119,30 @@ export function checkSmsTricks(text: string, findings: FindingSet): void {
       'sms-callback-number',
       "It asks you to call a phone number about an account or charge. Scammers use their own numbers to get you on the phone; look up the company's real number yourself.",
       `"${clip(call[0].trim(), 80)}"`,
+    )
+    const renewal = RENEWAL.exec(text)
+    if (renewal && AMOUNT.test(text) && CANCEL.test(text)) {
+      findings.add(
+        'sms-callback-charge',
+        'It reports a charge or renewal you did not expect and gives a number to cancel it. This is how refund scams start: the "agent" asks for remote access or your bank login to "refund" you.',
+        `"${clip(renewal[0], 40)}"`,
+      )
+    }
+  }
+  const gift = GIFT_CODES.exec(text)
+  if (gift && GIFT_CARD.test(text)) {
+    findings.add(
+      'sms-gift-card-codes',
+      'It asks you to buy gift cards and send the codes or photos of them. No real company, government office or person in trouble asks for payment this way.',
+      `"${clip(gift[0].trim(), 80)}"`,
+    )
+  }
+  const relay = CODE_RELAY.exec(text)
+  if (relay) {
+    findings.add(
+      'sms-code-relay',
+      'It asks you to pass on a code that was just texted to you. That code lets them take over your account (WhatsApp, Google, your bank); never share it.',
+      `"${clip(relay[0].trim(), 80)}"`,
     )
   }
   const m = SMS_REPLY_TRICK.exec(text)

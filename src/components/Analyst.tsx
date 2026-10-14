@@ -74,7 +74,7 @@ export function AuthTable({ email }: { email: EmailDetails }) {
               {auth.providerVerified ? ' (matches the server that received the message)' : ' (could not match it to the receiving server)'}.
             </p>
           )}
-          <div className="table-wrap">
+          <div className="table-wrap" role="region" tabIndex={0} aria-label="Authentication results">
             <table>
               <thead>
                 <tr>
@@ -179,7 +179,8 @@ export function LinksTable({ links }: { links: LinkInfo[] }) {
         <h2 id="links-table-heading">Links ({links.length})</h2>
         <CopyButton text={links.map((l) => l.defanged).join('\n')} label="Copy all" />
       </div>
-      <div className="table-wrap">
+      {/* Focusable so keyboard users can scroll the table sideways on narrow screens. */}
+      <div className="table-wrap" role="region" tabIndex={0} aria-labelledby="links-table-heading">
         <table>
           <thead>
             <tr>
@@ -229,7 +230,7 @@ export function AttachmentsTable({ email }: { email: EmailDetails }) {
     <section className="panel" aria-labelledby="att-heading">
       <h2 id="att-heading">Attachments ({email.attachments.length})</h2>
       <p className="muted small">Hashed in your browser. Files are never uploaded; only the SHA-256 may be looked up.</p>
-      <div className="table-wrap">
+      <div className="table-wrap" role="region" tabIndex={0} aria-labelledby="att-heading">
         <table>
           <thead>
             <tr>
