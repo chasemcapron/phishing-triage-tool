@@ -10,7 +10,10 @@ const SHORT_LABELS: Record<string, string> = {
   'legit-newsletter': 'Normal newsletter',
   'smishing-toll': 'Unpaid toll text',
   'smishing-package': 'Package delivery text',
-  'safe-browsing-test': 'Safe Browsing test links',
+  'safe-browsing-test': 'Safe Browsing test',
+  'fake-store': 'Fake store ad',
+  'wrong-number': 'Wrong number',
+  'normal-text': 'Normal text',
 }
 
 export interface Sample {
@@ -19,6 +22,8 @@ export interface Sample {
   title: string
   label: string
   content: string
+  /** Shown as a quick-try button (false keeps it as a test fixture and deep link only). */
+  chip: boolean
 }
 
 export const SAMPLES: Sample[] = manifest.samples.map((s) => ({
@@ -27,4 +32,5 @@ export const SAMPLES: Sample[] = manifest.samples.map((s) => ({
   title: s.title,
   label: SHORT_LABELS[s.id] ?? s.title,
   content: RAW[`../samples/${s.file}`] ?? '',
+  chip: (s as { chip?: boolean }).chip !== false,
 }))

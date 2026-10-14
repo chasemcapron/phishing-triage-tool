@@ -79,7 +79,13 @@
       "mode": "text",
       "title": "Unpaid toll text (smishing)",
       "expectedLocalVerdict": "high",
-      "expectedSignals": ["link-combosquat", "link-brand-mention", "sms-reply-to-activate", "content-urgency", "content-payment"],
+      "expectedSignals": [
+        "link-combosquat",
+        "link-brand-mention",
+        "sms-reply-to-activate",
+        "content-urgency",
+        "content-payment"
+      ],
       "notes": "The link has no scheme (bare domain), as is typical in SMS."
     },
     {
@@ -88,7 +94,38 @@
       "mode": "text",
       "title": "Package delivery text (smishing)",
       "expectedLocalVerdict": "high",
-      "expectedSignals": ["link-brand-subdomain", "link-raw-ip", "link-brand-mention", "content-urgency"]
+      "expectedSignals": [
+        "link-brand-subdomain",
+        "link-raw-ip",
+        "link-brand-mention",
+        "content-urgency"
+      ],
+      "chip": false
+    },
+    {
+      "id": "fake-store",
+      "file": "08-fake-store.txt",
+      "mode": "text",
+      "title": "Fake store ad (social media)",
+      "expectedLocalVerdict": "high",
+      "expectedSignals": [
+        "link-combosquat",
+        "link-brand-mention",
+        "content-deal"
+      ],
+      "notes": "Modeled on a real fake Summer Fridays store (Oct 2026), moved to a reserved .test domain. Live, a real .shop store also gets domain age and the risky-ending signal."
+    },
+    {
+      "id": "wrong-number",
+      "file": "09-wrong-number.txt",
+      "mode": "text",
+      "title": "Wrong number text (investment scam opener)",
+      "expectedLocalVerdict": "suspicious",
+      "expectedSignals": [
+        "sms-wrong-number",
+        "content-payment"
+      ],
+      "notes": "No link: the scam starts with a friendly chat and turns to a crypto investment later."
     },
     {
       "id": "safe-browsing-test",
@@ -97,8 +134,20 @@
       "title": "Google Safe Browsing test URLs (real reputation hit)",
       "expectedLocalVerdict": "suspicious",
       "expectedVerdictWithReputation": "high",
-      "expectedSignals": ["link-brand-tld"],
+      "expectedSignals": [
+        "link-brand-tld"
+      ],
       "notes": "Google's official test URLs, not actually malicious. Locally only the google.test brand name is suspicious; with Safe Browsing configured, the match forces High. Still to confirm in M4: which of these two URLs the Lookup API actually matches today."
+    },
+    {
+      "id": "normal-text",
+      "file": "10-normal-text.txt",
+      "mode": "text",
+      "title": "Ordinary text from a friend (control)",
+      "expectedLocalVerdict": "none",
+      "expectedSignals": [],
+      "expectNoFindings": true,
+      "notes": "Control sample. Any finding here is a false positive."
     }
   ]
 }

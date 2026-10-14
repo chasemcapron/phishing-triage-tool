@@ -100,7 +100,7 @@ export function TextMode({ onSwitchToEmail, sample }: { onSwitchToEmail?: (text:
         </div>
         <div className="samples" role="group" aria-label="Try a sample">
           <span className="samples-label">Try a sample catch:</span>
-          {SAMPLES.filter((s) => s.mode === 'text').map((s) => (
+          {SAMPLES.filter((s) => s.mode === 'text' && s.chip).map((s) => (
             <button
               key={s.id}
               type="button"

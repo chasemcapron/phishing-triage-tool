@@ -14,10 +14,12 @@ mkdirSync(outDir, { recursive: true })
 const ALL_PAGES = [
   ['home', '/'],
   ['text-toll', '/#text/smishing-toll'],
-  ['text-package', '/#text/smishing-package'],
+  ['text-store', '/#text/fake-store'],
+  ['text-wrong', '/#text/wrong-number'],
+  ['text-normal', '/#text/normal-text'],
   ['text-sb', '/#text/safe-browsing-test'],
   // Email mode is paused (EMAIL_ENABLED in App.tsx); its pages come back with it.
-  // No sample lands on Suspicious, so this one is typed in (a lookalike on a reserved .test name).
+  // Typed in rather than a sample, to cover the textarea path (a lookalike on a reserved .test name).
   ['text-suspicious', '/#text', 'Sign in to keep your account: https://paypa1-login.test/'],
   // A real fake store (Oct 2026). Live, the browser domain-age fallback should lift it to High.
   ['text-fakeshop', '/#text', 'www.summrfrideays.shop'],
