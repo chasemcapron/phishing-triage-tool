@@ -1,5 +1,7 @@
 # Gone Phishing
 
+[![CI](https://github.com/chasemcapron/phishing-triage-tool/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/chasemcapron/phishing-triage-tool/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 **Live: [gonefishing-app.vercel.app](https://gonefishing-app.vercel.app)**
 
 Paste a suspicious link or text message *before you tap it* and get a clear, explainable verdict: what's wrong with it, in plain English, and what to do next. Everything is analyzed in your browser. Only links and domains are looked up online, and the tool never opens a link.
@@ -141,7 +143,7 @@ Two thresholds are there because false positives turned up during testing. `goog
 | Provider quotas | VirusTotal's 4/min and 500/day public quota is budgeted on the server: hashes first, then domains, then at most 2 URLs. Results are cached (Safe Browsing within Google's limits of 30 min for hits and 1 h for misses, URLhaus 30 min, VirusTotal 6–12 h, RDAP 24 h). When a limit is hit, the tool says so ("VirusTotal limit reached, try again in a minute") |
 | Safe rendering | Nothing from the input is ever rendered as HTML; every displayed value is escaped by React. IOC exports and ticket summaries are defanged and Markdown-escaped |
 | Secrets | API keys live only in Vercel environment variables, never with a `VITE_` prefix, so they're never shipped to the browser. `.env*` is gitignored except `.env.example`. A scan of the full git history finds no keys |
-| Supply chain | `npm audit`: 0 vulnerabilities. Dependabot is configured for npm and GitHub Actions |
+| Supply chain | `npm audit`: 0 vulnerabilities. Dependabot opens weekly npm and GitHub Actions updates. CI runs lint, format check, typecheck, tests and build on every push and pull request, with actions pinned to commit SHAs and a read-only token |
 
 ## Threat model
 
@@ -220,6 +222,8 @@ npm run dev          # frontend only (online checks show "unavailable")
 npx vercel dev       # frontend + /api functions
 npm test             # 294 Vitest tests: engine, every sample, server, scoring
 npm run build        # type-checks app and tests, then builds
+npm run lint         # Oxlint, including type-aware rules
+npm run format       # Prettier (format:check in CI)
 ```
 
 Copy `.env.example` to `.env.local` and add the keys:
