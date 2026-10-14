@@ -64,7 +64,7 @@ export function checkHiddenChars(text: string, findings: FindingSet): string {
   const hits = [...body.matchAll(HIDDEN)]
   if (!hits.length) return body
   const evidence = hits.slice(0, 3).map((m) => {
-    const at = m.index!
+    const at = m.index
     const around = body.slice(Math.max(0, at - 12), at + 13)
     return `"${defangText(around.replace(HIDDEN, codeOf))}"`
   })

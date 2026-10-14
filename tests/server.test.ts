@@ -99,7 +99,7 @@ describe('Safe Browsing v5', () => {
     expect(r).toEqual({ status: 'ok', results: [{ url: 'https://testsafebrowsing.appspot.com/s/malware.html', threatTypes: ['MALWARE'] }] })
     expect(decodeSearchUrlsResponse(new Uint8Array()).threats).toEqual([])
     expect(() => decodeSearchUrlsResponse(new Uint8Array([0x0a, 0x05, 0x01]))).toThrow()
-    const bad = await lookupSafeBrowsing(['https://x.example/'], { fetch: mockFetch(() => new Response(new Uint8Array([0x0a, 0x09]) as unknown as BodyInit, { status: 200 })), apiKey: 'k', cache: new TtlCache() })
+    const bad = await lookupSafeBrowsing(['https://x.example/'], { fetch: mockFetch(() => new Response(new Uint8Array([0x0a, 0x09]), { status: 200 })), apiKey: 'k', cache: new TtlCache() })
     expect(bad.status).toBe('error')
   })
 
@@ -188,7 +188,7 @@ describe('URLhaus', () => {
     // (Host lookups are supported by the client but not used by runLookup; see server/lookup.ts.)
     const f = mockFetch((url, init) => {
       expect((init!.headers as Record<string, string>)['Auth-Key']).toBe('uh')
-      const body = new URLSearchParams(String(init!.body))
+      const body = new URLSearchParams(init!.body as string)
       if (url.endsWith('/host/')) return jsonRes(200, { query_staus: 'ok', urls: [{ url_status: 'online', threat: 'malware_download', tags: null, urlhaus_reference: 'https://urlhaus.abuse.ch/url/1/' }] })
       if (url.endsWith('/url/')) return jsonRes(200, { query_status: body.get('url') === 'https://bad.example/x' ? 'ok' : 'no_results', url_status: 'offline', threat: 'malware_download', tags: ['exe'], urlhaus_reference: 'https://urlhaus.abuse.ch/url/2/' })
       return jsonRes(200, { query_status: 'no_results' })

@@ -49,17 +49,18 @@ export function CopyButton({ text, label = 'Copy', compact = false }: { text: st
   const [copied, setCopied] = useState(false)
   const timer = useRef<number | undefined>(undefined)
   useEffect(() => () => window.clearTimeout(timer.current), [])
+  const copy = async () => {
+    if (await writeClipboard(text)) {
+      setCopied(true)
+      window.clearTimeout(timer.current)
+      timer.current = window.setTimeout(() => setCopied(false), 1800)
+    }
+  }
   return (
     <button
       type="button"
       className={compact ? 'btn btn-ghost btn-icon' : 'btn btn-secondary btn-sm'}
-      onClick={async () => {
-        if (await writeClipboard(text)) {
-          setCopied(true)
-          window.clearTimeout(timer.current)
-          timer.current = window.setTimeout(() => setCopied(false), 1800)
-        }
-      }}
+      onClick={() => void copy()}
       aria-label={compact ? `${label}: ${text}` : undefined}
     >
       {copied ? <IconCheck className="icon icon-sm" /> : <IconCopy className="icon icon-sm" />}

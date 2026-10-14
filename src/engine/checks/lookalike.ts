@@ -154,8 +154,8 @@ export function isClassicTypo(candidate: string, target: string): boolean {
     return false
   }
   if (candidate.length === target.length && candidate !== target) {
-    const diff = [...candidate].flatMap((c, i) => (c === target[i] ? [] : [i]))
-    return diff.length === 2 && diff[1] === diff[0]! + 1 && candidate[diff[0]!] === target[diff[1]!] && candidate[diff[1]!] === target[diff[0]!]
+    const diff = candidate.split('').flatMap((c, i) => (c === target[i] ? [] : [i]))
+    return diff.length === 2 && diff[1] === diff[0]! + 1 && candidate[diff[0]!] === target[diff[1]] && candidate[diff[1]] === target[diff[0]!]
   }
   return false
 }

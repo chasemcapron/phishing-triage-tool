@@ -98,6 +98,7 @@ const FRONDS = (
   ] as const
 ).map(([x0, h, w, amp, waves, lean, ph, back, dur, delay]) => {
   const [d, vein] = frond(x0, h, w, amp, waves, lean, ph)
+  // oxlint-disable-next-line typescript/no-unnecessary-type-assertion -- false positive: without the cast tsc rejects the custom properties in style (TS2559)
   return { d, vein, back: back === 1, style: { '--sway-dur': `${dur}s`, '--sway-delay': `${delay}s` } as Vars }
 })
 

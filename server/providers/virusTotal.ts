@@ -45,7 +45,7 @@ interface Job {
 function stats(v: unknown): VirusTotalStats | undefined {
   if (typeof v !== 'object' || v === null) return undefined
   const s = v as Record<string, unknown>
-  const n = (k: string) => (typeof s[k] === 'number' ? (s[k] as number) : 0)
+  const n = (k: string) => (typeof s[k] === 'number' ? s[k] : 0)
   return { malicious: n('malicious'), suspicious: n('suspicious'), harmless: n('harmless'), undetected: n('undetected') }
 }
 
