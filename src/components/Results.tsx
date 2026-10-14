@@ -1,5 +1,5 @@
 import { forwardRef, type CSSProperties } from 'react'
-import { adviceFor } from '../engine/advice'
+import { adviceFor, reportUrl } from '../engine/advice'
 import { THRESHOLDS } from '../engine/config'
 import { friendSummary } from '../engine/export'
 import type { Finding, Report } from '../engine'
@@ -92,7 +92,7 @@ export const VerdictCard = forwardRef<HTMLHeadingElement, { report: Report; anal
 
 export function WhatToDo({ report }: { report: Report }) {
   const advice = adviceFor(report)
-  const link = report.links.find((l) => l.scheme === 'http' || l.scheme === 'https')
+  const link = reportUrl(report)
   return (
     <section className={report.verdict === 'none' ? 'todo todo-none' : 'todo'} aria-labelledby="todo-heading">
       <h2 id="todo-heading">What to do</h2>
@@ -104,14 +104,14 @@ export function WhatToDo({ report }: { report: Report }) {
       {advice.report.length > 0 && (
         <div className="todo-report">
           <h3>Report it</h3>
-          <p className="small">Reporting gets the site blocked faster for everyone. These open the official forms in a new tab.</p>
+          <p className="small">Reporting gets the site blocked faster for everyone. These open the official forms in a new tab; Google's comes with the link filled in.</p>
           <div className="todo-actions">
             {advice.report.map((r) => (
               <a key={r.href} className="btn btn-secondary btn-sm" href={r.href} target="_blank" rel="noopener noreferrer">
                 {r.label}
               </a>
             ))}
-            {link && <CopyButton text={link.url} label="Copy the link for the form" />}
+            {link && <CopyButton text={link} label="Copy the link" />}
           </div>
         </div>
       )}

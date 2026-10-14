@@ -102,9 +102,6 @@ export default function App() {
           <SkyBackdrop />
           <header className="site-header">
             <div className="container header-inner">
-              <div className="brand">
-                <LogoMark className="brand-logo" />
-              </div>
               <button
                 type="button"
                 className="btn btn-icon theme-toggle"

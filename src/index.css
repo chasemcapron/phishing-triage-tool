@@ -214,19 +214,9 @@ code {
 .header-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   min-height: 64px;
   padding-top: 6px;
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.brand-logo.pond-logo {
-  width: 34px;
-  height: 34px;
-  filter: drop-shadow(0 2px 4px rgba(15, 50, 90, 0.18));
 }
 .brand-name {
   font-family: var(--display);
@@ -1487,10 +1477,6 @@ td.hash {
   .header-inner {
     min-height: 76px;
     padding-top: 10px;
-  }
-  .brand-logo.pond-logo {
-    width: 40px;
-    height: 40px;
   }
   .brand-name {
     font-size: 1.55rem;

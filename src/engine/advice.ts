@@ -28,6 +28,18 @@ const REPORT = {
   ic3: { label: 'Lost money? Report it to the FBI (IC3)', href: 'https://www.ic3.gov/' },
 } satisfies Record<string, ReportLink>
 
+/**
+ * The link to report: the most suspicious web link, without its ?query and #fragment (they can
+ * carry tracking codes that identify the person it was sent to). Google's form pre-fills from it.
+ */
+export function reportUrl(r: Pick<Report, 'links'>): string | null {
+  const web = r.links.filter((l) => l.scheme === 'http' || l.scheme === 'https')
+  const link = [...web].sort((a, b) => b.flags.length - a.flags.length)[0]
+  if (!link) return null
+  const u = new URL(link.url)
+  return `${u.origin}${u.pathname}`
+}
+
 export function scamKind(r: Pick<Report, 'findings'>): ScamKind {
   const kinds = new Set(r.findings.map((f) => f.kind))
   const said = r.findings.map((f) => `${f.explanation} ${f.evidence.join(' ')}`).join(' ')
@@ -101,7 +113,6 @@ export function adviceFor(r: Pick<Report, 'verdict' | 'mode' | 'findings' | 'lin
   const out = [...steps[kind]]
   if (email) out.push('At work, report it to your IT or security team before deleting it.')
 
-  const web = r.links.some((l) => l.scheme === 'http' || l.scheme === 'https')
-  const report = [...(web ? [REPORT.google] : []), REPORT.ftc, ...(kind === 'shop' || kind === 'wrong-number' || kind === 'callback' ? [REPORT.ic3] : [])]
+  const report = [...(reportUrl(r) ? [{ ...REPORT.google, href: `${REPORT.google.href}?url=${encodeURIComponent(reportUrl(r)!)}` }] : []), REPORT.ftc, ...(kind === 'shop' || kind === 'wrong-number' || kind === 'callback' ? [REPORT.ic3] : [])]
   return { kind, steps: out, report }
 }

@@ -72,7 +72,7 @@ describe('advice and reporting', () => {
     expect(shop.kind).toBe('shop')
     expect(shop.steps[0]).toMatch(/Don't buy/)
     expect(shop.report.map((r) => r.href)).toEqual([
-      'https://safebrowsing.google.com/safebrowsing/report_phish/',
+      'https://safebrowsing.google.com/safebrowsing/report_phish/?url=http%3A%2F%2Fwww.summrfrideays.shop%2F',
       'https://reportfraud.ftc.gov/',
       'https://www.ic3.gov/',
     ])
@@ -80,7 +80,9 @@ describe('advice and reporting', () => {
     expect(adviceFor(analyzeText('USPS: your package is on hold, confirm your address at usps-redelivery.test/track')).kind).toBe('delivery')
     const wrong = adviceFor(analyzeText('Hi, is this Emily? We met at the conference last week'))
     expect(wrong.kind).toBe('wrong-number')
-    expect(wrong.report.map((r) => r.href)).not.toContain('https://safebrowsing.google.com/safebrowsing/report_phish/')
+    expect(wrong.report.some((r) => r.href.includes('safebrowsing'))).toBe(false)
+    const tracked = adviceFor(analyzeText('PayPal: confirm now https://paypa1-login.test/verify?victim=jane@example.com#step2'))
+    expect(tracked.report[0]!.href).toBe('https://safebrowsing.google.com/safebrowsing/report_phish/?url=https%3A%2F%2Fpaypa1-login.test%2Fverify')
   })
 
   it('has nothing to report on a clean result', () => {
