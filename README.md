@@ -187,6 +187,7 @@ This is a non-commercial portfolio project and follows each provider's terms for
 
 - **Day-zero sites.** Brand-new phishing sites that copy no listed brand, sit on an ordinary `.com` and use neutral wording can come back clean. Domain age helps, but only flags domains younger than 30 or 90 days.
 - **Shortened links** stay hidden, because the tool never visits links.
+- **Registries rate-limit.** A registry can briefly refuse domain-age lookups from a busy network (the `.shop` registry did after a day of testing from one machine). The panel then shows domain age as unavailable, and every other check still runs.
 - **Brand coverage** is a curated list of about 50 brands, not every company.
 - **Query-string stripping** can miss phishing pages that differ only in their query string.
 - **VirusTotal's free quota** of 4 lookups a minute is shared by all users, so heavy use shows "limit reached" for that provider. The other checks keep working.
