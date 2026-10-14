@@ -5,7 +5,7 @@ import type { FindingSet } from '../findings'
 import type { LinkInfo } from '../types'
 import { hostInfo } from '../util/domain'
 import { clip } from '../util/text'
-import { findLookalike, findPopularLookalike, isOfficialFor, officialBrand, type LookalikeHit, type PopularHit } from './lookalike'
+import { findLookalike, findPopularLookalike, isKnownPopular, isOfficialFor, officialBrand, type LookalikeHit, type PopularHit } from './lookalike'
 
 export const tldOf = (domain: string) => domain.slice(domain.lastIndexOf('.') + 1).toLowerCase()
 
@@ -177,11 +177,20 @@ export function mentionedBrands(text: string): Brand[] {
   return BRANDS.filter((b) => b.mentions.length && new RegExp(`(${b.mentions.join('|')})`, 'im').test(text))
 }
 
+// Links and bare domains in the text ("https://…", "www.…", "name.com", defanged "name[.]com").
+const LINKISH = /\S*(?::\/\/|\[\.\]|\.[a-z]{2,})\S*/gi
+
+/** A popular site carrying the brand's name ("amazon.fr", "googleusercontent.com") is the brand's own. */
+const brandsOwn = (brand: Brand, domain: string | null) =>
+  Boolean(domain && isKnownPopular(domain) && brand.keywords.some((k) => domain.split('.')[0]!.includes(k)))
+
 /** Text mode: the message names a brand but links somewhere that brand doesn't own. */
 export function checkBrandMentions(text: string, links: LinkInfo[], findings: FindingSet): void {
   const web = links.filter((l) => l.scheme === 'http' || l.scheme === 'https')
-  for (const brand of mentionedBrands(text)) {
-    const offsite = web.filter((l) => !isOfficialFor(brand, l.registrableDomain))
+  // Only the words count as a claim: a bare "google.de" link doesn't claim to be Google, and the
+  // link's own name is already judged by the lookalike checks.
+  for (const brand of mentionedBrands(text.replace(LINKISH, ' '))) {
+    const offsite = web.filter((l) => !isOfficialFor(brand, l.registrableDomain) && !brandsOwn(brand, l.registrableDomain))
     if (!offsite.length) continue
     for (const l of offsite) flag(l, 'link-brand-mention')
     const dest = offsite[0]!.registrableDomain ?? offsite[0]!.host

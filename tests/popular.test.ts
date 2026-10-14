@@ -89,3 +89,32 @@ describe('popular-site lookalikes', () => {
     expect(kinds).not.toContain('link-popular-lookalike')
   })
 })
+
+describe('popular sites are never called fakes', () => {
+  it('rates every shipped popular domain, as a bare link, as no red flags', () => {
+    const flagged = [...POPULAR_TARGETS, ...POPULAR_KNOWN].filter((d) => analyzeText(`https://${d}/`).verdict !== 'none')
+    expect(flagged).toEqual([])
+  })
+
+  it.each([
+    'google.de',
+    'google.co.uk',
+    'google.com.br',
+    'amazon.co.jp',
+    'amazon.fr',
+    'ticketmaster.co.uk',
+    'onmicrosoft.com',
+    'googleusercontent.com',
+    'cloud.com',
+    'pcloud.com',
+  ])('%s is not flagged', (d) => {
+    expect(analyzeText(`Here you go: https://${d}/`).verdict).toBe('none')
+  })
+
+  it('still flags a brand on a country ending it does not own, and a brand named in words', () => {
+    expect(analyzeText('https://paypal.de/login').verdict).not.toBe('none')
+    const named = analyzeText('Your Amazon order is on hold: https://amazon-orders.example/fix')
+    expect(named.findings.map((f) => f.kind)).toEqual(expect.arrayContaining(['link-combosquat', 'link-brand-mention']))
+    expect(named.verdict).not.toBe('none')
+  })
+})

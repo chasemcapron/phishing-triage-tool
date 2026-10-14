@@ -17,17 +17,23 @@ export interface LookalikeHit {
 
 const PRIORITY: LookalikeType[] = ['homoglyph', 'typo', 'brand-subdomain', 'combosquat', 'brand-tld', 'idn']
 
+// A country ending: "de", "co.uk", "com.br" (two-letter top level, optionally with a generic second level).
+const COUNTRY_ENDING = /^(?:(?:com|co|org|net|gov|ac|edu|or|ne|go)\.)?[a-z]{2}$/
+
+const owns = (b: Brand, d: string) =>
+  b.domains.includes(d) ||
+  Boolean(b.officialSuffixes?.some((s) => d.endsWith(s))) ||
+  Boolean(b.countryDomains && d.startsWith(`${b.countryDomains}.`) && COUNTRY_ENDING.test(d.slice(b.countryDomains.length + 1)))
+
 /** The brand that owns this registrable domain, if any. */
 export function officialBrand(domain: string | null): Brand | null {
   if (!domain) return null
   const d = domain.toLowerCase()
-  return BRANDS.find((b) => b.domains.includes(d) || b.officialSuffixes?.some((s) => d.endsWith(s))) ?? null
+  return BRANDS.find((b) => owns(b, d)) ?? null
 }
 
 export function isOfficialFor(brand: Brand, domain: string | null): boolean {
-  if (!domain) return false
-  const d = domain.toLowerCase()
-  return brand.domains.includes(d) || Boolean(brand.officialSuffixes?.some((s) => d.endsWith(s)))
+  return Boolean(domain && owns(brand, domain.toLowerCase()))
 }
 
 const tokensOf = (s: string) => s.split(/[-_]+/).filter(Boolean)
@@ -39,7 +45,9 @@ const tokensOf = (s: string) => s.split(/[-_]+/).filter(Boolean)
 export function findLookalike(rawHost: string): LookalikeHit | null {
   const info = hostInfo(rawHost)
   if (info.isIp || !info.domain || !info.label) return null
-  if (officialBrand(info.domain)) return null
+  // A brand's own sites (and, via the Tranco top 10,000, its country sites and infrastructure such
+  // as google.de or googleusercontent.com) are never imitations of it.
+  if (officialBrand(info.domain) || isKnownPopular(info.domain)) return null
 
   const label = info.unicodeHost.split('.').slice(-info.domain.split('.').length)[0] ?? info.label
   const isIdn = info.domain.split('.').some((l) => l.startsWith('xn--'))
@@ -65,7 +73,8 @@ export function findLookalike(rawHost: string): LookalikeHit | null {
       // Whole registrable label.
       if (labelSk === kwSk || labelFlatSk === kwSk) {
         hit(label === kw ? 'brand-tld' : 'homoglyph', brand, label)
-      } else if (kw.length >= 6 && editDistance(labelFlatSk, kwSk) <= (kw.length >= 9 ? 2 : 1)) {
+        // Typos keep the first letter: "cloud" and "pcloud" are other names, not iCloud misspelled.
+      } else if (kw.length >= 6 && labelFlatSk[0] === kwSk[0] && editDistance(labelFlatSk, kwSk) <= (kw.length >= 9 ? 2 : 1)) {
         hit('typo', brand, label)
       }
 
@@ -141,6 +150,11 @@ const popularIndex = () => {
   }).filter((t) => t.flat.length >= 5)
   known ??= new Set([...POPULAR_KNOWN, ...POPULAR_TARGETS])
   return { targets, known }
+}
+
+/** In the Tranco top 10,000 (only names close to a brand or target are shipped; see popular.ts). */
+export function isKnownPopular(domain: string): boolean {
+  return popularIndex().known.has(domain.toLowerCase())
 }
 
 /** A doubled letter, a dropped inner letter, or two swapped neighbours (not a plain substitution). */

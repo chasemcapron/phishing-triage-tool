@@ -7,6 +7,7 @@
 // domains: registrable domains the brand really uses.
 // officialSuffixes: any registrable domain ending in one of these counts as official
 //   (e.g. every .gov domain for government services).
+// countryDomains: the brand owns this name on every country ending ("google.de", "amazon.co.jp").
 // mentions: regex fragments that mean a message or display name claims to be the brand.
 
 export interface Brand {
@@ -15,6 +16,7 @@ export interface Brand {
   tokenOnly?: string[]
   domains: string[]
   officialSuffixes?: string[]
+  countryDomains?: string
   mentions: string[]
 }
 
@@ -34,11 +36,14 @@ export const BRANDS: Brand[] = [
     name: 'Google',
     keywords: ['google', 'gmail', 'googledocs', 'googledrive'],
     domains: ['google.com', 'gmail.com', 'googlemail.com', 'youtube.com', 'googleapis.com', 'gstatic.com', 'g.co', 'goo.gl', 'withgoogle.com'],
+    countryDomains: 'google',
     mentions: ['google', 'gmail'],
   },
   {
     name: 'Apple',
     keywords: ['apple', 'icloud', 'appleid', 'itunes'],
+    // "icloud" only as a whole word: inside a name it matches every "…cloud" ("huaweicloud").
+    tokenOnly: ['icloud'],
     domains: ['apple.com', 'icloud.com', 'me.com', 'mac.com', 'apple.co', 'itunes.com'],
     mentions: ['apple', 'icloud', 'apple ?id', 'itunes'],
   },
@@ -46,6 +51,7 @@ export const BRANDS: Brand[] = [
     name: 'Amazon',
     keywords: ['amazon', 'primevideo', 'aws'],
     domains: ['amazon.com', 'amazon.co.uk', 'amazon.ca', 'amazon.de', 'amazon.jobs', 'a.co', 'amzn.to', 'primevideo.com'],
+    countryDomains: 'amazon',
     mentions: ['amazon', 'prime video'],
   },
   {
@@ -255,6 +261,7 @@ export const BRANDS: Brand[] = [
     name: 'Shein',
     keywords: ['shein'],
     domains: ['shein.com'],
+    countryDomains: 'shein',
     mentions: ['\\bshein\\b'],
   },
   {
@@ -333,6 +340,7 @@ export const BRANDS: Brand[] = [
     name: 'Ticketmaster',
     keywords: ['ticketmaster'],
     domains: ['ticketmaster.com', 'livenation.com'],
+    countryDomains: 'ticketmaster',
     mentions: ['ticketmaster'],
   },
   {
