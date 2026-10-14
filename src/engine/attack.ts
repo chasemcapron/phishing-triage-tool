@@ -70,6 +70,7 @@ export function techniquesFor(f: Finding, report: Pick<Report, 'mode' | 'finding
   // domains still get the Resource Development tag.
   if (report.mode === 'text') {
     if (LOOKALIKE.includes(k)) return ['T1583.001', 'T1660']
+    if (k === 'text-bidi-override') return ['T1036.002', 'T1660']
     if (k.startsWith('link-') || k.startsWith('sms-') || k.startsWith('rep-') || k === 'content-credentials' || k === 'content-sensitive-info') {
       return ['T1660']
     }
