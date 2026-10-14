@@ -22,6 +22,8 @@ const ALL_PAGES = [
   ['email-newsletter', '/#email/legit-newsletter'],
   // No sample lands on Suspicious, so this one is typed in (a lookalike on a reserved .test name).
   ['text-suspicious', '/#text', 'Sign in to keep your account: https://paypa1-login.test/'],
+  // A real fake store (Oct 2026). Live, the browser domain-age fallback should lift it to High.
+  ['text-fakeshop', '/#text', 'www.summrfrideays.shop'],
 ]
 // Optional filters for quick iteration: ONLY=home,email-m365 DEVICES=phone CLIP=.verdict
 const PAGES = process.env.ONLY ? ALL_PAGES.filter(([n]) => process.env.ONLY.split(',').includes(n)) : ALL_PAGES
@@ -90,7 +92,7 @@ for (const theme of THEMES) {
         await send('Runtime.evaluate', {
           expression: `(() => { const ta = document.querySelector('#text-input'); Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set.call(ta, ${JSON.stringify(typed)}); ta.dispatchEvent(new Event('input', { bubbles: true })); ta.form.requestSubmit() })()`,
         })
-        await sleep(1500)
+        await sleep(4000) // room for the live lookups
       }
       const { result } = await send('Runtime.evaluate', {
         returnByValue: true,
