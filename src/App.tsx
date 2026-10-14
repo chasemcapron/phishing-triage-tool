@@ -75,6 +75,13 @@ export default function App() {
     else root.dataset.season = season
   }, [season])
 
+  // The phone's toolbar takes the top-of-sky colour, so it matches night and seasonal skies too.
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="theme-color"]')
+    const sky = getComputedStyle(document.documentElement).getPropertyValue('--sky-top').trim()
+    if (meta && sky) meta.setAttribute('content', sky)
+  }, [theme, season])
+
   const pickSeason = (c: SeasonChoice) => {
     setSeasonChoice(c)
     saveSeasonChoice(c)
@@ -218,7 +225,7 @@ export default function App() {
               <span>Gone Phishing</span>
             </p>
             <p>
-              Verdicts are advisory. "No red flags found" means none of our checks matched, not that something is
+              Verdicts are advisory. "No red flags" means none of our checks matched, not that something is
               guaranteed legitimate. All sample messages are synthetic.
             </p>
             <p>

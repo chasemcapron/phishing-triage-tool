@@ -49,6 +49,7 @@ export function useReport() {
   const [report, setReport] = useState<Report | null>(null)
   const [checking, setChecking] = useState(false)
   const [focusKey, setFocusKey] = useState(0)
+  const [firstLabel, setFirstLabel] = useState<string | null>(null)
   const ctrl = useRef<AbortController | null>(null)
   useEffect(() => () => ctrl.current?.abort(), [])
 
@@ -58,6 +59,7 @@ export function useReport() {
       ctrl.current = null
       setChecking(false)
       setReport(local)
+      setFirstLabel(local?.verdictLabel ?? null)
       if (!local) return
       setFocusKey((k) => k + 1)
       const eng = await loadEngine()
@@ -90,5 +92,8 @@ export function useReport() {
     [online],
   )
 
-  return { report, checking, focusKey, show }
+  // Focus moves to the verdict heading, which reads the first verdict aloud. The live region
+  // only speaks when online checks change it afterwards, so nothing is announced twice.
+  const announcement = report && firstLabel && report.verdictLabel !== firstLabel ? `Online checks changed the result: ${report.verdictLabel}` : ''
+  return { report, checking, focusKey, show, announcement }
 }

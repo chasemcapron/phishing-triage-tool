@@ -139,7 +139,7 @@ export function ticketSummary(report: Report): string {
   return lines.join('\n')
 }
 
-export const SITE_URL = 'https://phishing-triage-tool.vercel.app'
+export const SITE_URL = 'https://gonefishing-app.vercel.app'
 
 /**
  * A short, plain-English summary to text or message to someone else. Every host is defanged so

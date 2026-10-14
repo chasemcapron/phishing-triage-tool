@@ -46,7 +46,8 @@ export async function handleLookup(request: Request, deps: HandlerDeps): Promise
   const declared = Number(request.headers.get('content-length') ?? '0')
   if (declared > LOOKUP_LIMITS.bodyBytes) return json(413, { error: 'Request too large.' })
 
-  const rl = (deps.limiter ?? limiter).check(clientIp(request.headers), (deps.now ?? Date.now)())
+  const ip = clientIp(request.headers)
+  const rl = (deps.limiter ?? limiter).check(ip, (deps.now ?? Date.now)())
   if (!rl.ok) {
     return json(429, { error: `Too many checks from your network. Try again in ${rl.retryAfter} seconds.` }, { 'Retry-After': String(rl.retryAfter) })
   }
@@ -63,7 +64,7 @@ export async function handleLookup(request: Request, deps: HandlerDeps): Promise
   if (!valid.ok) return json(400, { error: valid.error })
 
   try {
-    return json(200, await runLookup(valid.value, { fetch: deps.fetch, env: deps.env, now: deps.now }))
+    return json(200, await runLookup(valid.value, { fetch: deps.fetch, env: deps.env, now: deps.now, clientKey: ip }))
   } catch {
     // Never echo upstream details or submitted indicators.
     return json(500, { error: 'Lookup failed.' })

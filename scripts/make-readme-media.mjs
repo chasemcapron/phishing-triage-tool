@@ -8,7 +8,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-const [base = 'https://phishing-triage-tool.vercel.app', chromePath = 'C:/Program Files/Google/Chrome/Application/chrome.exe'] = process.argv.slice(2)
+const [base = 'https://gonefishing-app.vercel.app', chromePath = 'C:/Program Files/Google/Chrome/Application/chrome.exe'] = process.argv.slice(2)
 const shots = 'docs/screenshots'
 const frames = mkdtempSync(join(tmpdir(), 'gp-frames-'))
 mkdirSync(shots, { recursive: true })

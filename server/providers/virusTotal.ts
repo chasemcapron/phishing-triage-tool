@@ -3,7 +3,7 @@
 import type { ProviderResult, VirusTotalResult, VirusTotalStats } from '../../src/engine/lookup-contract.js'
 import { TtlCache } from '../cache.js'
 import { fetchWithTimeout, readJson, TimeoutError, type FetchLike } from '../http.js'
-import { QuotaBudget } from '../rateLimit.js'
+import { QuotaBudget, SlidingWindowLimiter } from '../rateLimit.js'
 
 const API = 'https://www.virustotal.com/api/v3'
 const GUI = 'https://www.virustotal.com/gui'
@@ -14,8 +14,15 @@ const MAX_URL_LOOKUPS = 2
 
 const cache = new TtlCache<VirusTotalResult>(5000)
 const budget = new QuotaBudget(4, 500)
+/**
+ * Each network's share of the daily quota (uncached lookups only), so one script can't
+ * spend the 500/day key and leave every other visitor with "limit reached".
+ */
+export const VT_PER_CLIENT_DAILY = 60
+const perClient = new SlidingWindowLimiter([{ windowMs: 86_400_000, max: VT_PER_CLIENT_DAILY }])
 
 export const VT_LIMIT_MESSAGE = 'VirusTotal limit reached, try again in a minute.'
+export const VT_CLIENT_LIMIT_MESSAGE = "Your network has used today's share of VirusTotal lookups. The other checks still ran."
 
 export interface VirusTotalDeps {
   fetch: FetchLike
@@ -24,6 +31,9 @@ export interface VirusTotalDeps {
   now?: () => number
   cache?: TtlCache<VirusTotalResult>
   budget?: QuotaBudget
+  /** Who is asking (client IP); their uncached lookups count against VT_PER_CLIENT_DAILY. */
+  clientKey?: string
+  clientLimiter?: SlidingWindowLimiter
 }
 
 interface Job {
@@ -67,10 +77,12 @@ export async function lookupVirusTotal(
   const now = deps.now ?? Date.now
   const store = deps.cache ?? cache
   const quota = deps.budget ?? budget
+  const clients = deps.clientLimiter ?? perClient
 
   const results: VirusTotalResult[] = []
   const skipped: string[] = []
   let limited = false
+  let clientLimited = false
   let failure: ProviderResult<VirusTotalResult>['status'] | null = null
   let failCode = 0
 
@@ -80,6 +92,9 @@ export async function lookupVirusTotal(
     if (cached) {
       results.push(cached)
       continue
+    }
+    if (!limited && !failure && deps.clientKey && !clients.check(deps.clientKey, now()).ok) {
+      limited = clientLimited = true
     }
     if (limited || failure || !quota.take(now())) {
       limited ||= !failure
@@ -131,6 +146,6 @@ export async function lookupVirusTotal(
   if (failure && !results.length) {
     return { status: failure, message: failure === 'timeout' ? 'VirusTotal did not answer in time.' : `VirusTotal is unavailable right now${failCode ? ` (HTTP ${failCode})` : ''}.`, results, skipped }
   }
-  if (limited) return { status: 'rate_limited', message: VT_LIMIT_MESSAGE, results, skipped }
+  if (limited) return { status: 'rate_limited', message: clientLimited ? VT_CLIENT_LIMIT_MESSAGE : VT_LIMIT_MESSAGE, results, skipped }
   return { status: 'ok', results, ...(skipped.length ? { skipped } : {}) }
 }

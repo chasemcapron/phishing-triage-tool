@@ -11,7 +11,7 @@ const LOOKS_LIKE_EMAIL = /^(?:delivered-to|received|return-path|from|arc-seal|au
 
 export function TextMode({ onSwitchToEmail, sample }: { onSwitchToEmail?: (text: string) => void; sample: SampleRequest | null }) {
   const [input, setInput] = useState('')
-  const { report, checking, focusKey, show } = useReport()
+  const { report, checking, focusKey, show, announcement } = useReport()
   const [view, setView] = useState<View>('simple')
   const [empty, setEmpty] = useState(false)
 
@@ -54,6 +54,13 @@ export function TextMode({ onSwitchToEmail, sample }: { onSwitchToEmail?: (text:
           className="textarea textarea-lg"
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            // Ctrl/Cmd+Enter checks it; plain Enter stays a newline for pasted messages.
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+              e.preventDefault()
+              e.currentTarget.form?.requestSubmit()
+            }
+          }}
           placeholder={'e.g. "USPS: your package is on hold, confirm your address at usps-redelivery.example/track"'}
           rows={5}
           spellCheck={false}
@@ -118,7 +125,7 @@ export function TextMode({ onSwitchToEmail, sample }: { onSwitchToEmail?: (text:
         <PrivacyNote />
       </form>
       <div aria-live="polite" className="sr-only">
-        {report ? `Result: ${report.verdictLabel}` : ''}
+        {announcement}
       </div>
       {report && <ResultsView report={report} view={view} onViewChange={setView} checking={checking} focusKey={focusKey} />}
     </div>

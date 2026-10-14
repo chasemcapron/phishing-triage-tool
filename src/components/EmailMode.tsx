@@ -11,7 +11,7 @@ import { ResultsView, type View } from './ResultsView'
 export function EmailMode({ initialInput = '', sample }: { initialInput?: string; sample: SampleRequest | null }) {
   const [input, setInput] = useState(initialInput)
   const [fileName, setFileName] = useState<string | null>(null)
-  const { report, checking, focusKey, show } = useReport()
+  const { report, checking, focusKey, show, announcement } = useReport()
   const [view, setView] = useState<View>('analyst')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -166,7 +166,7 @@ export function EmailMode({ initialInput = '', sample }: { initialInput?: string
         <PrivacyNote />
       </form>
       <div aria-live="polite" className="sr-only">
-        {report ? `Result: ${report.verdictLabel}` : ''}
+        {announcement}
       </div>
       {report && <ResultsView report={report} view={view} onViewChange={setView} checking={checking} focusKey={focusKey} />}
     </div>

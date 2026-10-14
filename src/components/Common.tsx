@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useOnline } from '../online'
 import type { Severity } from '../engine'
-import { IconCheck, IconCopy, IconLock, SeverityIcon } from './Icons'
+import { IconCheck, IconCopy, IconLock, IconShare, SeverityIcon } from './Icons'
 
 const SEVERITY_LABEL: Record<Severity, string> = { high: 'High', medium: 'Medium', low: 'Low', info: 'Info' }
 
@@ -38,6 +38,7 @@ async function writeClipboard(text: string): Promise<boolean> {
     ta.className = 'sr-only'
     document.body.appendChild(ta)
     ta.select()
+    ta.setSelectionRange(0, text.length) // older iOS ignores select() on a readonly field
     const ok = document.execCommand('copy')
     ta.remove()
     return ok
@@ -66,6 +67,27 @@ export function CopyButton({ text, label = 'Copy', compact = false }: { text: st
       <span className="sr-only" aria-live="polite">
         {copied ? 'Copied to clipboard' : ''}
       </span>
+    </button>
+  )
+}
+
+/**
+ * Opens the phone's share sheet (Messages, WhatsApp, mail...) where the browser has one.
+ * Renders nothing elsewhere, so it sits next to a CopyButton for the same text.
+ */
+export function ShareButton({ text, label }: { text: string; label: string }) {
+  if (typeof navigator === 'undefined' || typeof navigator.share !== 'function') return null
+  return (
+    <button
+      type="button"
+      className="btn btn-secondary btn-sm"
+      onClick={() => {
+        // Cancelling the sheet rejects with AbortError; there is nothing to do either way.
+        navigator.share({ text }).catch(() => {})
+      }}
+    >
+      <IconShare className="icon icon-sm" />
+      <span>{label}</span>
     </button>
   )
 }

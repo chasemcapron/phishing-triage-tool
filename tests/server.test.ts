@@ -6,7 +6,7 @@ import { lookupRdap } from '../server/providers/rdap'
 import { lookupSafeBrowsing, threatMatchesInput } from '../server/providers/safeBrowsing'
 import { decodeSearchUrlsResponse, encodeSearchUrlsResponse } from '../server/protobuf'
 import { lookupUrlhaus } from '../server/providers/urlhaus'
-import { lookupVirusTotal, VT_LIMIT_MESSAGE } from '../server/providers/virusTotal'
+import { lookupVirusTotal, VT_CLIENT_LIMIT_MESSAGE, VT_LIMIT_MESSAGE } from '../server/providers/virusTotal'
 import { QuotaBudget, SlidingWindowLimiter } from '../server/rateLimit'
 import { isReservedDomain, validateLookupRequest } from '../server/validate'
 
@@ -163,6 +163,19 @@ describe('VirusTotal', () => {
     expect(r).toMatchObject({ status: 'rate_limited', skipped: ['a.example', 'b.example'] })
     expect(f).toHaveBeenCalledTimes(1)
     expect(f.mock.calls.every(([, init]) => init?.method === 'GET')).toBe(true)
+  })
+
+  it("caps each client's share of uncached lookups and serves cached ones regardless", async () => {
+    const f = mockFetch(() => jsonRes(404, {}))
+    const clientLimiter = new SlidingWindowLimiter([{ windowMs: 86_400_000, max: 2 }])
+    const deps = { fetch: f, apiKey: 'vt', cache: new TtlCache<never>(), budget: new QuotaBudget(100, 500), clientLimiter, now: () => 0 }
+    const first = await lookupVirusTotal({ hashes: [], domains: ['a.example', 'b.example', 'c.example'], urls: [] }, { ...deps, clientKey: '203.0.113.9' })
+    expect(first).toMatchObject({ status: 'rate_limited', message: VT_CLIENT_LIMIT_MESSAGE, skipped: ['c.example'] })
+    expect(f).toHaveBeenCalledTimes(2)
+    // Cached answers cost nothing; another network still has its own share.
+    expect((await lookupVirusTotal({ hashes: [], domains: ['a.example'], urls: [] }, { ...deps, clientKey: '203.0.113.9' })).status).toBe('ok')
+    expect((await lookupVirusTotal({ hashes: [], domains: ['c.example'], urls: [] }, { ...deps, clientKey: '198.51.100.7' })).status).toBe('ok')
+    expect(f).toHaveBeenCalledTimes(3)
   })
 
   it('is not configured without a key', async () => {

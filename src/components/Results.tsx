@@ -3,7 +3,7 @@ import { adviceFor, reportUrl } from '../engine/advice'
 import { THRESHOLDS } from '../engine/config'
 import { friendSummary } from '../engine/export'
 import type { Finding, Report } from '../engine'
-import { CopyButton, SeverityBadge } from './Common'
+import { CopyButton, SeverityBadge, ShareButton } from './Common'
 import { SASH, VerdictFish } from './art/Fish'
 import { IconInfo } from './Icons'
 import { AttackChips, GoogleAdvisory, SourceNote } from './Reputation'
@@ -30,7 +30,9 @@ export const VerdictCard = forwardRef<HTMLHeadingElement, { report: Report; anal
 ) {
   const [mouthX, mouthY, ratio] = MOUTH[report.verdict]
   const sash = SASH[report.verdict]
-  const [main, sub] = report.verdictLabel.split(' — ')
+  // "No red flags found" has no sub-line, and as one long line the band shrank it to half the
+  // size of "High risk". Split it like the others so the reassuring verdict stays as readable.
+  const [main, sub] = report.verdict === 'none' ? ['No red flags', 'nothing matched'] : report.verdictLabel.split(' — ')
   const sbFinding = report.findings.find((f) => f.source === 'google-safe-browsing')
   const catchVars = {
     '--mouth-x': mouthX,
@@ -116,6 +118,7 @@ export function WhatToDo({ report }: { report: Report }) {
         </div>
       )}
       <div className="todo-share">
+        <ShareButton text={friendSummary(report)} label="Send a summary to someone" />
         <CopyButton text={friendSummary(report)} label="Copy a summary to send someone" />
         <span className="small muted">Plain English, with the link made safe so it can't be tapped.</span>
       </div>

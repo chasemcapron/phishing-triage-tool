@@ -59,6 +59,13 @@ export const IconCopy = (p: IconProps) => (
     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
   </Svg>
 )
+export const IconShare = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 3v12" />
+    <path d="m7 8 5-5 5 5" />
+    <path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" />
+  </Svg>
+)
 export const IconCheck = (p: IconProps) => (
   <Svg {...p}>
     <path d="M20 6 9 17l-5-5" />

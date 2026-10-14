@@ -1,6 +1,6 @@
 # Gone Phishing
 
-**Live: [phishing-triage-tool.vercel.app](https://phishing-triage-tool.vercel.app)**
+**Live: [gonefishing-app.vercel.app](https://gonefishing-app.vercel.app)**
 
 Paste a suspicious link or text message *before you tap it* and get a clear, explainable verdict: what's wrong with it, in plain English, and what to do next. Everything is analyzed in your browser. Only links and domains are looked up online, and the tool never opens a link.
 
@@ -19,7 +19,7 @@ The demo uses a real fake store that took a friend's card details at checkout in
 ## What it does
 
 - **One box.** Paste a link or a whole text message, or try one of the five samples: toll text, fake store ad, wrong-number opener, a Google Safe Browsing test page, and an ordinary text that should come back clean.
-- **A verdict you can read.** "High risk", "Suspicious" or "No red flags found" is painted on the fish's band, with the two or three most useful reasons as bubbles. "No red flags" never means "safe".
+- **A verdict you can read.** "High risk", "Suspicious" or "No red flags" is painted on the fish's band, with the two or three most useful reasons as bubbles. "No red flags" never means "safe".
 - **Advice that fits the scam.** A fake store says "don't buy; if you already paid, call your bank and dispute the charge". A toll text says "toll agencies don't collect by text", and so on for delivery, sign-in, callback-number and wrong-number scams.
 - **Report it in one tap.** Official forms open in a new tab: Google Safe Browsing (with the link pre-filled), the FTC, and the FBI's IC3 for scams that can cost money.
 - **Send it to someone.** "Copy a summary to send someone" gives a plain-English summary. Every link in it is defanged so the other person's phone can't make it tappable.
@@ -134,7 +134,7 @@ Two thresholds are there because false positives turned up during testing. `goog
 | Other headers | HSTS (2 years, preload), `nosniff`, `Referrer-Policy: no-referrer`, `X-Frame-Options: DENY`, COOP `same-origin`, Permissions-Policy denying camera, microphone, geolocation, payment and USB |
 | Verified | [Mozilla Observatory](https://developer.mozilla.org/en-US/observatory/analyze?host=phishing-triage-tool.vercel.app): **A+ (130/130, 12/12 tests)**. Lighthouse (mobile): **Performance 96, Accessibility 100, Best Practices 100, SEO 100** (October 14, 2026) |
 | No SSRF | The server never requests a user-supplied URL; it only calls four fixed provider hosts |
-| API abuse | Cross-site browser requests are rejected (`Origin` and `Sec-Fetch-Site`), so other websites can't spend the quotas. That is not authentication: scripts can still call the API, and the per-IP limit is what covers them. Strict validation (http/https URLs, domains and SHA-256 hashes only), 32 KB body cap, per-provider timeouts, per-IP limit of 30/min and 300/hour |
+| API abuse | Cross-site browser requests are rejected (`Origin` and `Sec-Fetch-Site`), so other websites can't spend the quotas. That is not authentication: scripts can still call the API, and the per-IP limit is what covers them. Strict validation (http/https URLs, domains and SHA-256 hashes only), 32 KB body cap, per-provider timeouts, per-IP limit of 30/min and 300/hour, and each network's share of VirusTotal capped at 60 uncached lookups a day so one script can't spend the whole key |
 | Provider quotas | VirusTotal's 4/min and 500/day public quota is budgeted on the server: hashes first, then domains, then at most 2 URLs. Results are cached (Safe Browsing within Google's limits of 30 min for hits and 1 h for misses, URLhaus 30 min, VirusTotal 6–12 h, RDAP 24 h). When a limit is hit, the tool says so ("VirusTotal limit reached, try again in a minute") |
 | Safe rendering | Nothing from the input is ever rendered as HTML; every displayed value is escaped by React. IOC exports and ticket summaries are defanged and Markdown-escaped |
 | Secrets | API keys live only in Vercel environment variables, never with a `VITE_` prefix, so they're never shipped to the browser. `.env*` is gitignored except `.env.example`. A scan of the full git history finds no keys |
@@ -150,7 +150,7 @@ Two thresholds are there because false positives turned up during testing. `goog
 **What it deliberately doesn't trust:**
 - **Anything in the pasted text.** Link text, brand names and phone numbers are all attacker-controlled. Display text is compared with the real destination, never believed.
 - **Reputation feeds as proof of safety.** Blocklists lag days behind brand-new phishing sites. The fake store in the demo was on none of them. A clean reputation result never lowers the score; only local evidence and domain age can catch day-zero sites.
-- **The heuristics themselves.** They can false-positive. Every finding explains itself and shows its evidence, so a person can disagree, and "No red flags found" is never worded as "safe".
+- **The heuristics themselves.** They can false-positive. Every finding explains itself and shows its evidence, so a person can disagree, and "No red flags" is never worded as "safe".
 
 **Why links are never visited:**
 - **Tipping off the attacker.** Visiting a phishing link confirms the target is active.
@@ -215,7 +215,7 @@ This is a non-commercial portfolio project and follows each provider's terms for
 npm install
 npm run dev          # frontend only (online checks show "unavailable")
 npx vercel dev       # frontend + /api functions
-npm test             # 267 Vitest tests: engine, every sample, server, scoring
+npm test             # 268 Vitest tests: engine, every sample, server, scoring
 npm run build        # type-checks app and tests, then builds
 ```
 
