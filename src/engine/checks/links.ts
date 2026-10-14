@@ -1,6 +1,6 @@
 import { LIMITS, type FindingKind } from '../config'
 import { BRANDS, type Brand } from '../data/brands'
-import { REDIRECT_PARAMS, RISKY_TLDS, URL_SHORTENERS } from '../data/lists'
+import { FREE_HOSTS, REDIRECT_PARAMS, RISKY_TLDS, URL_SHORTENERS } from '../data/lists'
 import type { FindingSet } from '../findings'
 import type { LinkInfo } from '../types'
 import { hostInfo } from '../util/domain'
@@ -102,6 +102,21 @@ export function checkLinks(links: LinkInfo[], findings: FindingSet): void {
       const kind = LOOKALIKE_KIND[hit.type]
       flag(link, kind)
       findings.add(kind, lookalikeExplanation(hit, 'A link goes to'), `${link.defanged} (${hit.type}${hit.brand ? `: ${hit.brand}` : ''})`)
+    }
+
+    const host = link.host.toLowerCase()
+    const free = FREE_HOSTS.find(
+      (h) => (h.exact ? host === h.host : host.endsWith(`.${h.host}`) && !host.startsWith('www.')) && (!h.path || url.pathname.startsWith(h.path)),
+    )
+    if (free) {
+      flag(link, 'link-free-hosting')
+      findings.add(
+        'link-free-hosting',
+        free.kind === 'form'
+          ? `A link goes to a ${free.name} form. Anyone can make one in minutes, and real companies never ask you to sign in, verify an account or pay through one.`
+          : `A link goes to ${link.unicodeHost}, a page on ${free.name}, where anyone can publish a site for free. Real companies rarely send you to one to sign in or pay.`,
+        link.defanged,
+      )
     }
 
     const tld = link.registrableDomain ? tldOf(link.registrableDomain) : ''

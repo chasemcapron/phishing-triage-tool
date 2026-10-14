@@ -104,6 +104,8 @@ check('empty submit shows error', ((await ev(`return document.querySelector('#te
 await click('.chip', 'Package delivery text')
 await sleep(800)
 check('text sample chip → High', (await verdict()) === 'High risk — likely phishing')
+check('high result offers official report links', (await ev(`return [...document.querySelectorAll('.todo-report a')].map(a => a.href).join(' ')`)).includes('reportfraud.ftc.gov'))
+check('summary to send someone is offered', (await ev(`return [...document.querySelectorAll('.todo-share button')].some(b => b.textContent.includes('Copy a summary'))`)) === true)
 check('focus moved to verdict', (await ev(`return document.activeElement?.id`)) === 'verdict-heading')
 check('verdict fish is decorative', (await ev(`return document.querySelector('.verdict .fish')?.getAttribute('aria-hidden')`)) === 'true')
 await sleep(1000)

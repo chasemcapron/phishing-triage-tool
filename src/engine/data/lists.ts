@@ -76,3 +76,34 @@ export const GATEWAYS: { name: string; hosts: string[]; authserv: string[] }[] =
   { name: 'Broadcom Email Security', hosts: ['messagelabs.com'], authserv: ['messagelabs.com'] },
   { name: 'Trend Micro', hosts: ['trendmicro.com', 'trendmicro.eu'], authserv: ['trendmicro.com'] },
 ]
+
+/**
+ * Free website, form and file hosts where anyone can publish a page in minutes. Their main
+ * domains are old and reputable, so blocklists and domain age often miss phishing hosted there.
+ * exact: the host itself is the user-content host (forms.gle); otherwise a subdomain is required
+ * (anything.pages.dev, but not www.wordpress.com). path: only that path counts (Google Forms).
+ */
+export const FREE_HOSTS: { host: string; name: string; kind: 'site' | 'form'; exact?: boolean; path?: string }[] = [
+  ...(
+    [
+      ['pages.dev', 'Cloudflare Pages'], ['workers.dev', 'Cloudflare Workers'], ['r2.dev', 'Cloudflare R2'], ['trycloudflare.com', 'a Cloudflare tunnel'],
+      ['github.io', 'GitHub Pages'], ['gitlab.io', 'GitLab Pages'], ['vercel.app', 'Vercel'], ['netlify.app', 'Netlify'],
+      ['web.app', 'Firebase'], ['firebaseapp.com', 'Firebase'], ['glitch.me', 'Glitch'], ['onrender.com', 'Render'],
+      ['herokuapp.com', 'Heroku'], ['replit.app', 'Replit'], ['repl.co', 'Replit'], ['weebly.com', 'Weebly'], ['weeblysite.com', 'Weebly'],
+      ['wixsite.com', 'Wix'], ['square.site', 'Square Online'], ['godaddysites.com', 'GoDaddy'], ['webflow.io', 'Webflow'],
+      ['framer.website', 'Framer'], ['framer.app', 'Framer'], ['blogspot.com', 'Blogger'], ['wordpress.com', 'WordPress.com'],
+      ['carrd.co', 'Carrd'], ['notion.site', 'Notion'], ['canva.site', 'Canva'], ['jimdosite.com', 'Jimdo'], ['mystrikingly.com', 'Strikingly'],
+      ['yolasite.com', 'Yola'], ['000webhostapp.com', '000webhost'], ['azurewebsites.net', 'Azure'], ['web.core.windows.net', 'Azure Storage'],
+      ['ngrok-free.app', 'ngrok'], ['ipfs.io', 'IPFS'], ['dweb.link', 'IPFS'], ['s3.amazonaws.com', 'Amazon S3'],
+      ['typeform.com', 'Typeform'],
+    ] as const
+  ).map(([host, name]) => ({ host, name, kind: host === 'typeform.com' ? ('form' as const) : ('site' as const) })),
+  { host: 'storage.googleapis.com', name: 'Google Cloud Storage', kind: 'site', exact: true },
+  { host: 'firebasestorage.googleapis.com', name: 'Firebase Storage', kind: 'site', exact: true },
+  { host: 'sites.google.com', name: 'Google Sites', kind: 'site', exact: true },
+  { host: 'forms.gle', name: 'Google Forms', kind: 'form', exact: true },
+  { host: 'docs.google.com', name: 'Google Forms', kind: 'form', exact: true, path: '/forms' },
+  { host: 'forms.office.com', name: 'Microsoft Forms', kind: 'form', exact: true },
+  { host: 'forms.microsoft.com', name: 'Microsoft Forms', kind: 'form', exact: true },
+  { host: 'form.jotform.com', name: 'Jotform', kind: 'form', exact: true },
+]

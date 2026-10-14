@@ -1,5 +1,6 @@
 import type { FindingKind } from '../config'
 import type { FindingSet } from '../findings'
+import { defangText } from '../export'
 import { clip } from '../util/text'
 
 // Weak signals: plenty of legitimate mail says "urgent" too, so these are low weight
@@ -50,7 +51,63 @@ export function checkContent(text: string, findings: FindingSet): void {
   }
 }
 
+// Invisible characters scammers use to split words past filters ("pay\u200Bpal") or, with
+// direction overrides, to make a link or file name read differently from what it is.
+// Zero-width joiners (emoji sequences, some scripts) are left alone.
+const DIRECTION = /[\u202A-\u202E\u2066-\u2069]/
+const HIDDEN = /[\u202A-\u202E\u2066-\u2069\u200B\u200E\u200F\u2060-\u2064\uFEFF\u00AD]/g
+const codeOf = (c: string) => `[U+${c.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0')}]`
+
+/** Flags hidden characters and returns the text without them, so the real links can be checked. */
+export function checkHiddenChars(text: string, findings: FindingSet): string {
+  const body = text.replace(/^\uFEFF/, '')
+  const hits = [...body.matchAll(HIDDEN)]
+  if (!hits.length) return body
+  const evidence = hits.slice(0, 3).map((m) => {
+    const at = m.index!
+    const around = body.slice(Math.max(0, at - 12), at + 13)
+    return `"${defangText(around.replace(HIDDEN, codeOf))}"`
+  })
+  if (hits.some((m) => DIRECTION.test(m[0]))) {
+    findings.add(
+      'text-bidi-override',
+      'It contains invisible characters that flip the direction of text, a trick to make a link or file name look like something else.',
+      evidence,
+    )
+  } else {
+    findings.add(
+      'text-invisible-chars',
+      'It contains invisible characters hidden inside words or links, a trick to slip names like "PayPal" past spam filters.',
+      evidence,
+    )
+  }
+  return body.replace(HIDDEN, '')
+}
+
+// Case-sensitive on purpose: the name must be capitalized ("are you coming" is not a name).
+const WRONG_NUMBER =
+  /^\s*(?:(?:[Hh]i|[Hh]ello|[Hh]ey|[Gg]ood (?:morning|afternoon|evening))\b[^\n?]{0,24}?\b(?:[Ii]s this|[Aa]re you)\s+(?:still\s+)?(?:Mr\.?\s+|Mrs\.?\s+|Ms\.?\s+|Miss\s+)?[A-Z][a-z]+\b[^\n?]{0,30}\?|(?:[Ss]orry,?\s+)?(?:[Ww]rong number|[Dd]id I (?:text|message) the wrong (?:number|person)))/
+const CALLBACK = /\b(?:call|contact|dial|phone|reach)\b[^.\n]{0,40}?((?:\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4})\b/i
+const ACCOUNT_TALK =
+  /\b(account|card|order|charge[ds]?|payment|refund|subscription|locked|suspended|fraud|unauthori[sz]ed|renewal|invoice|security|support|geek squad|norton|mcafee|paypal|amazon|apple|microsoft|bank)\b/i
+
 export function checkSmsTricks(text: string, findings: FindingSet): void {
+  const opener = WRONG_NUMBER.exec(text.slice(0, 240))
+  if (opener) {
+    findings.add(
+      'sms-wrong-number',
+      'It opens like a message sent to the wrong person. That is how many investment ("pig butchering") and romance scams start: a polite reply leads to a friendly chat, then to a "can\'t-miss" investment.',
+      `"${clip(opener[0].trim(), 80)}"`,
+    )
+  }
+  const call = CALLBACK.exec(text)
+  if (call && ACCOUNT_TALK.test(text)) {
+    findings.add(
+      'sms-callback-number',
+      "It asks you to call a phone number about an account or charge. Scammers use their own numbers to get you on the phone; look up the company's real number yourself.",
+      `"${clip(call[0].trim(), 80)}"`,
+    )
+  }
   const m = SMS_REPLY_TRICK.exec(text)
   if (m) {
     findings.add(

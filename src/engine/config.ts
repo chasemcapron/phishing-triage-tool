@@ -95,6 +95,9 @@ export const CHECKS = {
   'link-idn': { weight: 10, category: 'links', title: 'International (punycode) domain' },
   'link-many-subdomains': { weight: 8, category: 'links', title: 'Excessive subdomains' },
   'domain-risky-tld': { weight: 8, category: 'links', title: 'Domain ending popular with scam sites' },
+  'link-free-hosting': { weight: 15, category: 'links', title: 'Page on a free website or form builder' },
+  'text-bidi-override': { weight: 25, category: 'links', title: 'Text-direction trick' },
+  'text-invisible-chars': { weight: 12, category: 'links', title: 'Hidden characters' },
 
   // Attachments
   'att-double-ext': { weight: 40, category: 'attachments', title: 'Double file extension' },
@@ -120,6 +123,8 @@ export const CHECKS = {
 
   // Text messages
   'sms-reply-to-activate': { weight: 15, category: 'links', title: '"Reply to activate the link" trick' },
+  'sms-wrong-number': { weight: 25, category: 'sender', title: '"Wrong number" opener' },
+  'sms-callback-number': { weight: 20, category: 'links', title: 'Asks you to call a number' },
 
   // Reputation and domain age (server lookups). Known-bad hits also force a High verdict.
   'rep-safe-browsing': { weight: 50, category: 'reputation', title: 'Flagged by Google Safe Browsing' },

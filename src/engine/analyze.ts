@@ -2,7 +2,7 @@ import PostalMime from 'postal-mime'
 import { LIMITS } from './config'
 import { analyzeAttachments } from './checks/attachments'
 import { checkAuth, summarizeAuth } from './checks/auth'
-import { checkContent, checkSmsTricks } from './checks/content'
+import { checkContent, checkHiddenChars, checkSmsTricks } from './checks/content'
 import { checkBrandMentions, checkLinks } from './checks/links'
 import { checkRelay } from './checks/relay'
 import { checkSender } from './checks/sender'
@@ -26,9 +26,9 @@ export class InputError extends Error {}
 
 /** Mode 1: a pasted link, SMS or chat message. */
 export function analyzeText(input: string): Report {
-  const text = refang(input.slice(0, LIMITS.maxTextChars))
-  const links = normalizeLinks(extractTextLinks(text))
   const findings = new FindingSet()
+  const text = checkHiddenChars(refang(input.slice(0, LIMITS.maxTextChars)), findings)
+  const links = normalizeLinks(extractTextLinks(text))
   checkLinks(links, findings)
   checkBrandMentions(text, links, findings)
   checkContent(text, findings)

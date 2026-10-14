@@ -1,5 +1,7 @@
 import { forwardRef, type CSSProperties } from 'react'
+import { adviceFor } from '../engine/advice'
 import { THRESHOLDS } from '../engine/config'
+import { friendSummary } from '../engine/export'
 import type { Finding, Report } from '../engine'
 import { CopyButton, SeverityBadge } from './Common'
 import { SASH, VerdictFish } from './art/Fish'
@@ -89,36 +91,34 @@ export const VerdictCard = forwardRef<HTMLHeadingElement, { report: Report; anal
 })
 
 export function WhatToDo({ report }: { report: Report }) {
-  const isEmail = report.mode === 'email'
-  if (report.verdict === 'none') {
-    return (
-      <section className="todo todo-none" aria-labelledby="todo-heading">
-        <h2 id="todo-heading">What to do</h2>
-        <ul>
-          <li>If you weren't expecting it, don't use its links. Open the company's app or type its website address yourself.</li>
-          <li>Never share passwords, one-time codes or card numbers in reply to a message.</li>
-        </ul>
-      </section>
-    )
-  }
+  const advice = adviceFor(report)
+  const link = report.links.find((l) => l.scheme === 'http' || l.scheme === 'https')
   return (
-    <section className="todo" aria-labelledby="todo-heading">
+    <section className={report.verdict === 'none' ? 'todo todo-none' : 'todo'} aria-labelledby="todo-heading">
       <h2 id="todo-heading">What to do</h2>
       <ul>
-        <li>
-          <strong>Don't tap or open {isEmail ? 'its links or attachments' : 'the link'}</strong>, and don't reply.
-        </li>
-        <li>
-          {isEmail
-            ? 'Report it as phishing in your mail app (for example "Report phishing" in Gmail or Outlook), then delete it.'
-            : 'Report it as junk in your Messages app, or forward the text to 7726 (SPAM) in the US, then delete it.'}
-        </li>
-        <li>
-          Already entered card details? <strong>Call your bank using the number on the back of your card.</strong>
-        </li>
-        <li>Already entered a password? Change it on the real site, and anywhere else you reuse it.</li>
-        {isEmail && <li>At work, report it to your IT or security team before deleting it.</li>}
+        {advice.steps.map((s, i) => (
+          <li key={s}>{i === 0 && report.verdict !== 'none' ? <strong>{s}</strong> : s}</li>
+        ))}
       </ul>
+      {advice.report.length > 0 && (
+        <div className="todo-report">
+          <h3>Report it</h3>
+          <p className="small">Reporting gets the site blocked faster for everyone. These open the official forms in a new tab.</p>
+          <div className="todo-actions">
+            {advice.report.map((r) => (
+              <a key={r.href} className="btn btn-secondary btn-sm" href={r.href} target="_blank" rel="noopener noreferrer">
+                {r.label}
+              </a>
+            ))}
+            {link && <CopyButton text={link.url} label="Copy the link for the form" />}
+          </div>
+        </div>
+      )}
+      <div className="todo-share">
+        <CopyButton text={friendSummary(report)} label="Copy a summary to send someone" />
+        <span className="small muted">Plain English, with the link made safe so it can't be tapped.</span>
+      </div>
     </section>
   )
 }

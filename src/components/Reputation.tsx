@@ -19,6 +19,8 @@ const STATUS_TEXT: Record<string, string> = {
 /** Where the online checks stand: running, off, failed, or each provider's status. */
 export function ReputationStatus({ report, checking }: { report: Report; checking: boolean }) {
   const rep = report.reputation
+  const web = report.links.filter((l) => l.scheme === 'http' || l.scheme === 'https')
+  const unchecked = rep && rep.state !== 'off' ? new Set(web.map((l) => l.url.split(/[?#]/)[0])).size - rep.sent.urls : 0
   let body
   if (checking) {
     body = (
@@ -45,9 +47,15 @@ export function ReputationStatus({ report, checking }: { report: Report; checkin
           ))}
         </ul>
         <p className="small muted">
-          Sent {rep.sent.urls} link{rep.sent.urls === 1 ? '' : 's'} (without ?query parts), {rep.sent.domains} domain
-          {rep.sent.domains === 1 ? '' : 's'} and {rep.sent.hashes} file fingerprint{rep.sent.hashes === 1 ? '' : 's'}. Nothing else left your browser.
+          Sent {rep.sent.urls} link{rep.sent.urls === 1 ? '' : 's'} (without ?query parts){rep.sent.hashes ? ', ' : ' and '}{rep.sent.domains} domain
+          {rep.sent.domains === 1 ? '' : 's'}
+          {rep.sent.hashes ? ` and ${rep.sent.hashes} file fingerprint${rep.sent.hashes === 1 ? '' : 's'}` : ''}. Nothing else left your browser.
         </p>
+        {unchecked > 0 && (
+          <p className="small">
+            {unchecked} more link{unchecked === 1 ? ' was' : 's were'} only checked locally: online checks cover the {rep.sent.urls} most suspicious.
+          </p>
+        )}
       </>
     )
   }
