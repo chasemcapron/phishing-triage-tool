@@ -46,7 +46,7 @@ export const TECHNIQUES: Record<string, Technique> = Object.fromEntries(
 
 const TACTIC_ORDER = ['Resource Development', 'Reconnaissance', 'Initial Access', 'Execution', 'Stealth']
 
-const LOOKALIKE: FindingKind[] = ['link-lookalike', 'link-combosquat', 'link-brand-tld', 'link-idn']
+const LOOKALIKE: FindingKind[] = ['link-lookalike', 'link-combosquat', 'link-brand-tld', 'link-idn', 'link-popular-lookalike']
 const LINK_DECEPTION: FindingKind[] = [
   'link-brand-subdomain', 'link-text-mismatch', 'link-userinfo', 'link-raw-ip', 'link-redirect-param',
   'link-many-subdomains', 'link-script-uri',

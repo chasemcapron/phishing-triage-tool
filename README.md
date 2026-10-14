@@ -78,6 +78,7 @@ Every weight and threshold lives in [`src/engine/config.ts`](src/engine/config.t
 | Lookalike domain (homoglyphs, typos) | 40 | `paypa1-login`, `summrfrideays` |
 | Brand combined with other words | 35 | `ezpass-tollpay-services` |
 | Brand hidden in a subdomain | 35 | `usps.com-redelivery.test` |
+| Imitates one of the 1,000 most popular websites | 30 | `dr0pbox`, `githubb`, `canva-login` |
 | Link text doesn't match destination | 30 | shows `paypal.com`, goes elsewhere |
 | Script or data link | 30 | `javascript:`, `data:` |
 | Brand name on an unofficial domain | 25 | `google.test` |
@@ -94,6 +95,8 @@ Every weight and threshold lives in [`src/engine/config.ts`](src/engine/config.t
 | Punycode domain, excessive subdomains, risky ending | 10, 8, 8 | `xn--…`, `.shop`, `.top`, `.xyz` |
 
 The lookalike checks compare domains against **~50 commonly impersonated brands**: banks, delivery companies, toll agencies, big tech, and retailers copied by fake stores. They use confusable-character normalization and edit distance. Short brand names only match whole words, so "pineapple" never matches Apple.
+
+A second, wider net covers the **1,000 most popular websites** from the [Tranco](https://tranco-list.eu) research ranking. Because so many real sites have similar names, it only flags the classic squatting patterns: look-alike characters (`dr0pbox`), a doubled, dropped or swapped letter (`githubb`, `dropbx`, `gogole`), or the exact name plus a bait word such as `-login`, `-verify` or `-share`. Nothing in the Tranco top 10,000 is ever flagged, and the same name on another ending (`spotify.dk`) is left alone. Run against the 10,000 legitimate sites ranked 10,001–20,000, it flags 5 (0.05%). On its own it stops at Suspicious. The list is rebuilt with `scripts/make-popular-sites.mjs`.
 
 ### Texts without a link
 
@@ -182,6 +185,7 @@ It is **switched off in the UI** (`EMAIL_ENABLED` in [`src/App.tsx`](src/App.tsx
   - T1656 (Impersonation) and T1672 (Email Spoofing) were revoked in v19, so the tool uses their replacements, T1684.001 and T1684.002.
   - Text messages map to Mobile ATT&CK T1660 (Phishing).
   - ATT&CK is © The MITRE Corporation, used under its [terms of use](https://attack.mitre.org/resources/legal-and-branding/terms-of-use/).
+- **[Tranco](https://tranco-list.eu)** top-sites ranking, list [N26LW](https://tranco-list.eu/list/N26LW), for the popular-sites lookalike check (Le Pochat et al., NDSS 2019). Tranco combines several providers' rankings, including Cloudflare Radar (CC BY-NC 4.0), so this non-commercial use fits their terms.
 - **[Public Suffix List](https://publicsuffix.org)** (MPL 2.0), via [`tldts`](https://github.com/remusao/tldts), for registrable domains.
 - **[Fredoka](https://fonts.google.com/specimen/Fredoka)** (SIL Open Font License), self-hosted.
 - **Brand names** appear only to detect impersonation of them. This project isn't affiliated with any of them.
@@ -193,7 +197,7 @@ This is a non-commercial portfolio project and follows each provider's terms for
 - **Day-zero sites.** Brand-new phishing sites that copy no listed brand, sit on an ordinary `.com` and use neutral wording can come back clean. Domain age helps, but only flags domains younger than 30 or 90 days.
 - **Shortened links** stay hidden, because the tool never visits links.
 - **Registries rate-limit.** A registry can briefly refuse domain-age lookups from a busy network (the `.shop` registry did after a day of testing from one machine). The panel then shows domain age as unavailable, and every other check still runs.
-- **Brand coverage** is a curated list of about 50 brands, not every company.
+- **Brand coverage** is a curated list of about 50 brands, plus pattern-only checks against the 1,000 most popular sites. A company outside both, or a popular site imitated with a plain one-letter change, isn't caught by name.
 - **Conversation scams without a link** are mostly missed. Gift-card and code-relay requests, wrong-number openers and fake renewals with a callback number are caught, but job/task offers, crypto "mentors" and "Hi Mum, new number" texts usually score nothing. A red-team set of 32 synthetic scams and 20 legitimate texts flags 24 of the scams and none of the legitimate texts.
 - **English only.** Spanish and other languages get the link checks but none of the wording checks.
 - **Query-string stripping** can miss phishing pages that differ only in their query string.
@@ -206,7 +210,6 @@ This is a non-commercial portfolio project and follows each provider's terms for
 
 - **QR codes:** decode a photo of a QR code in the browser and check the link inside (quishing).
 - **Share from the phone:** an installable PWA with a share target, so a text can be shared straight into the app.
-- **Wider lookalike coverage:** compare against the top ~1,000 websites, not just the brand list.
 - **Email analysis back on,** once it has been tested against a corpus of real mail.
 
 ## Running it locally
@@ -215,7 +218,7 @@ This is a non-commercial portfolio project and follows each provider's terms for
 npm install
 npm run dev          # frontend only (online checks show "unavailable")
 npx vercel dev       # frontend + /api functions
-npm test             # 269 Vitest tests: engine, every sample, server, scoring
+npm test             # 294 Vitest tests: engine, every sample, server, scoring
 npm run build        # type-checks app and tests, then builds
 ```
 
@@ -231,6 +234,7 @@ Any key left empty makes that provider show "not configured", and everything els
 - `node scripts/qa-flows.mjs <url>`: 26 interaction checks (samples, keyboard, theme, deep links, report buttons).
 - `node scripts/make-readme-media.mjs`: regenerates these screenshots and the demo GIF (uses Pillow).
 - `node scripts/make-social-images.mjs`: regenerates the link-preview image and home-screen icon.
+- `node scripts/make-popular-sites.mjs <top-1m.csv> <list id>`: rebuilds the popular-sites data from a Tranco list.
 
 All samples in [`samples/`](samples/) are synthetic. They use reserved domains (`.example`, `.test`), documentation IP ranges and fictional people; [`samples/manifest.json`](samples/manifest.json) lists each one's expected verdict and signals.
 

@@ -1,4 +1,5 @@
 import { BRANDS, type Brand } from '../data/brands'
+import { POPULAR_KNOWN, POPULAR_TARGETS } from '../data/popular'
 import { hostInfo } from '../util/domain'
 import { editDistance, skeleton } from '../util/text'
 
@@ -87,5 +88,104 @@ export function findLookalike(rawHost: string): LookalikeHit | null {
     return { type: 'idn', brand: '', matched: label, domain: info.domain, unicodeHost: info.unicodeHost }
   }
   hits.sort((a, b) => PRIORITY.indexOf(a.type) - PRIORITY.indexOf(b.type))
+  return hits[0] ?? null
+}
+
+// ---------- Popular sites (Tranco top 1,000) ----------
+// A wider but more cautious net than the brand list. Only the classic squatting patterns count:
+//   - look-alike characters ("dr0pbox", "instagrarn"),
+//   - a classic typo: a doubled letter ("githubb"), a dropped inner letter ("dropbx") or two
+//     swapped letters ("gogole"); plain one-letter changes are too often other real names
+//     (stripe/stripes, metlife/fetlife),
+//   - the exact name plus a bait word ("dropbox-login"); companies' own "samsung-gamelauncher"
+//     style domains don't use those words.
+// The same name on another ending ("spotify.dk") is not flagged, and nothing in the top 10,000 is
+// ever flagged, so popular sites with similar names don't trip over each other.
+
+export interface PopularHit {
+  type: 'homoglyph' | 'typo' | 'combosquat'
+  /** The popular site imitated, e.g. "dropbox.com". */
+  site: string
+  matched: string
+  domain: string
+  unicodeHost: string
+}
+
+interface Target {
+  site: string
+  label: string
+  flat: string
+  sk: string
+}
+
+const BAIT = new Set([
+  'login', 'log', 'signin', 'sign', 'verify', 'verification', 'secure', 'security', 'account', 'accounts', 'support',
+  'help', 'helpdesk', 'update', 'auth', 'wallet', 'recovery', 'recover', 'billing', 'pay', 'payment', 'unlock',
+  'confirm', 'alert', 'alerts', 'free', 'gift', 'giftcard', 'reward', 'rewards', 'bonus', 'promo', 'claim', 'refund',
+  'restore', 'reset', 'password', 'id', 'team', 'service', 'center', 'centre', 'official', 'online', 'web', 'app',
+  'customer', 'care', 'live', 'chat', 'portal', 'access', 'session', 'validate', 'check', 'invoice', 'prize', 'share', 'shared', 'file', 'files', 'doc', 'docs',
+  'document', 'drive', 'meeting', 'invite', 'download',
+])
+
+let targets: Target[] | null = null
+let known: Set<string> | null = null
+const popularIndex = () => {
+  targets ??= POPULAR_TARGETS.map((site) => {
+    const label = site.split('.')[0]!
+    const flat = label.replace(/-/g, '')
+    return { site, label, flat, sk: skeleton(flat) }
+  }).filter((t) => t.flat.length >= 5)
+  known ??= new Set([...POPULAR_KNOWN, ...POPULAR_TARGETS])
+  return { targets, known }
+}
+
+/** A doubled letter, a dropped inner letter, or two swapped neighbours (not a plain substitution). */
+export function isClassicTypo(candidate: string, target: string): boolean {
+  if (candidate.length === target.length + 1) {
+    for (let i = 1; i < candidate.length; i++) {
+      if (candidate[i] === candidate[i - 1] && candidate.slice(0, i) + candidate.slice(i + 1) === target) return true
+    }
+    return false
+  }
+  if (candidate.length === target.length - 1) {
+    for (let i = 1; i < target.length - 1; i++) {
+      if (target.slice(0, i) + target.slice(i + 1) === candidate) return target.length >= 7
+    }
+    return false
+  }
+  if (candidate.length === target.length && candidate !== target) {
+    const diff = [...candidate].flatMap((c, i) => (c === target[i] ? [] : [i]))
+    return diff.length === 2 && diff[1] === diff[0]! + 1 && candidate[diff[0]!] === target[diff[1]!] && candidate[diff[1]!] === target[diff[0]!]
+  }
+  return false
+}
+
+const POPULAR_PRIORITY: PopularHit['type'][] = ['homoglyph', 'typo', 'combosquat']
+
+export function findPopularLookalike(rawHost: string): PopularHit | null {
+  const info = hostInfo(rawHost)
+  if (info.isIp || !info.domain || !info.label) return null
+  const { targets, known } = popularIndex()
+  if (known.has(info.domain) || officialBrand(info.domain)) return null
+
+  const label = info.unicodeHost.split('.').slice(-(info.domain.split('.').length))[0] ?? info.label
+  const flat = label.replace(/[-_]/g, '')
+  const flatSk = skeleton(flat)
+  const tokens = tokensOf(label)
+  const baited = tokens.length > 1 && tokens.some((t) => BAIT.has(t))
+  const hits: PopularHit[] = []
+  const hit = (type: PopularHit['type'], t: Target, matched: string) =>
+    hits.push({ type, site: t.site, matched, domain: info.domain!, unicodeHost: info.unicodeHost })
+
+  for (const t of targets) {
+    // Same name, different ending or hyphenation: often the real owner, never flagged here.
+    if (flat === t.flat) continue
+    if (flatSk === t.sk) hit('homoglyph', t, label)
+    else if (t.flat.length >= 6 && isClassicTypo(flat, t.flat)) hit('typo', t, label)
+    if (baited && t.flat.length >= 5 && tokens.some((tok) => !BAIT.has(tok) && (tok === t.flat || skeleton(tok) === t.sk))) {
+      hit('combosquat', t, label)
+    }
+  }
+  hits.sort((a, b) => POPULAR_PRIORITY.indexOf(a.type) - POPULAR_PRIORITY.indexOf(b.type))
   return hits[0] ?? null
 }

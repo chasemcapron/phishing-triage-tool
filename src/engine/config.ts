@@ -83,6 +83,8 @@ export const CHECKS = {
   'link-combosquat': { weight: 35, category: 'links', title: 'Brand name combined with other words' },
   'link-brand-subdomain': { weight: 35, category: 'links', title: 'Brand name hidden in a subdomain' },
   'link-brand-tld': { weight: 25, category: 'links', title: 'Brand name on an unofficial domain' },
+  // Wider net (Tranco top 1,000), so it stops at Suspicious on its own.
+  'link-popular-lookalike': { weight: 30, category: 'links', title: 'Imitates a popular website' },
   'link-text-mismatch': { weight: 30, category: 'links', title: 'Link text does not match destination' },
   'link-script-uri': { weight: 30, category: 'links', title: 'Script or data link' },
   'link-raw-ip': { weight: 25, category: 'links', title: 'Link to a raw IP address' },

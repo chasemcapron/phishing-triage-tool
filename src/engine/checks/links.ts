@@ -5,7 +5,7 @@ import type { FindingSet } from '../findings'
 import type { LinkInfo } from '../types'
 import { hostInfo } from '../util/domain'
 import { clip } from '../util/text'
-import { findLookalike, isOfficialFor, officialBrand, type LookalikeHit } from './lookalike'
+import { findLookalike, findPopularLookalike, isOfficialFor, officialBrand, type LookalikeHit, type PopularHit } from './lookalike'
 
 export const tldOf = (domain: string) => domain.slice(domain.lastIndexOf('.') + 1).toLowerCase()
 
@@ -31,6 +31,16 @@ export function lookalikeExplanation(hit: LookalikeHit, subject: string): string
     case 'idn':
       return `${subject} ${where}, an international (punycode) address that can disguise look-alike characters.`
   }
+}
+
+export function popularExplanation(hit: PopularHit, subject: string): string {
+  const how =
+    hit.type === 'homoglyph'
+      ? `swaps look-alike characters into the name of the popular site ${hit.site}`
+      : hit.type === 'typo'
+        ? `is a one-letter misspelling of the popular site ${hit.site}`
+        : `bolts extra words onto the name of the popular site ${hit.site}`
+  return `${subject} ${hit.unicodeHost}, which ${how}. It is not ${hit.site}.`
 }
 
 export const LOOKALIKE_KIND: Record<LookalikeHit['type'], FindingKind> = {
@@ -98,7 +108,12 @@ export function checkLinks(links: LinkInfo[], findings: FindingSet): void {
     }
 
     const hit = link.isIp ? null : findLookalike(link.host)
-    if (hit) {
+    // Not a listed brand (or only "punycode"): try the wider popular-sites list.
+    const popular = link.isIp || (hit && hit.type !== 'idn') ? null : findPopularLookalike(link.host)
+    if (popular) {
+      flag(link, 'link-popular-lookalike')
+      findings.add('link-popular-lookalike', popularExplanation(popular, 'A link goes to'), `${link.defanged} (${popular.type}: ${popular.site})`)
+    } else if (hit) {
       const kind = LOOKALIKE_KIND[hit.type]
       flag(link, kind)
       findings.add(kind, lookalikeExplanation(hit, 'A link goes to'), `${link.defanged} (${hit.type}${hit.brand ? `: ${hit.brand}` : ''})`)
