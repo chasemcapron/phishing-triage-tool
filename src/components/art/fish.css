@@ -41,6 +41,12 @@
   --fish-calm-cheek: #ffb3a6;
   --fish-calm-under: #a6e2cf;
 
+  /* Verdict bands (white text sits on these: keep contrast >= 4.5:1). */
+  --fish-phish-sash: #c42d47;
+  --fish-puffer-sash: #a34a0c;
+  --fish-calm-sash: #156b59;
+  --fish-sash-stitch: rgba(255, 255, 255, 0.55);
+
   --fish-small-1-body: #ff8a6b;
   --fish-small-1-fin: #e8654a;
   --fish-small-1-belly: #ffc7b3;
@@ -122,17 +128,17 @@
 .fish-phish {
   --f-body: var(--fish-phish-body); --f-shade: var(--fish-phish-shade); --f-belly: var(--fish-phish-belly);
   --f-accent: var(--fish-phish-lip); --f-line: var(--fish-phish-line); --f-spot: var(--fish-phish-spot);
-  --f-mouth: var(--fish-phish-mouth);
+  --f-mouth: var(--fish-phish-mouth); --f-sash: var(--fish-phish-sash);
 }
 .fish-puffer {
   --f-body: var(--fish-puffer-body); --f-shade: var(--fish-puffer-shade); --f-belly: var(--fish-puffer-belly);
   --f-accent: var(--fish-puffer-lip); --f-line: var(--fish-puffer-line); --f-spot: var(--fish-puffer-spot);
-  --f-under: var(--fish-puffer-under);
+  --f-under: var(--fish-puffer-under); --f-sash: var(--fish-puffer-sash);
 }
 .fish-calm {
   --f-body: var(--fish-calm-body); --f-shade: var(--fish-calm-shade); --f-belly: var(--fish-calm-belly);
   --f-accent: var(--fish-calm-lip); --f-line: var(--fish-calm-line); --f-stripe: var(--fish-calm-stripe);
-  --f-mouth: var(--fish-calm-line); --f-under: var(--fish-calm-under);
+  --f-mouth: var(--fish-calm-line); --f-under: var(--fish-calm-under); --f-sash: var(--fish-calm-sash);
 }
 .fish-small { --f-line: var(--fish-small-line); --f-stripe: var(--fish-small-stripe); }
 .fish-small--1 { --f-body: var(--fish-small-1-body); --f-shade: var(--fish-small-1-fin); --f-belly: var(--fish-small-1-belly); }
@@ -174,6 +180,8 @@
 .fish-hook, .fish-hook-eye { stroke: var(--fish-hook); stroke-width: 2.6; }
 .fish-snag { stroke: var(--fish-snag); stroke-width: 1.3; }
 .fish-bubble { fill: var(--fish-bubble-fill); stroke: var(--fish-bubble); stroke-width: 1.6; }
+.fish-sash__band { fill: var(--f-sash); }
+.fish-sash__stitch { fill: none; stroke: var(--fish-sash-stitch); stroke-width: 1; stroke-dasharray: 2.6 2.2; }
 
 /* ---------- Idle motion (off for reduced motion) ---------- */
 @media (prefers-reduced-motion: no-preference) {

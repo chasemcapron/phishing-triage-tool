@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { EmailMode } from './components/EmailMode'
 import { Bobber, Duck, Fisher, LilyPads, LogoMark, SkyBackdrop } from './components/art/PondScene'
-import { DepthGauge, PondFloor } from './components/art/Underwater'
+import { PondFloor } from './components/art/Underwater'
 import { IconMoon, IconSun } from './components/Icons'
 import { FishingLine, PondAmbient } from './components/Pond'
 import { TextMode } from './components/TextMode'
@@ -121,7 +121,6 @@ export default function App() {
 
         <main id="main" className="pond water-column">
           <PondAmbient />
-          <DepthGauge labels={9} className="pond-gauge" />
           <div className="container pond-content">
             <div className="tabs" role="tablist" aria-label="What do you want to check?" onKeyDown={onTabKey}>
               {(

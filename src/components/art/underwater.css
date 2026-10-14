@@ -59,12 +59,6 @@
   --uw-eye: #ffffff;
   --uw-pupil: #0f2540;
 
-  --uw-gauge-line: rgba(255, 255, 255, 0.55);
-  --uw-gauge-line-strong: rgba(255, 255, 255, 0.85);
-  --uw-gauge-pill: rgba(255, 255, 255, 0.8);
-  --uw-gauge-ink: #123a5e;
-  --uw-gauge-bead: #ffffff;
-  --uw-gauge-bead-ring: #2d93c8;
 
   --uw-fish-glow: rgba(126, 240, 255, 0.55);
 }
@@ -124,12 +118,6 @@
   --uw-eye: #f3f7ff;
   --uw-pupil: #0b1a30;
 
-  --uw-gauge-line: rgba(160, 215, 255, 0.32);
-  --uw-gauge-line-strong: rgba(160, 215, 255, 0.55);
-  --uw-gauge-pill: rgba(8, 26, 50, 0.78);
-  --uw-gauge-ink: #cfe6ff;
-  --uw-gauge-bead: #7ef0ff;
-  --uw-gauge-bead-ring: rgba(126, 240, 255, 0.35);
 }
 
 /* ---------------------------------------------------------------- Water */
@@ -712,128 +700,6 @@
 }
 .uw-pebble__shine {
   fill: var(--uw-shine);
-}
-
-/* ---------------------------------------------------------- Depth gauge */
-
-.uw-gauge {
-  --gauge-pad: 44px;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: clamp(10px, 1.6vw, 28px);
-  width: 72px;
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* The rail */
-.uw-gauge::before {
-  content: '';
-  position: absolute;
-  top: var(--gauge-pad);
-  bottom: var(--gauge-pad);
-  right: 7px;
-  width: 2px;
-  border-radius: 2px;
-  background: var(--uw-gauge-line);
-}
-
-.uw-gauge__scale {
-  position: absolute;
-  top: var(--gauge-pad);
-  bottom: var(--gauge-pad);
-  left: 0;
-  right: 8px;
-  display: flex;
-  flex-direction: column;
-}
-
-.uw-gauge__major {
-  position: relative;
-  flex: none;
-  height: 0;
-}
-
-.uw-gauge__major::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: -1px;
-  width: 16px;
-  height: 2px;
-  border-radius: 1px;
-  background: var(--uw-gauge-line-strong);
-}
-
-.uw-gauge__label {
-  position: absolute;
-  right: 21px;
-  top: 0;
-  transform: translateY(-50%);
-  padding: 2px 7px 2px;
-  border-radius: 999px;
-  background: var(--uw-gauge-pill);
-  color: var(--uw-gauge-ink);
-  font-family: var(--font-display, 'Fredoka Variable', 'Fredoka', system-ui, sans-serif);
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-}
-
-.uw-gauge__seg {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: flex-end;
-}
-
-.uw-gauge__seg > i {
-  display: block;
-  width: 8px;
-  height: 1.5px;
-  border-radius: 1px;
-  background: var(--uw-gauge-line);
-}
-
-.uw-gauge__seg > i:nth-child(2) {
-  width: 11px;
-}
-
-/* "You are here" bead: sticks at mid-screen while the gauge scrolls by. */
-.uw-gauge__track {
-  position: absolute;
-  top: var(--gauge-pad);
-  bottom: var(--gauge-pad);
-  right: 0;
-  width: 16px;
-}
-
-.uw-gauge__bead {
-  position: sticky;
-  top: calc(50vh - 8px);
-  display: block;
-  width: 16px;
-  height: 16px;
-  margin-top: -8px;
-  box-sizing: border-box;
-  border-radius: 50%;
-  background: var(--uw-gauge-bead);
-  border: 3px solid var(--uw-gauge-bead-ring);
-  box-shadow: 0 1px 4px rgba(11, 36, 64, 0.25);
-}
-
-:root[data-theme='dark'] .uw-gauge__bead {
-  box-shadow: 0 0 10px rgba(126, 240, 255, 0.55);
-}
-
-@media (max-width: 699.98px) {
-  .uw-gauge {
-    display: none;
-  }
 }
 
 /* ------------------------------------------------------------ Swim lane */

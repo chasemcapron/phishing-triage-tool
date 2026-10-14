@@ -5,7 +5,7 @@ import { useId, type ReactNode } from 'react'
 import type { Verdict } from '../../engine'
 import './fish.css'
 
-type ArtProps = { className?: string }
+type ArtProps = { className?: string; sash?: boolean }
 
 const useClip = () => 'fish-clip' + useId().replace(/[^\w-]/g, '')
 
@@ -30,10 +30,32 @@ function Eye({ cx, cy, r, px, py, pr, lid }: { cx: number; cy: number; r: number
   )
 }
 
+/**
+ * The band painted around each verdict fish's body, in its viewBox units: centre, height, tilt,
+ * and the width the verdict text may use. Results.tsx lays the text over it from these numbers.
+ */
+export const SASH: Record<Verdict, { box: [number, number]; cx: number; cy: number; h: number; rot: number; text: number }> = {
+  high: { box: [160, 136], cx: 99, cy: 100, h: 30, rot: -9, text: 80 },
+  suspicious: { box: [150, 130], cx: 72, cy: 95, h: 26, rot: -6, text: 70 },
+  none: { box: [150, 124], cx: 70, cy: 87, h: 22, rot: -5, text: 76 },
+}
+
+/** Drawn inside the body clip, so the band follows the fish's outline. */
+function Sash({ verdict }: { verdict: Verdict }) {
+  const { cx, cy, h, rot } = SASH[verdict]
+  const x = cx - 120
+  return (
+    <g className="fish-sash" transform={`rotate(${rot} ${cx} ${cy})`}>
+      <rect className="fish-sash__band" x={x} y={cy - h / 2} width={240} height={h} />
+      <path className="fish-sash__stitch" d={`M${x} ${cy - h / 2 + 2.4}h240M${x} ${cy + h / 2 - 2.4}h240`} />
+    </g>
+  )
+}
+
 /* ---------- High risk: the grumpy anglerfish "phish" (faces left) ---------- */
 const PHISH_BODY = 'M42 79C44 52 68 36 96 36c26 0 46 20 46 44s-20 40-46 40c-22 0-44-3-56-12-7-5-10-12-8-18 1-4 6-9 10-11z'
 
-export function FishPhish({ className }: ArtProps) {
+export function FishPhish({ className, sash }: ArtProps) {
   const clip = useClip()
   return (
     <Svg kind="fish-phish fish-verdict" box="0 0 160 136" className={className}>
@@ -56,6 +78,7 @@ export function FishPhish({ className }: ArtProps) {
         <circle className="fish-spot" cx="120" cy="58" r="2.6" />
         <circle className="fish-spot" cx="116" cy="44" r="2" />
         <circle className="fish-spot" cx="130" cy="72" r="2.2" />
+        {sash && <Sash verdict="high" />}
       </g>
       <path className="fish-hi" d="M110 41c11 3 21 11 26 22" />
       <path className="fish-mouth" d="M41 81c15 3 31 9 47 18-18-2-36-5-54-9 2-4 4-7 7-9z" />
@@ -89,7 +112,7 @@ const SPINES = [-158, -136, -114, -92, -70, -48, -28, 30, 50, 72, 94, 116, 138, 
   .join('')
 const PUFF_BODY = 'M28 68a44 44 0 1 0 88 0a44 44 0 1 0-88 0z'
 
-export function FishPuffer({ className }: ArtProps) {
+export function FishPuffer({ className, sash }: ArtProps) {
   const clip = useClip()
   return (
     <Svg kind="fish-puffer fish-verdict" box="0 0 150 130" className={className}>
@@ -108,6 +131,7 @@ export function FishPuffer({ className }: ArtProps) {
           <circle className="fish-spot" cx="104" cy="58" r="2.2" />
           <circle className="fish-spot" cx="90" cy="54" r="1.8" />
           <path className="fish-under" d="M28 68a44 44 0 0 0 88 0c0 21.5-19.7 39-44 39s-44-17.5-44-39z" />
+          {sash && <Sash verdict="suspicious" />}
         </g>
         <path className="fish-hi" d="M38 46c5-9 13-15 22-18" />
         <g className="fish-fin">
@@ -127,7 +151,7 @@ export function FishPuffer({ className }: ArtProps) {
 /* ---------- No red flags: calm, curious round fish (faces left) ---------- */
 const CALM_BODY = 'M24 62c0-26 22-42 48-42s44 18 44 42-18 42-44 42-48-16-48-42z'
 
-export function FishCalm({ className }: ArtProps) {
+export function FishCalm({ className, sash }: ArtProps) {
   const clip = useClip()
   return (
     <Svg kind="fish-calm fish-verdict" box="0 0 150 124" className={className}>
@@ -142,6 +166,7 @@ export function FishCalm({ className }: ArtProps) {
         <path className="fish-belly" d="M16 76c18 14 36 18 56 18s34-6 46-16v40H16z" />
         <path className="fish-stripe" d="M74 14c10 26 10 66 0 96h9c10-30 10-70 0-96zM98 14c8 26 8 66 0 96h7c8-30 8-70 0-96z" />
         <path className="fish-under" d="M116 62c0 24-18 42-44 42s-48-16-48-42c0 22 22 37 48 37s44-17 44-37z" />
+        {sash && <Sash verdict="none" />}
       </g>
       <ellipse className="fish-body" cx="25.5" cy="72" rx="4.6" ry="5.4" />
       <ellipse className="fish-mouth" cx="24.6" cy="72" rx="2" ry="3" />
@@ -188,8 +213,8 @@ export function FishSmall({ className, variant = 1 }: ArtProps & { variant?: 1 |
 }
 
 /** The verdict card's mascot: high → FishPhish, suspicious → FishPuffer, none → FishCalm. */
-export function VerdictFish({ verdict, className }: { verdict: Verdict; className?: string }) {
-  if (verdict === 'high') return <FishPhish className={className} />
-  if (verdict === 'suspicious') return <FishPuffer className={className} />
-  return <FishCalm className={className} />
+export function VerdictFish({ verdict, className, sash }: { verdict: Verdict; className?: string; sash?: boolean }) {
+  if (verdict === 'high') return <FishPhish className={className} sash={sash} />
+  if (verdict === 'suspicious') return <FishPuffer className={className} sash={sash} />
+  return <FishCalm className={className} sash={sash} />
 }

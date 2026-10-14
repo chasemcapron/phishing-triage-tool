@@ -1,5 +1,5 @@
 /*
- * Underwater world: Bubbles, LightRays, Seaweed, PondFloor, DepthGauge, SwimLane.
+ * Underwater world: Bubbles, LightRays, Seaweed, PondFloor, SwimLane.
  * All decorative (aria-hidden). Colours are CSS custom properties in
  * underwater.css (day on :root, night on :root[data-theme='dark']); motion is
  * CSS-only and off under prefers-reduced-motion. Water backgrounds are classes:
@@ -242,30 +242,6 @@ export function PondFloor({ children, seaweed = true, className }: { children?: 
         <Snail />
       </div>
       <div className="uw-floor__content">{children}</div>
-    </div>
-  )
-}
-
-/**
- * Depth ruler for the right edge: `labels` marks ("0 m", "1 m", ...) spread over
- * the positioned parent's height, with a bead that sticks at mid-screen while
- * scrolling (needs no overflow:hidden/auto ancestor; use overflow-x: clip).
- * Hidden below 700px.
- */
-export function DepthGauge({ labels = 8, start = 0, unit = 'm', marker = true, className }: { labels?: number; start?: number; unit?: string; marker?: boolean; className?: string }) {
-  const marks: ReactNode[] = []
-  for (let i = 0, n = Math.max(2, Math.round(labels)); i < n; i++) {
-    marks.push(
-      <div key={`m${i}`} className="uw-gauge__major">
-        <span className="uw-gauge__label">{`${start + i} ${unit}`}</span>
-      </div>,
-    )
-    if (i < n - 1) marks.push(<div key={`s${i}`} className="uw-gauge__seg"><i /><i /><i /><i /></div>)
-  }
-  return (
-    <div className={cx('uw-gauge', className)} aria-hidden="true">
-      <div className="uw-gauge__scale">{marks}</div>
-      {marker && <div className="uw-gauge__track"><span className="uw-gauge__bead" /></div>}
     </div>
   )
 }

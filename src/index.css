@@ -407,9 +407,6 @@ code {
   position: relative;
   z-index: 2;
 }
-.pond-gauge.uw-gauge {
-  display: none;
-}
 
 /* ---------- Pond floor + footer ---------- */
 .pond-floor {
@@ -787,75 +784,49 @@ code {
   --sev-bg: var(--none-bg);
   --sev-border: var(--none-border);
 }
-.verdict-eyebrow {
-  font-family: var(--display);
-  font-weight: 600;
-  font-size: 0.8rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 4px;
+/* ---- The catch: the verdict fish hangs from the line by its lip, the verdict painted on its band ---- */
+.verdict {
+  container-type: inline-size;
 }
-.verdict-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.verdict-icon {
-  width: 34px;
-  height: 34px;
-  color: var(--sev);
-}
-.verdict-label {
-  font-size: clamp(1.45rem, 5.6vw, 2.15rem);
-  font-weight: 650;
-  line-height: 1.12;
-  color: var(--sev-ink);
-}
-/* Programmatic focus target only (announces the result); not interactive, so no ring. */
-.verdict-label:focus,
-.verdict-label:focus-visible {
-  outline: none;
-}
-.verdict-summary {
-  margin-top: 8px;
-  font-size: 1.05rem;
-}
-/* ---- The catch: the verdict fish hangs from the line by its lip, wearing the verdict tag ---- */
 .catch {
-  --fish-w: clamp(220px, 66vw, 300px);
-  --fish-top: 12px;
+  --fish-w: min(94cqw, 330px);
+  --fish-top: 14px;
+  --fish-tilt: 8deg;
   --fish-h: calc(var(--fish-w) * var(--fish-ratio, 0.85));
   position: relative;
-  /* The whole fish stays visible; the tag overlaps just its belly, as if tied on. */
-  padding-top: calc(var(--fish-top) + var(--fish-h) * 0.9);
+  /* Room for the fish plus the tail dipping as it hangs tilted from its lip. */
+  height: calc(var(--fish-top) + var(--fish-h) + var(--fish-w) * 0.07);
 }
+/* Continues the page-level line from the card's top edge to the lip (geometry set in Pond.tsx). */
 .catch-cord {
   position: absolute;
   left: calc(var(--hook-x, 30%) - 0.75px);
-  /* Start above the card edge so it meets the page-level line, end in the fish's lip. */
-  top: -48px;
-  height: calc(48px + var(--fish-top) + var(--fish-h) * var(--mouth-y) - 26px);
+  top: var(--cord-top, -18px);
+  height: var(--cord-len, 0px);
   width: 1.5px;
   background: var(--line-under);
+  transform-origin: 50% 0;
+  rotate: var(--cord-angle, 0deg);
   opacity: var(--hooked, 0);
 }
 .catch-fish {
+  container-type: inline-size;
   position: absolute;
   top: var(--fish-top);
   width: var(--fish-w);
-  /* Mouth under the line; clamped so the fish never leaves the card. */
-  left: clamp(0px, calc(var(--hook-x, 30%) - var(--fish-w) * var(--mouth-x)), calc(100% - var(--fish-w)));
+  /* Centred; the cord angles over from the rod to the lip. */
+  left: calc((100% - var(--fish-w)) / 2);
   transform-origin: calc(var(--mouth-x) * 100%) calc(var(--mouth-y) * 100%);
-  rotate: 14deg;
+  rotate: var(--fish-tilt);
 }
 .catch-fish__art.fish {
   width: 100%;
 }
-/* The phish brings its own old hook; on the line it is replaced by ours. */
+/* The phish brings its own old hook and the calm fish its own bubbles; on the line they are replaced. */
 .catch-fish .fish-snag,
 .catch-fish .fish-hook,
-.catch-fish .fish-hook-eye {
+.catch-fish .fish-hook-eye,
+.catch-fish .fish-bubbles {
   display: none;
 }
 .catch-hook {
@@ -864,61 +835,226 @@ code {
   top: calc(var(--mouth-y) * 100%);
   width: 26px;
   height: 39px;
-  /* The hook's bend (x≈9, y≈30 of 24×36) sits at the lip; counter-rotate so it hangs straight. */
+  /* The hook's bend (x≈9, y≈30 of 24×36) sits at the lip; counter-rotate so it hangs from the cord. */
   translate: -9.7px -32.5px;
-  rotate: -14deg;
+  rotate: calc(var(--cord-angle, 0deg) - var(--fish-tilt));
   transform-origin: 9.7px 32.5px;
   overflow: visible;
 }
-.catch-tag {
-  position: relative;
-  z-index: 1;
-  max-width: 30rem;
-  margin: 0 auto;
-  padding: 16px 18px 18px;
-  background: var(--surface);
-  border: 2px solid var(--sev-border);
-  border-radius: var(--radius-lg, 18px);
-  box-shadow: var(--shadow-card);
-  text-align: left;
+.catch-mouth {
+  position: absolute;
+  left: calc(var(--mouth-x) * 100%);
+  top: calc(var(--mouth-y) * 100%);
+  width: 0;
+  height: 0;
 }
-/* Tag eyelet, like a weigh-in tag tied onto the catch. */
-.catch-tag::before {
+/* The verdict, lettered on the band (the band itself is drawn in the fish SVG). */
+.catch-sash {
+  position: absolute;
+  left: calc(var(--sash-x) * 100%);
+  top: calc(var(--sash-y) * 100%);
+  width: calc(var(--sash-w) * 100%);
+  translate: -50% -50%;
+  rotate: var(--sash-rot);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1em;
+  margin: 0;
+  color: #fff;
+  font-family: var(--display);
+  text-align: center;
+  line-height: 1;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.22);
+  white-space: nowrap;
+}
+.catch-sash__main {
+  /* Sized so the longest label still fits the band: about 0.58em per character. */
+  font-size: min(9cqw, calc(var(--sash-w) * 172cqw / var(--label-len)));
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.catch-sash__sub {
+  font-size: 4.4cqw;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  opacity: 0.92;
+}
+/* Programmatic focus target only (announces the result); not interactive, so no ring. */
+.catch-sash:focus,
+.catch-sash:focus-visible {
+  outline: none;
+}
+/* Little bubbles rising from the fish's mouth. */
+.catch-fizz {
+  position: absolute;
+  left: calc(var(--mouth-x) * 100% - 16px);
+  top: calc(var(--mouth-y) * 100% - 18px);
+  rotate: calc(-1 * var(--fish-tilt));
+}
+.catch-fizz i {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.6px solid var(--fish-bubble);
+  background: var(--fish-bubble-fill);
+  opacity: 0;
+}
+.catch-fizz i:nth-child(2) {
+  width: 6px;
+  height: 6px;
+  left: -8px;
+}
+.catch-fizz i:nth-child(3) {
+  width: 11px;
+  height: 11px;
+  left: -2px;
+}
+.verdict-summary {
+  margin-top: 4px;
+  font-size: 1.08rem;
+  font-weight: 500;
+  text-align: center;
+  text-wrap: balance;
+}
+/* Why: each reason in its own bubble, drifting up from the catch. */
+.reasons {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+  font-size: 1.02rem;
+}
+.reasons li {
+  --bubble-edge: color-mix(in srgb, var(--sev-border) 70%, #fff);
+  --bubble-hi: color-mix(in srgb, var(--surface) 45%, #fff);
+  --bubble-glint: rgba(255, 255, 255, 0.85);
+  position: relative;
+  max-width: 38rem;
+  padding: 14px 20px 15px 22px;
+  border-radius: 28px;
+  border: 2px solid var(--bubble-edge);
+  background: radial-gradient(130% 120% at 14% 0%, var(--bubble-hi) 0%, var(--surface) 48%, color-mix(in srgb, var(--surface) 90%, var(--sev)) 100%);
+  box-shadow:
+    inset -6px -8px 16px color-mix(in srgb, var(--sev) 8%, transparent),
+    0 10px 20px -14px rgba(12, 40, 80, 0.45);
+}
+/* At night the bubbles are lit from inside, not glossy white. */
+:root[data-theme='dark'] .reasons li {
+  --bubble-edge: color-mix(in srgb, var(--sev-border) 80%, #7ef0ff);
+  --bubble-hi: color-mix(in srgb, var(--surface) 82%, #7ef0ff);
+  --bubble-glint: rgba(126, 240, 255, 0.4);
+}
+/* Glint, like light on a bubble. */
+.reasons li::before {
   content: '';
   position: absolute;
-  top: 10px;
-  right: 12px;
-  width: 12px;
-  height: 12px;
+  top: 4px;
+  left: 20px;
+  width: 18px;
+  height: 6px;
   border-radius: 50%;
-  border: 2px solid var(--sev-border);
-  background: var(--sev-bg);
+  background: var(--bubble-glint);
+  rotate: -14deg;
+}
+/* A small bubble trailing between each pair. */
+.reasons li::after {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: 30px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 2px solid var(--bubble-edge);
+  background: var(--surface);
+}
+@media (min-width: 640px) {
+  .catch {
+    --fish-w: min(62cqw, 440px);
+    --fish-top: 18px;
+  }
+  .reasons li {
+    width: fit-content;
+  }
+  .reasons li:nth-child(even) {
+    justify-self: end;
+    margin-right: 3%;
+  }
+  .reasons li:nth-child(odd) {
+    margin-left: 3%;
+  }
+  .reasons li:nth-child(even)::after {
+    left: auto;
+    right: 34px;
+  }
 }
 @media (prefers-reduced-motion: no-preference) {
   .catch-fish {
     animation: catch-swing 3.6s ease-in-out infinite alternate;
   }
+  .catch-fizz i {
+    animation: fizz 3.2s ease-in infinite;
+  }
+  .catch-fizz i:nth-child(2) {
+    animation-delay: 1.1s;
+  }
+  .catch-fizz i:nth-child(3) {
+    animation-delay: 2.2s;
+  }
+  .reasons li {
+    animation: bubble-up 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .reasons li:nth-child(2) {
+    animation-delay: 0.12s;
+  }
+  .reasons li:nth-child(3) {
+    animation-delay: 0.24s;
+  }
+  .reasons li:nth-child(n + 4) {
+    animation-delay: 0.36s;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .catch-fizz i {
+    opacity: 1;
+  }
+  .catch-fizz i:nth-child(2) {
+    translate: -4px -20px;
+  }
+  .catch-fizz i:nth-child(3) {
+    translate: -8px -38px;
+  }
 }
 @keyframes catch-swing {
   from {
-    rotate: 10deg;
+    rotate: calc(var(--fish-tilt) - 3deg);
   }
   to {
-    rotate: 17deg;
+    rotate: calc(var(--fish-tilt) + 3deg);
   }
 }
-.reasons {
-  margin: 16px 0 0;
-  padding: 14px 16px 14px 2.1rem;
-  display: grid;
-  gap: 8px;
-  font-size: 1.02rem;
-  background: var(--surface);
-  border-radius: var(--radius);
-  border: 1px solid var(--sev-border);
+@keyframes fizz {
+  0% {
+    opacity: 0;
+    translate: 0 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    translate: -10px -64px;
+  }
 }
-.reasons li::marker {
-  color: var(--sev);
+@keyframes bubble-up {
+  from {
+    opacity: 0;
+    translate: 0 22px;
+    scale: 0.94;
+  }
 }
 .verdict-meta {
   margin-top: 14px;
@@ -1309,13 +1445,6 @@ td.hash {
   .verdict {
     padding: 24px 26px;
   }
-  .catch {
-    --fish-w: clamp(280px, 40vw, 380px);
-    --fish-top: 16px;
-  }
-  .catch-tag {
-    padding: 18px 24px 20px;
-  }
   .panel {
     padding: 18px 20px;
   }
@@ -1376,9 +1505,6 @@ td.hash {
 }
 
 @media (min-width: 1280px) {
-  .pond-gauge.uw-gauge {
-    display: block;
-  }
   .pond .container {
     max-width: min(1200px, 100vw - 240px);
   }

@@ -22,8 +22,7 @@ export function FishingLine() {
     let raf = 0
     let hooked: HTMLElement | null = null
     const unhook = () => {
-      hooked?.style.removeProperty('--hook-x')
-      hooked?.style.removeProperty('--hooked')
+      for (const p of ['--hook-x', '--hooked', '--cord-top', '--cord-len', '--cord-angle']) hooked?.style.removeProperty(p)
       hooked = null
     }
 
@@ -59,8 +58,21 @@ export function FishingLine() {
         unhook()
         hooked = anchor
       }
-      anchor.style.setProperty('--hook-x', `${(f.right - anchor.getBoundingClientRect().left).toFixed(1)}px`)
+      const a = anchor.getBoundingClientRect()
+      const hookX = f.right - a.left
+      anchor.style.setProperty('--hook-x', `${hookX.toFixed(1)}px`)
       anchor.style.setProperty('--hooked', '1')
+      // Inside the card the cord runs from where the line meets the card's top edge to the fish's
+      // lip, pulled taut at an angle when the fish isn't right under the rod.
+      const mouth = anchor.querySelector('.catch-mouth')?.getBoundingClientRect()
+      if (mouth) {
+        const top = t.top - a.top
+        const dx = mouth.left - a.left - hookX
+        const dy = mouth.top - a.top - top
+        anchor.style.setProperty('--cord-top', `${top.toFixed(1)}px`)
+        anchor.style.setProperty('--cord-len', `${Math.hypot(dx, dy).toFixed(1)}px`)
+        anchor.style.setProperty('--cord-angle', `${((Math.atan2(-dx, dy) * 180) / Math.PI).toFixed(2)}deg`)
+      }
     }
     const schedule = () => {
       if (!raf) raf = requestAnimationFrame(update)

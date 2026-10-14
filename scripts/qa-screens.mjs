@@ -20,8 +20,10 @@ const ALL_PAGES = [
   ['email-recruiter', '/#email/fake-recruiter'],
   ['email-invoice', '/#email/invoice-attachments'],
   ['email-newsletter', '/#email/legit-newsletter'],
+  // No sample lands on Suspicious, so this one is typed in (a lookalike on a reserved .test name).
+  ['text-suspicious', '/#text', 'Sign in to keep your account: https://paypa1-login.test/'],
 ]
-// Optional filters for quick iteration: ONLY=home,email-m365 DEVICES=phone
+// Optional filters for quick iteration: ONLY=home,email-m365 DEVICES=phone CLIP=.verdict
 const PAGES = process.env.ONLY ? ALL_PAGES.filter(([n]) => process.env.ONLY.split(',').includes(n)) : ALL_PAGES
 const ALL_DEVICES = [
   ['phone', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true }],
@@ -76,7 +78,7 @@ for (const theme of THEMES) {
   for (const [device, metrics] of DEVICES) {
     await send('Emulation.setDeviceMetricsOverride', metrics)
     await send('Emulation.setTouchEmulationEnabled', { enabled: metrics.mobile })
-    for (const [name, path] of PAGES) {
+    for (const [name, path, typed] of PAGES) {
       events.length = 0
       await send('Page.navigate', { url: 'about:blank' })
       await sleep(100)
@@ -84,6 +86,12 @@ for (const theme of THEMES) {
       await sleep(1200)
       await send('Runtime.evaluate', { expression: `localStorage.setItem('theme','${theme}'); location.reload()` })
       await sleep(2500)
+      if (typed) {
+        await send('Runtime.evaluate', {
+          expression: `(() => { const ta = document.querySelector('#text-input'); Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set.call(ta, ${JSON.stringify(typed)}); ta.dispatchEvent(new Event('input', { bubbles: true })); ta.form.requestSubmit() })()`,
+        })
+        await sleep(1500)
+      }
       const { result } = await send('Runtime.evaluate', {
         returnByValue: true,
         expression: `({ sw: document.documentElement.scrollWidth, cw: ${metrics.width},
@@ -98,7 +106,16 @@ for (const theme of THEMES) {
             e.method === 'Runtime.exceptionThrown',
         )
         .map((e) => e.params.entry?.text ?? e.params.exceptionDetails?.text ?? e.params.args?.map((a) => a.value).join(' '))
-      const shot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true })
+      // CLIP=.verdict captures just that element (with a margin) instead of the whole page.
+      let clip
+      if (process.env.CLIP) {
+        const { result: box } = await send('Runtime.evaluate', {
+          returnByValue: true,
+          expression: `(() => { const r = document.querySelector(${JSON.stringify(process.env.CLIP)})?.getBoundingClientRect(); return r && { x: Math.max(0, r.left - 24), y: Math.max(0, r.top + scrollY - 70), width: r.width + 48, height: r.height + 94, scale: 1 } })()`,
+        })
+        clip = box.value ?? undefined
+      }
+      const shot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, ...(clip ? { clip } : {}) })
       const file = `${theme}-${device}-${name}.png`
       writeFileSync(join(outDir, file), Buffer.from(shot.data, 'base64'))
       report.push({ file, verdict: result.value.verdict, overflow: result.value.sw > result.value.cw, sw: result.value.sw, wide: result.value.wide, problems })

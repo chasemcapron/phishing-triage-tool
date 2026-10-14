@@ -2,8 +2,8 @@ import { forwardRef, type CSSProperties } from 'react'
 import { THRESHOLDS } from '../engine/config'
 import type { Finding, Report } from '../engine'
 import { CopyButton, SeverityBadge } from './Common'
-import { VerdictFish } from './art/Fish'
-import { IconInfo, VerdictIcon } from './Icons'
+import { SASH, VerdictFish } from './art/Fish'
+import { IconInfo } from './Icons'
 import { AttackChips, GoogleAdvisory, SourceNote } from './Reputation'
 
 const VERDICT_SUMMARY: Record<Report['verdict'], string> = {
@@ -27,34 +27,51 @@ export const VerdictCard = forwardRef<HTMLHeadingElement, { report: Report; anal
   headingRef,
 ) {
   const [mouthX, mouthY, ratio] = MOUTH[report.verdict]
+  const sash = SASH[report.verdict]
+  const [main, sub] = report.verdictLabel.split(' — ')
   const sbFinding = report.findings.find((f) => f.source === 'google-safe-browsing')
-  const catchVars = { '--mouth-x': mouthX, '--mouth-y': mouthY, '--fish-ratio': ratio } as CSSProperties
+  const catchVars = {
+    '--mouth-x': mouthX,
+    '--mouth-y': mouthY,
+    '--fish-ratio': ratio,
+    '--sash-x': sash.cx / sash.box[0],
+    '--sash-y': sash.cy / sash.box[1],
+    '--sash-w': sash.text / sash.box[0],
+    '--sash-rot': `${sash.rot}deg`,
+    '--label-len': main!.length,
+  } as CSSProperties
   return (
     <section className={`verdict verdict-${report.verdict}`} aria-labelledby="verdict-heading">
-      {/* The catch: the fish hangs from the fishing line by its lip, wearing the verdict as a tag. */}
+      {/* The catch: the fish hangs from the fishing line by its lip, the verdict painted on its band. */}
       <div className="catch" style={catchVars}>
         <span className="catch-cord" aria-hidden="true" />
-        <div className="catch-fish" aria-hidden="true">
-          <VerdictFish verdict={report.verdict} className="catch-fish__art" />
+        <div className="catch-fish">
+          <VerdictFish verdict={report.verdict} sash className="catch-fish__art" />
           <svg className="catch-hook" viewBox="0 0 24 36" aria-hidden="true" focusable="false">
             <circle className="fishing-hook__eye" cx="16" cy="4.5" r="3" />
             <path className="fishing-hook__metal" d="M16 7.5V26A5 5 0 0 1 6 26V20.5L9.4 23.6" />
             <path className="fishing-hook__shine" d="M17.4 11V22" />
           </svg>
-        </div>
-        <div className="catch-tag">
-          <p className="verdict-eyebrow">Your catch</p>
-          <div className="verdict-title">
-            <VerdictIcon verdict={report.verdict} className="icon verdict-icon" />
-            <h2 id="verdict-heading" ref={headingRef} tabIndex={-1} className="verdict-label">
-              {report.verdictLabel}
-            </h2>
-          </div>
-          <p className="verdict-summary">{VERDICT_SUMMARY[report.verdict]}</p>
+          <span className="catch-mouth" aria-hidden="true" />
+          <span className="catch-fizz" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </span>
+          <h2 id="verdict-heading" ref={headingRef} tabIndex={-1} className="verdict-label catch-sash">
+            <span className="catch-sash__main">{main}</span>
+            {sub && (
+              <>
+                <span className="sr-only"> — </span>
+                <span className="catch-sash__sub">{sub}</span>
+              </>
+            )}
+          </h2>
         </div>
       </div>
+      <p className="verdict-summary">{VERDICT_SUMMARY[report.verdict]}</p>
       {report.reasons.length > 0 && (
-        <ul className="reasons">
+        <ul className="reasons" aria-label="Why">
           {report.reasons.map((r) => (
             <li key={r}>{r}</li>
           ))}
