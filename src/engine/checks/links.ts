@@ -1,11 +1,13 @@
 import { LIMITS, type FindingKind } from '../config'
 import { BRANDS, type Brand } from '../data/brands'
-import { REDIRECT_PARAMS, URL_SHORTENERS } from '../data/lists'
+import { REDIRECT_PARAMS, RISKY_TLDS, URL_SHORTENERS } from '../data/lists'
 import type { FindingSet } from '../findings'
 import type { LinkInfo } from '../types'
 import { hostInfo } from '../util/domain'
 import { clip } from '../util/text'
-import { findLookalike, isOfficialFor, type LookalikeHit } from './lookalike'
+import { findLookalike, isOfficialFor, officialBrand, type LookalikeHit } from './lookalike'
+
+export const tldOf = (domain: string) => domain.slice(domain.lastIndexOf('.') + 1).toLowerCase()
 
 const LOGIN_WORDS = /(log-?in|sign-?in|log-?on|verify|account|password|passwd|secure|auth|webmail|owa\b|banking|wp-login)/i
 
@@ -100,6 +102,12 @@ export function checkLinks(links: LinkInfo[], findings: FindingSet): void {
       const kind = LOOKALIKE_KIND[hit.type]
       flag(link, kind)
       findings.add(kind, lookalikeExplanation(hit, 'A link goes to'), `${link.defanged} (${hit.type}${hit.brand ? `: ${hit.brand}` : ''})`)
+    }
+
+    const tld = link.registrableDomain ? tldOf(link.registrableDomain) : ''
+    if (RISKY_TLDS.has(tld) && !officialBrand(link.registrableDomain)) {
+      flag(link, 'domain-risky-tld')
+      findings.add('domain-risky-tld', `A link goes to a .${tld} address. Endings like this are cheap and popular with short-lived fake stores, though many real sites use them too.`, link.defanged)
     }
 
     for (const text of link.displayTexts) {

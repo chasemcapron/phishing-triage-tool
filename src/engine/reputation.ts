@@ -2,7 +2,8 @@
 // provider results back into the report as findings (re-scored, with ATT&CK tags).
 import { buildReport } from './analyze'
 import { CHECKS, LIMITS, type FindingKind } from './config'
-import { FREE_WEBMAIL } from './data/lists'
+import { tldOf } from './checks/links'
+import { FREE_WEBMAIL, RISKY_TLDS } from './data/lists'
 import { FindingSet } from './findings'
 import { LOOKUP_LIMITS, PROVIDER_LABELS, type LookupRequest, type LookupResponse, type ProviderName } from './lookup-contract'
 import type { LinkInfo, Report, ReputationSummary } from './types'
@@ -176,7 +177,7 @@ export function applyReputation(report: Report, res: LookupResponse, req: Lookup
       rep(l).domainAgeDays = d.ageDays
       rep(l).domainRegistered = d.registered
     })
-    if (d.ageDays >= LIMITS.newDomainDays) continue
+    if (d.ageDays >= (RISKY_TLDS.has(tldOf(d.domain)) ? LIMITS.newRiskyTldDomainDays : LIMITS.newDomainDays)) continue
     ls.forEach((l) => flag(l, 'domain-new'))
     const brand = ls.map((l) => brandFor(r, l)).find(Boolean)
     const explanation = brand

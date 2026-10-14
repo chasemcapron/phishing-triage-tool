@@ -86,3 +86,12 @@ export const PROVIDER_LABELS: Record<ProviderName, string> = {
   urlhaus: 'URLhaus',
   rdap: 'Domain age (RDAP)',
 }
+
+/** Reads the registration date out of an RDAP domain answer (RFC 9083 events). */
+export function rdapFromBody(domain: string, body: unknown, now: number): RdapResult {
+  const events = (body as { events?: { eventAction?: unknown; eventDate?: unknown }[] } | null)?.events
+  const reg = Array.isArray(events) ? events.find((e) => e?.eventAction === 'registration')?.eventDate : undefined
+  const t = typeof reg === 'string' ? Date.parse(reg) : NaN
+  if (Number.isNaN(t)) return { domain, status: 'unknown' }
+  return { domain, status: 'ok', registered: new Date(t).toISOString(), ageDays: Math.max(0, Math.floor((now - t) / 86_400_000)) }
+}

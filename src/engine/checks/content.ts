@@ -26,6 +26,11 @@ const PATTERNS: { kind: FindingKind; re: RegExp; explanation: string }[] = [
     explanation: 'It pushes a payment or money transfer, often by methods that are hard to reverse.',
   },
   {
+    kind: 'content-deal',
+    re: /\b((?:up to |save |get )?[5-9]\d ?% off|(?:store|shop) closing|closing (?:down|sale)|going out of business|liquidation|clearance sale|final clearance|today only|last day|only \d+ left|limited stock|while supplies last|free shipping (?:today|on all)|(?:huge|massive|insane) (?:sale|discount)s?|buy (?:1|one) get (?:2|two|3|three) free)\b/gi,
+    explanation: 'It advertises a huge discount or a clearance with pressure to buy now, the classic bait of fake online stores.',
+  },
+  {
     kind: 'content-generic-greeting',
     re: /^[ \t]*((?:dear|hello|hi)[ \t]+(?:user|customer|client|member|applicant|candidate|sir|madam|sir\/madam|account ?holder|valued [a-z]+|friend|[\w.+-]+@[\w.-]+)|hello|hi there|greetings)[ \t]*[,!:]?[ \t]*$/gim,
     explanation: 'It opens with a generic greeting instead of your name.',

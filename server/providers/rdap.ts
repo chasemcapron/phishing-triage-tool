@@ -1,7 +1,7 @@
 // Domain registration date via RDAP. Uses IANA's RDAP bootstrap registry (RFC 9224) to find
 // the registry server for the TLD, then asks the registry about the domain. We never contact
 // the domain itself. (rdap.org's redirector blocks datacenter IPs, so it isn't used.)
-import type { ProviderResult, RdapResult } from '../../src/engine/lookup-contract.js'
+import { rdapFromBody, type ProviderResult, type RdapResult } from '../../src/engine/lookup-contract.js'
 import { TtlCache } from '../cache.js'
 import { fetchWithTimeout, mapLimit, readJson, type FetchLike } from '../http.js'
 
@@ -71,11 +71,7 @@ async function one(domain: string, base: string, deps: RdapDeps): Promise<RdapRe
   }
   if (res.status === 404) return { domain, status: 'not_registered' }
   if (!res.ok) return res.status
-  const body = (await readJson(res)) as { events?: { eventAction?: unknown; eventDate?: unknown }[] } | null
-  const reg = body?.events?.find((e) => e?.eventAction === 'registration')?.eventDate
-  const t = typeof reg === 'string' ? Date.parse(reg) : NaN
-  if (Number.isNaN(t)) return { domain, status: 'unknown' }
-  return { domain, status: 'ok', registered: new Date(t).toISOString(), ageDays: Math.max(0, Math.floor((now - t) / 86_400_000)) }
+  return rdapFromBody(domain, await readJson(res), now)
 }
 
 export async function lookupRdap(domains: string[], deps: RdapDeps): Promise<ProviderResult<RdapResult>> {

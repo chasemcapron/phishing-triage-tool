@@ -9,7 +9,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://rdap.verisign.com https://rdap.publicinterestregistry.org https://pubapi.registry.google https://rdap.gmoregistry.net https://rdap.zdnsgtld.com https://rdap.centralnic.com https://rdap.radix.host https://rdap.identitydigital.services https://rdap.nic.biz https://rdap.nic.buzz https://rdap.nic.club https://rdap.nic.fashion https://rdap.nic.vip https://rdap.nic.win https://rdap.registry.click https://rdap.registry.bar https://rdap.uniregistry.net; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
         },
         { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
         { "key": "X-Content-Type-Options", "value": "nosniff" },

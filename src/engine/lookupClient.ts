@@ -1,4 +1,5 @@
 import type { LookupRequest, LookupResponse } from './lookup-contract'
+import { fillRdapInBrowser } from './rdapBrowser'
 
 export class LookupError extends Error {
   constructor(
@@ -9,7 +10,7 @@ export class LookupError extends Error {
   }
 }
 
-/** Calls our own /api/lookup (same origin; the CSP allows nothing else). */
+/** Calls our own /api/lookup, then asks registries directly for any domain ages the server could not get. */
 export async function fetchLookup(
   request: LookupRequest,
   opts: { signal?: AbortSignal; fetchImpl?: typeof fetch; endpoint?: string } = {},
@@ -37,5 +38,5 @@ export async function fetchLookup(
   if (!body || typeof body !== 'object' || !('safeBrowsing' in body)) {
     throw new LookupError('Online checks returned an unexpected answer. Local checks still ran.')
   }
-  return body
+  return fillRdapInBrowser(request, body, { fetchImpl: opts.fetchImpl, signal: opts.signal })
 }

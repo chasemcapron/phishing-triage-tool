@@ -43,3 +43,12 @@ export const DOC_EXTS = new Set([
   'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'rtf', 'csv', 'jpg', 'jpeg', 'png', 'gif',
   'mp3', 'mp4', 'mov', 'wav', 'zip', 'html', 'htm', 'odt', 'ods',
 ])
+
+/**
+ * Domain endings that are cheap to register and heavily used by short-lived fake stores and
+ * phishing pages (per Spamhaus, Interisle and Netcraft TLD abuse reports). A weak signal only.
+ */
+export const RISKY_TLDS = new Set([
+  'shop', 'store', 'online', 'site', 'website', 'top', 'xyz', 'icu', 'cyou', 'sbs', 'cfd', 'bond', 'buzz',
+  'vip', 'click', 'lat', 'rest', 'monster', 'cam', 'boutique', 'sale', 'deals', 'win', 'fun', 'space',
+])

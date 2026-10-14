@@ -32,6 +32,8 @@ export const LIMITS = {
   maxSubdomainLabels: 3,
   /** Domains registered fewer than this many days ago count as newly registered. */
   newDomainDays: 30,
+  /** Same, for cheap endings popular with fake stores (.shop, .top, ...), which rarely last 3 months. */
+  newRiskyTldDomainDays: 90,
   /** VirusTotal engines that must say "malicious" for a known-bad (forced High) verdict. */
   vtMaliciousEngines: 2,
   /**
@@ -91,6 +93,7 @@ export const CHECKS = {
   'link-shortener': { weight: 10, category: 'links', title: 'URL shortener hides destination' },
   'link-idn': { weight: 10, category: 'links', title: 'International (punycode) domain' },
   'link-many-subdomains': { weight: 8, category: 'links', title: 'Excessive subdomains' },
+  'domain-risky-tld': { weight: 8, category: 'links', title: 'Domain ending popular with scam sites' },
 
   // Attachments
   'att-double-ext': { weight: 40, category: 'attachments', title: 'Double file extension' },
@@ -111,6 +114,7 @@ export const CHECKS = {
   'content-urgency': { weight: 8, category: 'content', title: 'Urgency or pressure language' },
   'content-credentials': { weight: 8, category: 'content', title: 'Asks you to sign in or verify' },
   'content-payment': { weight: 8, category: 'content', title: 'Payment or money-transfer request' },
+  'content-deal': { weight: 6, category: 'content', title: 'Too-good-to-be-true deal' },
   'content-generic-greeting': { weight: 4, category: 'content', title: 'Generic greeting' },
 
   // Text messages
