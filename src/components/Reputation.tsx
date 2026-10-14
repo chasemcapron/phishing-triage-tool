@@ -47,7 +47,8 @@ export function ReputationStatus({ report, checking }: { report: Report; checkin
           ))}
         </ul>
         <p className="small muted">
-          Sent {rep.sent.urls} link{rep.sent.urls === 1 ? '' : 's'} (without ?query parts){rep.sent.hashes ? ', ' : ' and '}{rep.sent.domains} domain
+          Sent {rep.sent.urls} link{rep.sent.urls === 1 ? '' : 's'} (without ?query parts){rep.sent.hashes ? ', ' : ' and '}
+          {rep.sent.domains} domain
           {rep.sent.domains === 1 ? '' : 's'}
           {rep.sent.hashes ? ` and ${rep.sent.hashes} file fingerprint${rep.sent.hashes === 1 ? '' : 's'}` : ''}. Nothing else left your browser.
         </p>

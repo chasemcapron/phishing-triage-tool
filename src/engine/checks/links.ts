@@ -76,11 +76,19 @@ export function checkLinks(links: LinkInfo[], findings: FindingSet): void {
 
     if (link.isIp) {
       flag(link, 'link-raw-ip')
-      findings.add('link-raw-ip', `A link points to a bare IP address (${link.host}) instead of a named website, which real companies almost never do.`, link.defanged)
+      findings.add(
+        'link-raw-ip',
+        `A link points to a bare IP address (${link.host}) instead of a named website, which real companies almost never do.`,
+        link.defanged,
+      )
     }
     if (link.registrableDomain && URL_SHORTENERS.has(link.registrableDomain)) {
       flag(link, 'link-shortener')
-      findings.add('link-shortener', `A link uses a URL shortener (${link.registrableDomain}), which hides where it really goes. This tool never opens links to find out.`, link.defanged)
+      findings.add(
+        'link-shortener',
+        `A link uses a URL shortener (${link.registrableDomain}), which hides where it really goes. This tool never opens links to find out.`,
+        link.defanged,
+      )
     }
     if (url.username || url.password) {
       flag(link, 'link-userinfo')
@@ -137,7 +145,11 @@ export function checkLinks(links: LinkInfo[], findings: FindingSet): void {
     const tld = link.registrableDomain ? tldOf(link.registrableDomain) : ''
     if (RISKY_TLDS.has(tld) && !officialBrand(link.registrableDomain)) {
       flag(link, 'domain-risky-tld')
-      findings.add('domain-risky-tld', `A link goes to a .${tld} address. Endings like this are cheap and popular with short-lived fake stores, though many real sites use them too.`, link.defanged)
+      findings.add(
+        'domain-risky-tld',
+        `A link goes to a .${tld} address. Endings like this are cheap and popular with short-lived fake stores, though many real sites use them too.`,
+        link.defanged,
+      )
     }
 
     for (const text of link.displayTexts) {
@@ -146,7 +158,11 @@ export function checkLinks(links: LinkInfo[], findings: FindingSet): void {
       const shownDomain = hostInfo(shown).domain ?? shown
       if (shownDomain === (link.registrableDomain ?? link.host)) continue
       flag(link, 'link-text-mismatch')
-      findings.add('link-text-mismatch', `The link text shows ${shown}, but clicking it actually goes to ${link.unicodeHost}.`, `shown "${clip(text, 80)}" → real ${link.defanged}`)
+      findings.add(
+        'link-text-mismatch',
+        `The link text shows ${shown}, but clicking it actually goes to ${link.unicodeHost}.`,
+        `shown "${clip(text, 80)}" → real ${link.defanged}`,
+      )
     }
 
     if (link.sources.includes('html-form')) {

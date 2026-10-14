@@ -225,8 +225,8 @@ export default function App() {
               <span>Gone Phishing</span>
             </p>
             <p>
-              Verdicts are advisory. "No red flags" means none of our checks matched, not that something is
-              guaranteed legitimate. All sample messages are synthetic.
+              Verdicts are advisory. "No red flags" means none of our checks matched, not that something is guaranteed legitimate. All sample messages are
+              synthetic.
             </p>
             <p>
               <a href="https://github.com/chasemcapron/phishing-triage-tool" rel="noreferrer">

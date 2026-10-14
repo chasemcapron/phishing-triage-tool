@@ -64,9 +64,9 @@ export function AuthTable({ email }: { email: EmailDetails }) {
         <>
           {auth.gateway ? (
             <p className="small">
-              Trusted header from <strong>{auth.provider}</strong>, which checked the message when it arrived from the internet and then
-              relayed it to {auth.gateway.downstream.provider}. That later check (SPF {auth.gateway.downstream.spf ?? 'none'}, DKIM{' '}
-              {auth.gateway.downstream.dkim ?? 'none'}, DMARC {auth.gateway.downstream.dmarc ?? 'none'}) is expected to fail after a gateway relay.
+              Trusted header from <strong>{auth.provider}</strong>, which checked the message when it arrived from the internet and then relayed it to{' '}
+              {auth.gateway.downstream.provider}. That later check (SPF {auth.gateway.downstream.spf ?? 'none'}, DKIM {auth.gateway.downstream.dkim ?? 'none'},
+              DMARC {auth.gateway.downstream.dmarc ?? 'none'}) is expected to fail after a gateway relay.
             </p>
           ) : (
             <p className="small">
@@ -297,7 +297,9 @@ function RepDetails({ rep }: { rep: LinkInfo['reputation'] }) {
   const age = rep.domainAgeDays
   return (
     <div className="rep-detail">
-      {age !== undefined && <div>registered {age <= 0 ? 'today' : age === 1 ? '1 day ago' : age < 730 ? `${age} days ago` : `${Math.floor(age / 365)} years ago`}</div>}
+      {age !== undefined && (
+        <div>registered {age <= 0 ? 'today' : age === 1 ? '1 day ago' : age < 730 ? `${age} days ago` : `${Math.floor(age / 365)} years ago`}</div>
+      )}
       {rep.safeBrowsing && <div>Safe Browsing: {rep.safeBrowsing.join(', ').toLowerCase().replace(/_/g, ' ')}</div>}
       {rep.virusTotal?.found && (
         <div>

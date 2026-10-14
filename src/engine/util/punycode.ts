@@ -41,7 +41,7 @@ export function decodePunycodeLabel(input: string): string {
     output.push(code)
   }
 
-  for (let idx = basic > 0 ? basic + 1 : 0; idx < input.length; ) {
+  for (let idx = basic > 0 ? basic + 1 : 0; idx < input.length;) {
     const oldi = i
     let w = 1
     for (let k = BASE; ; k += BASE) {

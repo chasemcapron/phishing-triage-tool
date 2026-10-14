@@ -103,7 +103,12 @@ export async function lookupVirusTotal(
     }
     let res: Response
     try {
-      res = await fetchWithTimeout(deps.fetch, API + job.path, { method: 'GET', headers: { 'x-apikey': deps.apiKey, accept: 'application/json' } }, deps.timeoutMs ?? 5000)
+      res = await fetchWithTimeout(
+        deps.fetch,
+        API + job.path,
+        { method: 'GET', headers: { 'x-apikey': deps.apiKey, accept: 'application/json' } },
+        deps.timeoutMs ?? 5000,
+      )
     } catch (e) {
       failure = e instanceof TimeoutError ? 'timeout' : 'error'
       skipped.push(job.indicator)
@@ -144,7 +149,12 @@ export async function lookupVirusTotal(
   }
 
   if (failure && !results.length) {
-    return { status: failure, message: failure === 'timeout' ? 'VirusTotal did not answer in time.' : `VirusTotal is unavailable right now${failCode ? ` (HTTP ${failCode})` : ''}.`, results, skipped }
+    return {
+      status: failure,
+      message: failure === 'timeout' ? 'VirusTotal did not answer in time.' : `VirusTotal is unavailable right now${failCode ? ` (HTTP ${failCode})` : ''}.`,
+      results,
+      skipped,
+    }
   }
   if (limited) return { status: 'rate_limited', message: clientLimited ? VT_CLIENT_LIMIT_MESSAGE : VT_LIMIT_MESSAGE, results, skipped }
   return { status: 'ok', results, ...(skipped.length ? { skipped } : {}) }

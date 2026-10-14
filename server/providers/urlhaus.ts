@@ -68,10 +68,7 @@ async function one(kind: Kind, indicator: string, deps: UrlhausDeps & { authKey:
   }
 }
 
-export async function lookupUrlhaus(
-  input: { urls: string[]; hosts: string[]; hashes: string[] },
-  deps: UrlhausDeps,
-): Promise<ProviderResult<UrlhausResult>> {
+export async function lookupUrlhaus(input: { urls: string[]; hosts: string[]; hashes: string[] }, deps: UrlhausDeps): Promise<ProviderResult<UrlhausResult>> {
   if (!deps.authKey) return { status: 'not_configured', message: 'URLhaus is not configured.', results: [] }
   const jobs: [Kind, string][] = [
     ...input.hashes.slice(0, MAX_EACH).map((h): [Kind, string] => ['payload', h]),

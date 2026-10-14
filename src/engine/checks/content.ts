@@ -47,7 +47,12 @@ export function checkContent(text: string, findings: FindingSet): void {
   for (const p of PATTERNS) {
     const source = p.kind === 'content-generic-greeting' ? text : flat
     const hits = [...new Set([...source.matchAll(p.re)].map((m) => clip(m[0], 60).toLowerCase()))]
-    if (hits.length) findings.add(p.kind, p.explanation, hits.slice(0, 5).map((h) => `"${h}"`))
+    if (hits.length)
+      findings.add(
+        p.kind,
+        p.explanation,
+        hits.slice(0, 5).map((h) => `"${h}"`),
+      )
   }
 }
 

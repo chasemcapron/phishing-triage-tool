@@ -24,7 +24,8 @@ const INFRA = /cdn|static|adsystem|adservice|adnxs|doubleclick|analytics|metric|
 // prettier-ignore
 // prettier-ignore
 const GENERIC = new Set(['service', 'services', 'platform', 'action', 'online', 'mobile', 'nature', 'cloud', 'archive', 'independent', 'clever', 'office', 'news', 'video', 'media', 'today', 'weather', 'search', 'translate', 'usercontent', 'mail', 'games', 'music', 'shopping', 'travel', 'health', 'science', 'energy', 'digital', 'apple-cloudkit'])
-const ADULT = /porn|xxx|xvideo|xhamster|xnxx|redtube|youporn|onlyfans|chaturbate|stripchat|bongacams|spankbang|livejasmin|brazzers|\bsex|sexy|hentai|camsoda|eporner|txxx/i
+const ADULT =
+  /porn|xxx|xvideo|xhamster|xnxx|redtube|youporn|onlyfans|chaturbate|stripchat|bongacams|spankbang|livejasmin|brazzers|\bsex|sexy|hentai|camsoda|eporner|txxx/i
 
 const domains = []
 const seen = new Set()

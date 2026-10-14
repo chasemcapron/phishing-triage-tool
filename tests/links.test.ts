@@ -6,17 +6,11 @@ const urls = (text: string) => normalizeLinks(extractTextLinks(text)).map((l) =>
 
 describe('extractTextLinks', () => {
   it('finds scheme URLs and trims sentence punctuation', () => {
-    expect(urls('Go to https://example.com/a?b=1, then (see https://x.test/p).')).toEqual([
-      'https://example.com/a?b=1',
-      'https://x.test/p',
-    ])
+    expect(urls('Go to https://example.com/a?b=1, then (see https://x.test/p).')).toEqual(['https://example.com/a?b=1', 'https://x.test/p'])
   })
 
   it('finds bare domains with paths, as sent in SMS', () => {
-    expect(urls('Pay now: delivery-update.top/track or www.example.com')).toEqual([
-      'http://delivery-update.top/track',
-      'http://www.example.com/',
-    ])
+    expect(urls('Pay now: delivery-update.top/track or www.example.com')).toEqual(['http://delivery-update.top/track', 'http://www.example.com/'])
   })
 
   it('finds bare IP links with a path', () => {
@@ -103,9 +97,7 @@ describe('URL heuristics (via analyzeText)', () => {
   })
 
   it('does not flag a brand claim when the link is official', () => {
-    expect(analyzeText('Your Amazon order shipped: https://www.amazon.com/orders').findings.map((f) => f.kind)).not.toContain(
-      'link-brand-mention',
-    )
+    expect(analyzeText('Your Amazon order shipped: https://www.amazon.com/orders').findings.map((f) => f.kind)).not.toContain('link-brand-mention')
   })
 
   it('defangs every link', () => {

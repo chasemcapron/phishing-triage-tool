@@ -30,7 +30,12 @@ async function services(deps: RdapDeps): Promise<Map<string, string> | number> {
   if (!deps.freshBootstrap && bootstrap && bootstrap.expires > now) return bootstrap.services
   let res: Response
   try {
-    res = await fetchWithTimeout(deps.fetch, BOOTSTRAP, { method: 'GET', headers: { accept: 'application/json', 'user-agent': USER_AGENT } }, deps.timeoutMs ?? 4000)
+    res = await fetchWithTimeout(
+      deps.fetch,
+      BOOTSTRAP,
+      { method: 'GET', headers: { accept: 'application/json', 'user-agent': USER_AGENT } },
+      deps.timeoutMs ?? 4000,
+    )
   } catch {
     return 0
   }
@@ -85,7 +90,8 @@ export async function lookupRdap(domains: string[], deps: RdapDeps): Promise<Pro
   const map = pending.length ? await services(deps) : new Map<string, string>()
   if (typeof map === 'number') {
     const cachedOnly = list.map((d) => store.get(d, now())).filter((r): r is RdapResult => Boolean(r))
-    if (!cachedOnly.length) return { status: 'error', message: `Domain registration data is unavailable right now (${map ? `HTTP ${map}` : 'timeout'}).`, results: [], skipped }
+    if (!cachedOnly.length)
+      return { status: 'error', message: `Domain registration data is unavailable right now (${map ? `HTTP ${map}` : 'timeout'}).`, results: [], skipped }
     return { status: 'ok', results: cachedOnly, skipped }
   }
 

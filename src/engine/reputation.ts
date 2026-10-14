@@ -39,9 +39,7 @@ export function buildLookupRequest(report: Report, opts: { stripQuery?: boolean 
     .sort((a, b) => b.p - a.p || a.i - b.i)
     .map((x) => x.l)
   const urls = [...new Set(links.map((l) => stripUrl(l.url, strip)))].slice(0, LOOKUP_LIMITS.urls)
-  const senderDomains = report.email
-    ? [domainOfEmail(report.email.from?.address), domainOfEmail(report.email.replyTo)].map((d) => registrable(d))
-    : []
+  const senderDomains = report.email ? [domainOfEmail(report.email.from?.address), domainOfEmail(report.email.replyTo)].map((d) => registrable(d)) : []
   const domains = [...new Set([...links.map((l) => l.registrableDomain), ...senderDomains])]
     .filter((d): d is string => Boolean(d) && !FREE_WEBMAIL.has(d!))
     .slice(0, LOOKUP_LIMITS.domains)
@@ -141,11 +139,19 @@ export function applyReputation(report: Report, res: LookupResponse, req: Lookup
       const ls = v.kind === 'domain' ? linksForDomain(v.indicator) : linksForUrl(v.indicator)
       ls.forEach((l) => (rep(l).virusTotal = summary))
     }
-    const name = v.kind === 'file' ? (r.email?.attachments.find((a) => a.sha256 === v.indicator)?.filename ?? 'an attachment') : v.kind === 'domain' ? defangHost(v.indicator) : defangUrl(v.indicator)
+    const name =
+      v.kind === 'file'
+        ? (r.email?.attachments.find((a) => a.sha256 === v.indicator)?.filename ?? 'an attachment')
+        : v.kind === 'domain'
+          ? defangHost(v.indicator)
+          : defangUrl(v.indicator)
     const evidence = `${v.kind} ${v.kind === 'url' ? defangUrl(v.indicator) : v.kind === 'domain' ? defangHost(v.indicator) : v.indicator}: ${malicious} malicious, ${suspicious} suspicious${v.label ? ` (${v.label})` : ''}`
     const trusted = (v.reputation ?? 0) >= LIMITS.vtTrustedReputation
     if (malicious >= LIMITS.vtMaliciousEngines && !trusted) {
-      fs.add('rep-virustotal-malicious', `${malicious} security vendors on VirusTotal flag ${name} as malicious.`, evidence, { forceHigh: true, source: 'virustotal' })
+      fs.add('rep-virustotal-malicious', `${malicious} security vendors on VirusTotal flag ${name} as malicious.`, evidence, {
+        forceHigh: true,
+        source: 'virustotal',
+      })
     } else if ((malicious >= 1 || suspicious >= 2) && (v.reputation ?? 0) <= 0) {
       fs.add('rep-virustotal-suspicious', `A few security vendors on VirusTotal flag ${name} as malicious or suspicious.`, evidence, { source: 'virustotal' })
     }
@@ -164,8 +170,18 @@ export function applyReputation(report: Report, res: LookupResponse, req: Lookup
         flag(l, 'rep-urlhaus')
       })
     }
-    const what = u.kind === 'payload' ? 'this attachment as known malware' : u.kind === 'host' ? `${defangHost(u.indicator)} as a site that has spread malware` : 'this link as a malware download'
-    fs.add('rep-urlhaus', `URLhaus (abuse.ch) lists ${what}.`, `${u.kind} ${u.kind === 'url' ? defangUrl(u.indicator) : u.kind === 'host' ? defangHost(u.indicator) : u.indicator}${u.threat ? ` (${u.threat})` : ''}${u.urlStatus ? `, ${u.urlStatus}` : ''}`, { forceHigh: true, source: 'urlhaus' })
+    const what =
+      u.kind === 'payload'
+        ? 'this attachment as known malware'
+        : u.kind === 'host'
+          ? `${defangHost(u.indicator)} as a site that has spread malware`
+          : 'this link as a malware download'
+    fs.add(
+      'rep-urlhaus',
+      `URLhaus (abuse.ch) lists ${what}.`,
+      `${u.kind} ${u.kind === 'url' ? defangUrl(u.indicator) : u.kind === 'host' ? defangHost(u.indicator) : u.indicator}${u.threat ? ` (${u.threat})` : ''}${u.urlStatus ? `, ${u.urlStatus}` : ''}`,
+      { forceHigh: true, source: 'urlhaus' },
+    )
   }
 
   // Domain age: newly registered domains are a strong phishing signal.

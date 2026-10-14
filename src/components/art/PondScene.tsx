@@ -31,13 +31,7 @@ const cls = (...c: (string | undefined)[]) => c.filter(Boolean).join(' ')
 
 function Art(p: { className?: string; viewBox?: string; fit?: string; children: ReactNode }) {
   return (
-    <svg
-      className={cls('pond-art', p.className)}
-      viewBox={p.viewBox}
-      preserveAspectRatio={p.fit}
-      aria-hidden="true"
-      focusable="false"
-    >
+    <svg className={cls('pond-art', p.className)} viewBox={p.viewBox} preserveAspectRatio={p.fit} aria-hidden="true" focusable="false">
       {p.children}
     </svg>
   )
@@ -115,7 +109,9 @@ function Cloud({ v, n }: { v: keyof typeof CLOUDS; n: number }) {
   )
   return (
     <Art className={`pond-cloud pond-cloud--${n}`} viewBox={vb}>
-      <g className="pc-shade" transform="translate(0 6)">{shape}</g>
+      <g className="pc-shade" transform="translate(0 6)">
+        {shape}
+      </g>
       <g className="pc-body">{shape}</g>
     </Art>
   )
@@ -136,7 +132,15 @@ const TREE_BAND =
 // prettier-ignore
 // prettier-ignore
 const PINES: N3[] = [[372, 104, 30], [812, 92, 32], [1232, 88, 28], [244, 96, 24]]
-const FLOWERS = [[140, 134, 'a'], [168, 140, 'b'], [520, 136, 'a'], [604, 131, 'b'], [1010, 141, 'a'], [1290, 128, 'b'], [1330, 134, 'a']] as const
+const FLOWERS = [
+  [140, 134, 'a'],
+  [168, 140, 'b'],
+  [520, 136, 'a'],
+  [604, 131, 'b'],
+  [1010, 141, 'a'],
+  [1290, 128, 'b'],
+  [1330, 134, 'a'],
+] as const
 
 function Hills() {
   return (
@@ -183,8 +187,7 @@ const W = 192 // bank waterline (viewBox y)
 
 function Bank({ side }: { side: 'l' | 'r' }) {
   const b = BANKS[side]
-  const reeds = (list: Reed[], k: string) =>
-    list.map(([x, h, l]) => <path key={k + x} className="pb-reed" d={blade(x, W, h, l)} />)
+  const reeds = (list: Reed[], k: string) => list.map(([x, h, l]) => <path key={k + x} className="pb-reed" d={blade(x, W, h, l)} />)
   return (
     <Art className={`pond-bank pond-bank--${side}`} viewBox="0 0 300 200">
       <path className="pk-back" d="M0 64C54 56 112 70 160 104S240 170 270 192H0Z" />

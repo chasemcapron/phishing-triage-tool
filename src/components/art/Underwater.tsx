@@ -34,10 +34,16 @@ export function Bubbles({ count = 14, speed = 1, seed = 0, className }: { count?
         <span
           key={i}
           className="uw-bubble"
-          style={{
-            '--x': `${r1((x + seed * 23) % 97)}%`, '--size': `${size}px`, '--dur': `${dur}s`,
-            '--delay': `${r1(delay - seed * 1.7)}s`, '--drift': `${drift}px`, '--rest': r1(((rest + seed * 0.37) % 1) * 100) / 100,
-          } as Vars}
+          style={
+            {
+              '--x': `${r1((x + seed * 23) % 97)}%`,
+              '--size': `${size}px`,
+              '--dur': `${dur}s`,
+              '--delay': `${r1(delay - seed * 1.7)}s`,
+              '--drift': `${drift}px`,
+              '--rest': r1(((rest + seed * 0.37) % 1) * 100) / 100,
+            } as Vars
+          }
         >
           <span className="uw-bubble__dot" />
         </span>
@@ -105,7 +111,17 @@ const FRONDS = (
 })
 
 /** Swaying seaweed on two rocks, pinned to the bottom-left/right of the positioned parent. */
-export function Seaweed({ side = 'left', height = 220, offset = '2%', className }: { side?: 'left' | 'right'; height?: Len; offset?: Len; className?: string }) {
+export function Seaweed({
+  side = 'left',
+  height = 220,
+  offset = '2%',
+  className,
+}: {
+  side?: 'left' | 'right'
+  height?: Len
+  offset?: Len
+  className?: string
+}) {
   return (
     <svg
       className={cx('uw-seaweed', `uw-seaweed--${side}`, className)}
@@ -159,7 +175,10 @@ const Boot = () => (
 
 const Crab = () => (
   <Item name="crab" box="0 0 64 50">
-    <path className="uw-crab__legs" d="M18 36L8 41M20 38L11 46M24 40L19 48M46 36L56 41M44 38L53 46M40 40L45 48M14 32L8 21M50 32L56 21M27 26L25 13M37 26L39 13" />
+    <path
+      className="uw-crab__legs"
+      d="M18 36L8 41M20 38L11 46M24 40L19 48M46 36L56 41M44 38L53 46M40 40L45 48M14 32L8 21M50 32L56 21M27 26L25 13M37 26L39 13"
+    />
     <path className="uw-crab__claw" d="M8 18L13.9 16.9A6 6 0 1 1 10 12.4Z" />
     <path className="uw-crab__claw uw-crab__claw--wave" d="M56 18L50.1 16.9A6 6 0 1 0 54 12.4Z" />
     <path className="uw-crab__body" d="M11 35C11 20 53 20 53 35C53 42 11 42 11 35Z" />
@@ -269,17 +288,35 @@ type SwimLaneProps = {
  * right (or say faces="left"); 'rtl' mirrors the lane. Negative `delay` starts
  * mid-swim. Reduced motion: they rest `rest` % across (default: where the delay puts them).
  */
-export function SwimLane({ children, duration = 40, delay = 0, top = '50%', direction = 'ltr', scale = 1, faces = 'right', bob = true, glow = false, rest, className }: SwimLaneProps) {
+export function SwimLane({
+  children,
+  duration = 40,
+  delay = 0,
+  top = '50%',
+  direction = 'ltr',
+  scale = 1,
+  faces = 'right',
+  bob = true,
+  glow = false,
+  rest,
+  className,
+}: SwimLaneProps) {
   const progress = duration > 0 ? (((-delay % duration) + duration) % duration) / duration : 0.5
   const bobDur = 2.6 + (((duration * 7 + Math.abs(delay) * 3) % 10) / 10) * 1.6
   return (
     <div
       className={cx('uw-lane', `uw-lane--${direction}`, faces === 'left' && 'uw-lane--faces-left', bob && 'uw-lane--bob', glow && 'uw-lane--glow', className)}
       aria-hidden="true"
-      style={{
-        '--swim-dur': `${duration}s`, '--swim-delay': `${delay}s`, '--swim-top': len(top), '--swim-scale': scale,
-        '--swim-rest': `${r1(rest ?? 12 + progress * 76)}%`, '--swim-bob-dur': `${r1(bobDur)}s`,
-      } as Vars}
+      style={
+        {
+          '--swim-dur': `${duration}s`,
+          '--swim-delay': `${delay}s`,
+          '--swim-top': len(top),
+          '--swim-scale': scale,
+          '--swim-rest': `${r1(rest ?? 12 + progress * 76)}%`,
+          '--swim-bob-dur': `${r1(bobDur)}s`,
+        } as Vars
+      }
     >
       <div className="uw-lane__track">
         <div className="uw-lane__body">

@@ -48,12 +48,13 @@ export async function analyzeEmail(raw: string | ArrayBuffer | Uint8Array, opts:
   const parseHtml = opts.parseHtml ?? inertParser
   const parsed = await PostalMime.parse(raw, { attachmentEncoding: 'arraybuffer' })
 
-  const from = parsed.from && 'address' in parsed.from && parsed.from.address
-    ? { name: parsed.from.name ?? '', address: parsed.from.address.toLowerCase() }
-    : (() => {
-        const address = extractAddress(firstHeader(headers, 'from'))
-        return address ? { name: '', address } : null
-      })()
+  const from =
+    parsed.from && 'address' in parsed.from && parsed.from.address
+      ? { name: parsed.from.name ?? '', address: parsed.from.address.toLowerCase() }
+      : (() => {
+          const address = extractAddress(firstHeader(headers, 'from'))
+          return address ? { name: '', address } : null
+        })()
   const replyToEntry = parsed.replyTo?.find((a) => 'address' in a && a.address)
   const replyTo = replyToEntry && 'address' in replyToEntry ? replyToEntry.address!.toLowerCase() : null
   const returnPath = extractAddress(firstHeader(headers, 'return-path'))
@@ -70,10 +71,7 @@ export async function analyzeEmail(raw: string | ArrayBuffer | Uint8Array, opts:
   checkSender({ fromName: from?.name ?? '', fromAddress: from?.address ?? null, replyTo, returnPath, messageId, dmarc: auth.dmarc }, findings)
   checkRelay(hops, findings)
 
-  const links = normalizeLinks([
-    ...(parsed.text ? extractTextLinks(parsed.text) : []),
-    ...(parsed.html ? extractHtmlLinks(parsed.html, parseHtml) : []),
-  ])
+  const links = normalizeLinks([...(parsed.text ? extractTextLinks(parsed.text) : []), ...(parsed.html ? extractHtmlLinks(parsed.html, parseHtml) : [])])
   checkLinks(links, findings)
 
   const body = parsed.text || (parsed.html ? htmlToText(parsed.html, parseHtml) : '')

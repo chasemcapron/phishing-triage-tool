@@ -48,12 +48,15 @@ const TACTIC_ORDER = ['Resource Development', 'Reconnaissance', 'Initial Access'
 
 const LOOKALIKE: FindingKind[] = ['link-lookalike', 'link-combosquat', 'link-brand-tld', 'link-idn', 'link-popular-lookalike']
 const LINK_DECEPTION: FindingKind[] = [
-  'link-brand-subdomain', 'link-text-mismatch', 'link-userinfo', 'link-raw-ip', 'link-redirect-param',
-  'link-many-subdomains', 'link-script-uri',
+  'link-brand-subdomain',
+  'link-text-mismatch',
+  'link-userinfo',
+  'link-raw-ip',
+  'link-redirect-param',
+  'link-many-subdomains',
+  'link-script-uri',
 ]
-const EXEC_ATTACHMENT: FindingKind[] = [
-  'att-executable', 'att-archive-exec', 'att-disk-image', 'att-onenote', 'att-macro', 'att-archive-encrypted',
-]
+const EXEC_ATTACHMENT: FindingKind[] = ['att-executable', 'att-archive-exec', 'att-disk-image', 'att-onenote', 'att-macro', 'att-archive-encrypted']
 const CREDENTIAL_INTENT: FindingKind[] = ['content-credentials', 'content-sensitive-info', 'link-html-form', 'link-http-login']
 const IMPERSONATION: FindingKind[] = ['sender-display-brand', 'sender-display-email', 'sender-freemail-org', 'sender-lookalike-domain']
 const DECEPTION: FindingKind[] = [...LOOKALIKE, ...LINK_DECEPTION, ...IMPERSONATION, 'link-brand-mention', 'link-shortener']

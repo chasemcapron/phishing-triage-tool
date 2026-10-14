@@ -205,8 +205,7 @@ export function SeasonSky({ season }: { season: Season }) {
           </svg>
         </>
       )}
-      {season === 'winter' &&
-        FLAKES.map((p, i) => <Particle key={i} p={p} i={i} kind="flake" />)}
+      {season === 'winter' && FLAKES.map((p, i) => <Particle key={i} p={p} i={i} kind="flake" />)}
     </div>
   )
 }

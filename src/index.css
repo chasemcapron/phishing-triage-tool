@@ -769,7 +769,9 @@ code {
   border-radius: var(--radius-xl);
   border: 2px solid var(--sev-border);
   padding: 18px;
-  background: linear-gradient(var(--sev-bg), var(--sev-bg)) padding-box, var(--surface);
+  background:
+    linear-gradient(var(--sev-bg), var(--sev-bg)) padding-box,
+    var(--surface);
   box-shadow: var(--shadow-card);
 }
 .verdict-high {

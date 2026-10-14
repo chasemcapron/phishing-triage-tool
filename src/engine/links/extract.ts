@@ -27,8 +27,7 @@ function trimTrailing(url: string): string {
     if (!last) return u
     if ('.,;:!?\'"*'.includes(last)) u = u.slice(0, -1)
     else if (last === ')' && (u.match(/\(/g)?.length ?? 0) < (u.match(/\)/g)?.length ?? 0)) u = u.slice(0, -1)
-    else if ((last === ']' || last === '}' || last === '>') && !u.includes(last === ']' ? '[' : last === '}' ? '{' : '<'))
-      u = u.slice(0, -1)
+    else if ((last === ']' || last === '}' || last === '>') && !u.includes(last === ']' ? '[' : last === '}' ? '{' : '<')) u = u.slice(0, -1)
     else return u
   }
 }
@@ -126,8 +125,17 @@ export function normalizeLinks(raw: RawLink[]): LinkInfo[] {
     if (script) {
       const url = href.slice(0, 2000)
       link = byUrl.get(url) ?? {
-        url, defanged: defangUrl(url), host: '', unicodeHost: '', registrableDomain: null,
-        scheme: script[1]!.toLowerCase(), isIp: false, isBare: false, displayTexts: [], sources: [], flags: [],
+        url,
+        defanged: defangUrl(url),
+        host: '',
+        unicodeHost: '',
+        registrableDomain: null,
+        scheme: script[1]!.toLowerCase(),
+        isIp: false,
+        isBare: false,
+        displayTexts: [],
+        sources: [],
+        flags: [],
       }
     } else {
       let parsed: URL
@@ -140,9 +148,17 @@ export function normalizeLinks(raw: RawLink[]): LinkInfo[] {
       const url = parsed.href
       const info = hostInfo(parsed.hostname)
       link = byUrl.get(url) ?? {
-        url, defanged: defangUrl(url), host: info.host, unicodeHost: info.unicodeHost,
-        registrableDomain: info.isIp ? null : info.domain, scheme: parsed.protocol.slice(0, -1), isIp: info.isIp,
-        isBare: Boolean(r.isBare), displayTexts: [], sources: [], flags: [],
+        url,
+        defanged: defangUrl(url),
+        host: info.host,
+        unicodeHost: info.unicodeHost,
+        registrableDomain: info.isIp ? null : info.domain,
+        scheme: parsed.protocol.slice(0, -1),
+        isIp: info.isIp,
+        isBare: Boolean(r.isBare),
+        displayTexts: [],
+        sources: [],
+        flags: [],
       }
       if (!r.isBare) link.isBare = false
     }

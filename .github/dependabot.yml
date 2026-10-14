@@ -6,7 +6,7 @@ updates:
       interval: weekly
     groups:
       all-deps:
-        patterns: ["*"]
+        patterns: ['*']
   - package-ecosystem: github-actions
     directory: /
     schedule:

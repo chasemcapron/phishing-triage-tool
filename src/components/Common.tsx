@@ -132,22 +132,15 @@ export function PrivacyNote() {
           Your message is analyzed in your browser and links are never opened.{' '}
           {online ? (
             <>
-              For online checks, only the links (without anything after <code>?</code> or <code>#</code>) and their domains are
-              sent to Google Safe Browsing, VirusTotal, URLhaus and domain registries, which may keep them. If a registry
-              won't answer our server, your browser asks it for the domain's age directly. The message itself never leaves
-              your device. Reputation data can be incomplete or wrong.
+              For online checks, only the links (without anything after <code>?</code> or <code>#</code>) and their domains are sent to Google Safe Browsing,
+              VirusTotal, URLhaus and domain registries, which may keep them. If a registry won't answer our server, your browser asks it for the domain's age
+              directly. The message itself never leaves your device. Reputation data can be incomplete or wrong.
             </>
           ) : (
             <>Online checks are off: nothing leaves your device.</>
           )}
         </p>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={online}
-          className="online-switch"
-          onClick={() => setOnline(!online)}
-        >
+        <button type="button" role="switch" aria-checked={online} className="online-switch" onClick={() => setOnline(!online)}>
           <span className="online-switch__track" aria-hidden="true">
             <span className="online-switch__thumb" />
           </span>

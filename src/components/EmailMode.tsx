@@ -70,8 +70,7 @@ export function EmailMode({ initialInput = '', sample }: { initialInput?: string
           Paste the raw email source or headers
         </label>
         <p className="hint">
-          Gmail: ⋮ → <em>Show original</em>. Outlook: … → <em>View</em> → <em>View message source</em>. Apple Mail: View →
-          Message → <em>Raw Source</em>.
+          Gmail: ⋮ → <em>Show original</em>. Outlook: … → <em>View</em> → <em>View message source</em>. Apple Mail: View → Message → <em>Raw Source</em>.
         </p>
         <div
           className={`dropzone${dragging ? ' dragging' : ''}`}

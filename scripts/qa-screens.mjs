@@ -7,8 +7,7 @@ import { spawn } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const [base = 'http://localhost:4173', outDir = 'qa-out', chromePath = 'C:/Program Files/Google/Chrome/Application/chrome.exe'] =
-  process.argv.slice(2)
+const [base = 'http://localhost:4173', outDir = 'qa-out', chromePath = 'C:/Program Files/Google/Chrome/Application/chrome.exe'] = process.argv.slice(2)
 mkdirSync(outDir, { recursive: true })
 
 const ALL_PAGES = [
@@ -34,10 +33,11 @@ const DEVICES = process.env.DEVICES ? ALL_DEVICES.filter(([n]) => process.env.DE
 const THEMES = (process.env.THEMES ?? 'dark').split(',')
 
 const port = 9300 + Math.floor(Math.random() * 500)
-const chrome = spawn(chromePath, [
-  '--headless=new', `--remote-debugging-port=${port}`, '--no-first-run', '--disable-gpu',
-  `--user-data-dir=${join(outDir, '.profile')}`, 'about:blank',
-], { stdio: 'ignore' })
+const chrome = spawn(
+  chromePath,
+  ['--headless=new', `--remote-debugging-port=${port}`, '--no-first-run', '--disable-gpu', `--user-data-dir=${join(outDir, '.profile')}`, 'about:blank'],
+  { stdio: 'ignore' },
+)
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 let version

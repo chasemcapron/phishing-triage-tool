@@ -41,9 +41,16 @@ describe('hidden characters', () => {
 
 describe('scams without a link', () => {
   it('spots "wrong number" openers', () => {
-    for (const t of ['Hi, is this Emily? We met at the conference last week', 'Hello are you Mr. Chen? My assistant gave me this number', 'Sorry, wrong number! Anyway, how is your day?']) {
+    for (const t of [
+      'Hi, is this Emily? We met at the conference last week',
+      'Hello are you Mr. Chen? My assistant gave me this number',
+      'Sorry, wrong number! Anyway, how is your day?',
+    ]) {
       const r = analyzeText(t)
-      expect(r.findings.map((f) => f.kind), t).toContain('sms-wrong-number')
+      expect(
+        r.findings.map((f) => f.kind),
+        t,
+      ).toContain('sms-wrong-number')
       expect(r.verdict, t).toBe('suspicious')
     }
   })
@@ -60,7 +67,10 @@ describe('scams without a link', () => {
       'Your Geek Squad subscription auto-renewed for $289.99 today. To dispute this charge contact billing at +1 (888) 555-0110.',
     ]) {
       const r = analyzeText(t)
-      expect(r.findings.map((f) => f.kind), t).toEqual(expect.arrayContaining(['sms-callback-number', 'sms-callback-charge']))
+      expect(
+        r.findings.map((f) => f.kind),
+        t,
+      ).toEqual(expect.arrayContaining(['sms-callback-number', 'sms-callback-charge']))
       expect(r.verdict, t).toBe('suspicious')
     }
   })
@@ -71,7 +81,9 @@ describe('scams without a link', () => {
     )
     expect(gift.findings.map((f) => f.kind)).toContain('sms-gift-card-codes')
     expect(gift.verdict).toBe('suspicious')
-    const relay = analyzeText("Hey, it's Sam from church. I accidentally sent my Google verification code to your number. Can you send me the 6-digit code you just got?")
+    const relay = analyzeText(
+      "Hey, it's Sam from church. I accidentally sent my Google verification code to your number. Can you send me the 6-digit code you just got?",
+    )
     expect(relay.findings.map((f) => f.kind)).toContain('sms-code-relay')
     expect(relay.verdict).toBe('suspicious')
   })

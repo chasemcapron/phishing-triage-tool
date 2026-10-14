@@ -28,7 +28,10 @@ function makeZip(names: string[], encrypted = false): Uint8Array {
 }
 
 const att = (filename: string, mimeType: string, content: Uint8Array | string): RawAttachment => ({
-  filename, mimeType, disposition: 'attachment', content: typeof content === 'string' ? new TextEncoder().encode(content) : content,
+  filename,
+  mimeType,
+  disposition: 'attachment',
+  content: typeof content === 'string' ? new TextEncoder().encode(content) : content,
 })
 
 async function kindsFor(a: RawAttachment) {

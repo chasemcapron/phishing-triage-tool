@@ -53,7 +53,9 @@ describe('parseAuthResultsValue', () => {
 
 describe('parseReceivedValue', () => {
   it('prefers the connecting IP over the HELO literal', () => {
-    const hop = parseReceivedValue('from [10.0.0.5] (unknown [198.51.100.23]) by mail.example (Postfix) with ESMTPSA id X; Tue, 13 Oct 2026 14:41:55 +0000 (UTC)')
+    const hop = parseReceivedValue(
+      'from [10.0.0.5] (unknown [198.51.100.23]) by mail.example (Postfix) with ESMTPSA id X; Tue, 13 Oct 2026 14:41:55 +0000 (UTC)',
+    )
     expect(hop).toMatchObject({ from: '[10.0.0.5]', fromIp: '198.51.100.23', by: 'mail.example', protocol: 'ESMTPSA', date: '2026-10-13T14:41:55.000Z' })
   })
 

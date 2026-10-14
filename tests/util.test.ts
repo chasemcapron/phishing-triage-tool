@@ -9,12 +9,9 @@ import { decodePunycodeLabel, hostToUnicode } from '../src/engine/util/punycode'
 import { editDistance, skeleton } from '../src/engine/util/text'
 
 describe('punycode', () => {
-  it.each(['xn--pple-43d.com', 'xn--80ak6aa92e.com', 'xn--mnchen-3ya.de', 'xn--ls8h.la', 'plain.example'])(
-    'matches Node domainToUnicode for %s',
-    (host) => {
-      expect(hostToUnicode(host)).toBe(domainToUnicode(host))
-    },
-  )
+  it.each(['xn--pple-43d.com', 'xn--80ak6aa92e.com', 'xn--mnchen-3ya.de', 'xn--ls8h.la', 'plain.example'])('matches Node domainToUnicode for %s', (host) => {
+    expect(hostToUnicode(host)).toBe(domainToUnicode(host))
+  })
 
   it('rejects malformed labels', () => {
     expect(() => decodePunycodeLabel('a-?')).toThrow()

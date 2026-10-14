@@ -20,7 +20,10 @@ export interface HostInfo {
 }
 
 export function hostInfo(rawHost: string): HostInfo {
-  const host = rawHost.toLowerCase().replace(/^\[|\]$/g, '').replace(/\.$/, '')
+  const host = rawHost
+    .toLowerCase()
+    .replace(/^\[|\]$/g, '')
+    .replace(/\.$/, '')
   const p = parse(host, { allowPrivateDomains: true })
   const suffix = p.publicSuffix
   return {
@@ -46,7 +49,12 @@ export function registrable(hostOrEmail: string | null | undefined): string | nu
 export function domainOfEmail(address: string | null | undefined): string | null {
   if (!address) return null
   const at = address.lastIndexOf('@')
-  return at >= 0 ? address.slice(at + 1).toLowerCase().replace(/[>\s]/g, '') : null
+  return at >= 0
+    ? address
+        .slice(at + 1)
+        .toLowerCase()
+        .replace(/[>\s]/g, '')
+    : null
 }
 
 export function isIPv4(s: string): boolean {
@@ -65,8 +73,7 @@ export function classifyIp(ip: string): IpClass {
     if (a === 127) return 'loopback'
     if (a === 169 && b === 254) return 'link-local'
     if (a === 100 && b >= 64 && b <= 127) return 'cgnat'
-    if ((a === 192 && b === 0 && c === 2) || (a === 198 && b === 51 && c === 100) || (a === 203 && b === 0 && c === 113))
-      return 'documentation'
+    if ((a === 192 && b === 0 && c === 2) || (a === 198 && b === 51 && c === 100) || (a === 203 && b === 0 && c === 113)) return 'documentation'
     if (a === 0 || a >= 224 || (a === 198 && (b === 18 || b === 19))) return 'reserved'
     return 'public'
   }
