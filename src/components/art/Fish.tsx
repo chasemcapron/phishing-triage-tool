@@ -3,9 +3,11 @@
 // (day on :root, night on :root[data-theme='dark']); shapes only carry classes.
 import { useId, type ReactNode } from 'react'
 import type { Verdict } from '../../engine'
+import { SeasonHat } from './Seasonal'
 import './fish.css'
 
-type ArtProps = { className?: string; sash?: boolean }
+/** `hat`: room for a seasonal hat (shown only when a season is active; see seasonal.css). */
+type ArtProps = { className?: string; sash?: boolean; hat?: boolean }
 
 const useClip = () => 'fish-clip' + useId().replace(/[^\w-]/g, '')
 
@@ -55,7 +57,7 @@ function Sash({ verdict }: { verdict: Verdict }) {
 /* ---------- High risk: the grumpy anglerfish "phish" (faces left) ---------- */
 const PHISH_BODY = 'M42 79C44 52 68 36 96 36c26 0 46 20 46 44s-20 40-46 40c-22 0-44-3-56-12-7-5-10-12-8-18 1-4 6-9 10-11z'
 
-export function FishPhish({ className, sash }: ArtProps) {
+export function FishPhish({ className, sash, hat }: ArtProps) {
   const clip = useClip()
   return (
     <Svg kind="fish-phish fish-verdict" box="0 0 160 136" className={className}>
@@ -91,6 +93,7 @@ export function FishPhish({ className, sash }: ArtProps) {
       </g>
       <Eye cx={74} cy={62} r={14} px={68.5} py={65} pr={6.5} lid="M60.6 58A14 14 0 0 1 83.8 52z" />
       <path className="fish-brow" d="M58 52.5l28-9" />
+      {hat && <SeasonHat verdict="high" />}
       <path className="fish-stalk" d="M88 38c-2-20-26-30-48-22v4" />
       <g className="fish-lure">
         <rect className="fish-envelope" x="28" y="20" width="24" height="17" rx="3.5" />
@@ -112,7 +115,7 @@ const SPINES = [-158, -136, -114, -92, -70, -48, -28, 30, 50, 72, 94, 116, 138, 
   .join('')
 const PUFF_BODY = 'M28 68a44 44 0 1 0 88 0a44 44 0 1 0-88 0z'
 
-export function FishPuffer({ className, sash }: ArtProps) {
+export function FishPuffer({ className, sash, hat }: ArtProps) {
   const clip = useClip()
   return (
     <Svg kind="fish-puffer fish-verdict" box="0 0 150 130" className={className}>
@@ -143,6 +146,7 @@ export function FishPuffer({ className, sash }: ArtProps) {
         <path className="fish-brow" d="M33 43.5q6-1 12 1M60 37q8-6 17-2" />
         <ellipse className="fish-accent" cx="36" cy="83" rx="6.5" ry="4.6" />
         <path className="fish-line" d="M31 83.5q5-2.2 10 .6" />
+        {hat && <SeasonHat verdict="suspicious" />}
       </g>
     </Svg>
   )
@@ -151,7 +155,7 @@ export function FishPuffer({ className, sash }: ArtProps) {
 /* ---------- No red flags: calm, curious round fish (faces left) ---------- */
 const CALM_BODY = 'M24 62c0-26 22-42 48-42s44 18 44 42-18 42-44 42-48-16-48-42z'
 
-export function FishCalm({ className, sash }: ArtProps) {
+export function FishCalm({ className, sash, hat }: ArtProps) {
   const clip = useClip()
   return (
     <Svg kind="fish-calm fish-verdict" box="0 0 150 124" className={className}>
@@ -179,6 +183,7 @@ export function FishCalm({ className, sash }: ArtProps) {
         <Eye cx={47} cy={52} r={15} px={43} py={53} pr={8} />
       </g>
       <path className="fish-brow" d="M38 32q8-4 16-1" />
+      {hat && <SeasonHat verdict="none" />}
       <g className="fish-bubbles">
         <circle className="fish-bubble" cx="18" cy="58" r="3.4" />
         <circle className="fish-bubble" cx="11" cy="45" r="2.4" />
@@ -213,8 +218,8 @@ export function FishSmall({ className, variant = 1 }: ArtProps & { variant?: 1 |
 }
 
 /** The verdict card's mascot: high → FishPhish, suspicious → FishPuffer, none → FishCalm. */
-export function VerdictFish({ verdict, className, sash }: { verdict: Verdict; className?: string; sash?: boolean }) {
-  if (verdict === 'high') return <FishPhish className={className} sash={sash} />
-  if (verdict === 'suspicious') return <FishPuffer className={className} sash={sash} />
-  return <FishCalm className={className} sash={sash} />
+export function VerdictFish({ verdict, ...p }: { verdict: Verdict } & ArtProps) {
+  if (verdict === 'high') return <FishPhish {...p} />
+  if (verdict === 'suspicious') return <FishPuffer {...p} />
+  return <FishCalm {...p} />
 }

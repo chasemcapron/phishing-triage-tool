@@ -1,12 +1,15 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { EmailMode } from './components/EmailMode'
 import { Bobber, Duck, Fisher, LilyPads, LogoMark, SkyBackdrop } from './components/art/PondScene'
+import { SeasonSky } from './components/art/Seasonal'
 import { PondFloor } from './components/art/Underwater'
 import { IconMoon, IconSun } from './components/Icons'
 import { FishingLine, PondAmbient } from './components/Pond'
+import { SeasonPicker } from './components/SeasonPicker'
 import { TextMode } from './components/TextMode'
 import { loadEngine } from './engineLoader'
 import { SAMPLES } from './samples'
+import { initialSeasonChoice, resolveSeason, saveSeasonChoice, type SeasonChoice } from './season'
 
 type Mode = 'text' | 'email'
 
@@ -51,6 +54,8 @@ export default function App() {
   const [mode, setMode] = useState<Mode>(initial.mode)
   const [sample, setSample] = useState<SampleRequest | null>(initial.sample)
   const [theme, setTheme] = useState<Theme>(readTheme)
+  const [seasonChoice, setSeasonChoice] = useState<SeasonChoice>(() => initialSeasonChoice())
+  const season = resolveSeason(seasonChoice)
   const [handoff, setHandoff] = useState<{ text: string; key: number } | null>(null)
   const tabRefs = useRef<Record<Mode, HTMLButtonElement | null>>({ text: null, email: null })
 
@@ -62,6 +67,24 @@ export default function App() {
       /* storage unavailable: theme just won't persist */
     }
   }, [theme])
+
+  // Before paint, so the seasonal palette never flashes in after the default one.
+  useLayoutEffect(() => {
+    const root = document.documentElement
+    if (season === 'none') delete root.dataset.season
+    else root.dataset.season = season
+  }, [season])
+
+  const pickSeason = (c: SeasonChoice) => {
+    setSeasonChoice(c)
+    saveSeasonChoice(c)
+    // A ?season= link only sets the starting look; an explicit pick replaces it.
+    const url = new URL(window.location.href)
+    if (url.searchParams.has('season')) {
+      url.searchParams.delete('season')
+      history.replaceState(null, '', url.pathname + url.search + url.hash)
+    }
+  }
 
   // Start fetching the engine right after first paint.
   useEffect(() => {
@@ -100,8 +123,10 @@ export default function App() {
       <div className="pond-page">
         <div className="sky">
           <SkyBackdrop />
+          <SeasonSky season={season} />
           <header className="site-header">
             <div className="container header-inner">
+              <SeasonPicker choice={seasonChoice} season={season} onChange={pickSeason} />
               <button
                 type="button"
                 className="btn btn-icon theme-toggle"
