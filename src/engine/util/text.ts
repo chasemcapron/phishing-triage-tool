@@ -22,6 +22,8 @@ export function editDistance(a: string, b: string): number {
 
 // Characters commonly swapped in to imitate Latin letters: Cyrillic and Greek
 // look-alikes, digits and symbols. Applied to both sides of every comparison.
+// prettier-ignore
+// prettier-ignore
 const CONFUSABLES: Record<string, string> = {
   а: 'a', е: 'e', о: 'o', р: 'p', с: 'c', у: 'y', х: 'x', і: 'i', ј: 'j', ѕ: 's', ԁ: 'd', һ: 'h', ӏ: 'l',
   ԛ: 'q', ԝ: 'w', к: 'k', м: 'm', т: 't', в: 'b', н: 'h', ո: 'n', ս: 'u', ɡ: 'g', ı: 'i', ɩ: 'i',

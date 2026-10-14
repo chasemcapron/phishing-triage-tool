@@ -17,6 +17,8 @@ export interface Advice {
 
 const TOLL = ['E-ZPass', 'SunPass', 'FasTrak', 'TxTag']
 const DELIVERY = ['USPS', 'UPS', 'FedEx', 'DHL']
+// prettier-ignore
+// prettier-ignore
 const RETAIL = [
   'Summer Fridays', 'Lululemon', 'Walmart', 'Costco', 'Best Buy', 'The Home Depot', 'Sephora', 'Ulta Beauty', 'Shein', 'Temu',
   'Nike', 'Adidas', 'Stanley', 'Skims', 'Dyson', 'Crocs', 'UGG', 'Ray-Ban', 'The North Face', 'Le Creuset', 'LEGO', 'Ticketmaster',
@@ -103,16 +105,16 @@ export function adviceFor(r: Pick<Report, 'verdict' | 'mode' | 'findings' | 'lin
       junk,
       card,
     ],
-    login: [
-      `Don't sign in through ${email ? 'its links' : 'this link'}. Open the app or type the website address yourself.`,
-      password,
-      junk,
-    ],
+    login: [`Don't sign in through ${email ? 'its links' : 'this link'}. Open the app or type the website address yourself.`, password, junk],
     general: [`Don't tap or open ${email ? 'its links or attachments' : 'the link'}, and don't reply.`, junk, card, password],
   }
   const out = [...steps[kind]]
   if (email) out.push('At work, report it to your IT or security team before deleting it.')
 
-  const report = [...(reportUrl(r) ? [{ ...REPORT.google, href: `${REPORT.google.href}?url=${encodeURIComponent(reportUrl(r)!)}` }] : []), REPORT.ftc, ...(kind === 'shop' || kind === 'wrong-number' || kind === 'callback' ? [REPORT.ic3] : [])]
+  const report = [
+    ...(reportUrl(r) ? [{ ...REPORT.google, href: `${REPORT.google.href}?url=${encodeURIComponent(reportUrl(r)!)}` }] : []),
+    REPORT.ftc,
+    ...(kind === 'shop' || kind === 'wrong-number' || kind === 'callback' ? [REPORT.ic3] : []),
+  ]
   return { kind, steps: out, report }
 }

@@ -10,7 +10,18 @@ import { join } from 'node:path'
 
 const [base = 'https://gonefishing-app.vercel.app', chromePath = 'C:/Program Files/Google/Chrome/Application/chrome.exe'] = process.argv.slice(2)
 const port = 9800 + Math.floor(Math.random() * 100)
-const chrome = spawn(chromePath, ['--headless=new', `--remote-debugging-port=${port}`, '--no-first-run', '--hide-scrollbars', `--user-data-dir=${mkdtempSync(join(tmpdir(), 'gp-social-'))}`, 'about:blank'], { stdio: 'ignore' })
+const chrome = spawn(
+  chromePath,
+  [
+    '--headless=new',
+    `--remote-debugging-port=${port}`,
+    '--no-first-run',
+    '--hide-scrollbars',
+    `--user-data-dir=${mkdtempSync(join(tmpdir(), 'gp-social-'))}`,
+    'about:blank',
+  ],
+  { stdio: 'ignore' },
+)
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
 let version

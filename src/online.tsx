@@ -80,7 +80,10 @@ export function useReport() {
         if (!c.signal.aborted) setReport(eng.applyReputation(local, res, req))
       } catch (e) {
         if (!c.signal.aborted) {
-          setReport({ ...local, reputation: eng.offReputation('failed', e instanceof eng.LookupError ? e.message : 'Online checks are unavailable right now.') })
+          setReport({
+            ...local,
+            reputation: eng.offReputation('failed', e instanceof eng.LookupError ? e.message : 'Online checks are unavailable right now.'),
+          })
         }
       } finally {
         if (ctrl.current === c) {

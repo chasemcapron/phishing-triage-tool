@@ -103,7 +103,9 @@ export function ticketSummary(report: Report): string {
     if (e.from) lines.push(`- **From:** ${mdCode(e.from.name ? `${e.from.name} <${defangEmail(e.from.address)}>` : defangEmail(e.from.address))}`)
     if (e.replyTo) lines.push(`- **Reply-To:** ${mdCode(defangEmail(e.replyTo))}`)
     if (e.date) lines.push(`- **Date:** ${mdCode(e.date)}`)
-    lines.push(`- **Authentication (${mdEscape(e.auth.provider ?? 'unknown provider')}):** SPF ${e.auth.spf ?? 'none'}, DKIM ${e.auth.dkim ?? 'none'}, DMARC ${e.auth.dmarc ?? 'none'}`)
+    lines.push(
+      `- **Authentication (${mdEscape(e.auth.provider ?? 'unknown provider')}):** SPF ${e.auth.spf ?? 'none'}, DKIM ${e.auth.dkim ?? 'none'}, DMARC ${e.auth.dmarc ?? 'none'}`,
+    )
     const boundary = e.hops.find((h) => h.isBoundary)
     if (boundary?.fromIp) lines.push(`- **Sending server:** ${mdCode(`${boundary.from ?? '?'} [${defangHost(boundary.fromIp)}]`)}`)
   }

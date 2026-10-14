@@ -47,7 +47,12 @@ export function checkContent(text: string, findings: FindingSet): void {
   for (const p of PATTERNS) {
     const source = p.kind === 'content-generic-greeting' ? text : flat
     const hits = [...new Set([...source.matchAll(p.re)].map((m) => clip(m[0], 60).toLowerCase()))]
-    if (hits.length) findings.add(p.kind, p.explanation, hits.slice(0, 5).map((h) => `"${h}"`))
+    if (hits.length)
+      findings.add(
+        p.kind,
+        p.explanation,
+        hits.slice(0, 5).map((h) => `"${h}"`),
+      )
   }
 }
 
@@ -64,7 +69,7 @@ export function checkHiddenChars(text: string, findings: FindingSet): string {
   const hits = [...body.matchAll(HIDDEN)]
   if (!hits.length) return body
   const evidence = hits.slice(0, 3).map((m) => {
-    const at = m.index!
+    const at = m.index
     const around = body.slice(Math.max(0, at - 12), at + 13)
     return `"${defangText(around.replace(HIDDEN, codeOf))}"`
   })

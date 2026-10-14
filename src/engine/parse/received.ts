@@ -36,7 +36,13 @@ function connectingIp(fromPart: string): string | null {
 export function parseReceivedValue(value: string): Omit<Hop, 'index' | 'delaySeconds' | 'isBoundary'> {
   const semi = value.lastIndexOf(';')
   const clauses = semi >= 0 ? value.slice(0, semi) : value
-  const dateText = semi >= 0 ? value.slice(semi + 1).replace(/\([^)]*\)/g, '').trim() : ''
+  const dateText =
+    semi >= 0
+      ? value
+          .slice(semi + 1)
+          .replace(/\([^)]*\)/g, '')
+          .trim()
+      : ''
   const time = dateText ? Date.parse(dateText) : NaN
 
   const fromMatch = /^\s*from\s+(\S+)/i.exec(clauses)

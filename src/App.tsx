@@ -174,6 +174,8 @@ export default function App() {
         <main id="main" className="pond water-column">
           <PondAmbient />
           <div className="container pond-content">
+            {/* The tablist is a composite widget: its tabs take focus (roving tabindex), not the list itself. */}
+            {/* oxlint-disable-next-line jsx-a11y/interactive-supports-focus */}
             <div className={MODES.length > 1 ? 'tabs' : 'tabs tabs-single'} role="tablist" aria-label="What do you want to check?" onKeyDown={onTabKey}>
               {MODES.map(([m, label]) => (
                 <button
@@ -223,8 +225,8 @@ export default function App() {
               <span>Gone Phishing</span>
             </p>
             <p>
-              Verdicts are advisory. "No red flags" means none of our checks matched, not that something is
-              guaranteed legitimate. All sample messages are synthetic.
+              Verdicts are advisory. "No red flags" means none of our checks matched, not that something is guaranteed legitimate. All sample messages are
+              synthetic.
             </p>
             <p>
               <a href="https://github.com/chasemcapron/phishing-triage-tool" rel="noreferrer">

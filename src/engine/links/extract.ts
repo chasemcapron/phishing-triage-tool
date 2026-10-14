@@ -17,7 +17,7 @@ const SCHEME_URL_RE = /\b(?:https?:\/\/|www\.)[^\s<>"'`{}|\\^]+/gi
 const SCRIPT_URI_RE = /\b(?:javascript:[^\s<>"']+|data:[a-z]+\/[a-z0-9.+-]+[;,][^\s<>"']*)/gi
 const BARE_HOST_RE =
   /(?<![\p{L}\p{N}@._/-])((?:[\p{L}\p{N}](?:[\p{L}\p{N}-]{0,61}[\p{L}\p{N}])?\.)+(?:\p{L}{2,63}|xn--[a-z0-9-]{2,59}))(?![\p{L}\p{N}@-])(:\d{2,5})?(\/[^\s<>"'`]*)?/giu
-const BARE_IP_RE = /(?<![\w.\/:])((?:\d{1,3}\.){3}\d{1,3})(:\d{2,5})?(\/[^\s<>"'`]*)/g
+const BARE_IP_RE = /(?<![\w./:])((?:\d{1,3}\.){3}\d{1,3})(:\d{2,5})?(\/[^\s<>"'`]*)/g
 
 /** Trims trailing punctuation that belongs to the sentence, not the URL. */
 function trimTrailing(url: string): string {
@@ -27,8 +27,7 @@ function trimTrailing(url: string): string {
     if (!last) return u
     if ('.,;:!?\'"*'.includes(last)) u = u.slice(0, -1)
     else if (last === ')' && (u.match(/\(/g)?.length ?? 0) < (u.match(/\)/g)?.length ?? 0)) u = u.slice(0, -1)
-    else if ((last === ']' || last === '}' || last === '>') && !u.includes(last === ']' ? '[' : last === '}' ? '{' : '<'))
-      u = u.slice(0, -1)
+    else if ((last === ']' || last === '}' || last === '>') && !u.includes(last === ']' ? '[' : last === '}' ? '{' : '<')) u = u.slice(0, -1)
     else return u
   }
 }
@@ -37,21 +36,21 @@ function trimTrailing(url: string): string {
 export function extractTextLinks(text: string): RawLink[] {
   const found: (RawLink & { at: number })[] = []
   let rest = text
-  const blank = (m: RegExpMatchArray) => {
-    rest = rest.slice(0, m.index!) + ' '.repeat(m[0].length) + rest.slice(m.index! + m[0].length)
+  const blank = (m: RegExpExecArray) => {
+    rest = rest.slice(0, m.index) + ' '.repeat(m[0].length) + rest.slice(m.index + m[0].length)
   }
 
-  for (const m of [...rest.matchAll(SCRIPT_URI_RE)]) {
-    found.push({ href: trimTrailing(m[0]), source: 'text', at: m.index! })
+  for (const m of rest.matchAll(SCRIPT_URI_RE)) {
+    found.push({ href: trimTrailing(m[0]), source: 'text', at: m.index })
     blank(m)
   }
-  for (const m of [...rest.matchAll(SCHEME_URL_RE)]) {
+  for (const m of rest.matchAll(SCHEME_URL_RE)) {
     const raw = trimTrailing(m[0])
-    found.push({ href: /^www\./i.test(raw) ? `http://${raw}` : raw, source: 'text', isBare: /^www\./i.test(raw), at: m.index! })
+    found.push({ href: /^www\./i.test(raw) ? `http://${raw}` : raw, source: 'text', isBare: /^www\./i.test(raw), at: m.index })
     blank(m)
   }
-  for (const m of [...rest.matchAll(BARE_IP_RE)]) {
-    found.push({ href: `http://${trimTrailing(m[0])}`, source: 'text', isBare: true, at: m.index! })
+  for (const m of rest.matchAll(BARE_IP_RE)) {
+    found.push({ href: `http://${trimTrailing(m[0])}`, source: 'text', isBare: true, at: m.index })
     blank(m)
   }
   for (const m of rest.matchAll(BARE_HOST_RE)) {
@@ -65,7 +64,7 @@ export function extractTextLinks(text: string): RawLink[] {
     }
     if (!info.knownSuffix || !info.domain) continue
     if (!path && info.suffix && FILE_LIKE_TLDS.has(info.suffix)) continue
-    found.push({ href: `http://${trimTrailing(m[0])}`, source: 'text', isBare: true, at: m.index! })
+    found.push({ href: `http://${trimTrailing(m[0])}`, source: 'text', isBare: true, at: m.index })
   }
   return found.sort((a, b) => a.at - b.at).map(({ at: _at, ...link }) => link)
 }
@@ -126,8 +125,17 @@ export function normalizeLinks(raw: RawLink[]): LinkInfo[] {
     if (script) {
       const url = href.slice(0, 2000)
       link = byUrl.get(url) ?? {
-        url, defanged: defangUrl(url), host: '', unicodeHost: '', registrableDomain: null,
-        scheme: script[1]!.toLowerCase(), isIp: false, isBare: false, displayTexts: [], sources: [], flags: [],
+        url,
+        defanged: defangUrl(url),
+        host: '',
+        unicodeHost: '',
+        registrableDomain: null,
+        scheme: script[1]!.toLowerCase(),
+        isIp: false,
+        isBare: false,
+        displayTexts: [],
+        sources: [],
+        flags: [],
       }
     } else {
       let parsed: URL
@@ -140,9 +148,17 @@ export function normalizeLinks(raw: RawLink[]): LinkInfo[] {
       const url = parsed.href
       const info = hostInfo(parsed.hostname)
       link = byUrl.get(url) ?? {
-        url, defanged: defangUrl(url), host: info.host, unicodeHost: info.unicodeHost,
-        registrableDomain: info.isIp ? null : info.domain, scheme: parsed.protocol.slice(0, -1), isIp: info.isIp,
-        isBare: Boolean(r.isBare), displayTexts: [], sources: [], flags: [],
+        url,
+        defanged: defangUrl(url),
+        host: info.host,
+        unicodeHost: info.unicodeHost,
+        registrableDomain: info.isIp ? null : info.domain,
+        scheme: parsed.protocol.slice(0, -1),
+        isIp: info.isIp,
+        isBare: Boolean(r.isBare),
+        displayTexts: [],
+        sources: [],
+        flags: [],
       }
       if (!r.isBare) link.isBare = false
     }

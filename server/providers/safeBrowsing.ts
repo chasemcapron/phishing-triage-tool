@@ -67,7 +67,12 @@ export async function lookupSafeBrowsing(urls: string[], deps: SafeBrowsingDeps)
   for (const u of pending) qs.append('urls', u)
   let res: Response
   try {
-    res = await fetchWithTimeout(deps.fetch, `${ENDPOINT}?${qs}`, { method: 'GET', headers: { 'X-Goog-Api-Key': deps.apiKey, accept: 'application/x-protobuf' } }, deps.timeoutMs ?? 5000)
+    res = await fetchWithTimeout(
+      deps.fetch,
+      `${ENDPOINT}?${qs.toString()}`,
+      { method: 'GET', headers: { 'X-Goog-Api-Key': deps.apiKey, accept: 'application/x-protobuf' } },
+      deps.timeoutMs ?? 5000,
+    )
   } catch (e) {
     return e instanceof TimeoutError
       ? { status: 'timeout', message: 'Google Safe Browsing did not answer in time.', results }

@@ -75,7 +75,7 @@ export function checkSender(s: SenderInput, findings: FindingSet): void {
     )
   }
 
-  const midHost = s.messageId ? /@([^>\s]+)/.exec(s.messageId)?.[1] ?? null : null
+  const midHost = s.messageId ? (/@([^>\s]+)/.exec(s.messageId)?.[1] ?? null) : null
   const midDomain = registrable(midHost)
   if (midDomain && midDomain !== fromDomain && !MTA_MESSAGE_ID_DOMAINS.has(midDomain) && s.dmarc !== 'pass') {
     findings.add(

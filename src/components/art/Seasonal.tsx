@@ -17,12 +17,16 @@ const hidden = { 'aria-hidden': true, focusable: false } as const
 // [x %, duration s, delay s, sway px, resting y % (reduced motion), scale, shape, colour]
 // Resting heights stay above the title or below the lede, so still particles never sit behind text.
 type P = readonly [number, number, number, number, number, number, number, number]
+// prettier-ignore
+// prettier-ignore
 const LEAVES: P[] = [
   [3, 15, -2, 26, 8, 1, 0, 0], [11, 19, -11, -22, 72, 0.85, 1, 1], [19, 17, -6, 30, 80, 1.1, 2, 2],
   [27, 21, -15, -18, 12, 0.8, 0, 3], [36, 16, -9, 24, 5, 0.9, 1, 0], [47, 20, -3, -28, 86, 1, 2, 1],
   [58, 18, -13, 20, 10, 0.85, 0, 2], [66, 22, -7, -24, 76, 1.05, 1, 3], [74, 17, -16, 28, 14, 0.9, 2, 0],
   [83, 19, -4, -20, 70, 1, 0, 1], [90, 16, -10, 22, 6, 0.8, 1, 2], [97, 21, -18, -26, 84, 0.95, 2, 3],
 ]
+// prettier-ignore
+// prettier-ignore
 const FLAKES: P[] = [
   [2, 14, -3, 14, 10, 1, 0, 0], [8, 18, -12, -12, 74, 0.7, 0, 0], [14, 16, -7, 16, 4, 0.9, 1, 0],
   [21, 20, -16, -14, 82, 0.6, 0, 0], [27, 15, -2, 12, 13, 1.1, 0, 0], [33, 19, -10, -16, 70, 0.75, 1, 0],
@@ -201,8 +205,7 @@ export function SeasonSky({ season }: { season: Season }) {
           </svg>
         </>
       )}
-      {season === 'winter' &&
-        FLAKES.map((p, i) => <Particle key={i} p={p} i={i} kind="flake" />)}
+      {season === 'winter' && FLAKES.map((p, i) => <Particle key={i} p={p} i={i} kind="flake" />)}
     </div>
   )
 }

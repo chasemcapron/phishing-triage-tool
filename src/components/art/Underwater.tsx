@@ -17,6 +17,7 @@ const r1 = (n: number) => Math.round(n * 10) / 10
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(' ')
 
 // [left %, size px, rise s, delay s, wobble px, resting height 0..1]
+// prettier-ignore
 const BUBBLES = [
   [5, 16, 13, -2, 7, 0.72], [12, 9, 10, -7, 5, 0.34], [19, 22, 17, -11, 9, 0.55], [27, 12, 12, -4, 6, 0.16],
   [34, 8, 9, -6, 4, 0.84], [42, 18, 18, -14, 8, 0.42], [50, 10, 11, -3, 5, 0.63], [58, 24, 20, -9, 10, 0.26],
@@ -33,10 +34,16 @@ export function Bubbles({ count = 14, speed = 1, seed = 0, className }: { count?
         <span
           key={i}
           className="uw-bubble"
-          style={{
-            '--x': `${r1((x + seed * 23) % 97)}%`, '--size': `${size}px`, '--dur': `${dur}s`,
-            '--delay': `${r1(delay - seed * 1.7)}s`, '--drift': `${drift}px`, '--rest': r1(((rest + seed * 0.37) % 1) * 100) / 100,
-          } as Vars}
+          style={
+            {
+              '--x': `${r1((x + seed * 23) % 97)}%`,
+              '--size': `${size}px`,
+              '--dur': `${dur}s`,
+              '--delay': `${r1(delay - seed * 1.7)}s`,
+              '--drift': `${drift}px`,
+              '--rest': r1(((rest + seed * 0.37) % 1) * 100) / 100,
+            } as Vars
+          }
         >
           <span className="uw-bubble__dot" />
         </span>
@@ -46,6 +53,7 @@ export function Bubbles({ count = 14, speed = 1, seed = 0, className }: { count?
 }
 
 // [left %, width %, strength 0..1, shimmer s, delay s]
+// prettier-ignore
 const RAYS = [[2, 8, 0.9, 7, -1], [15, 4, 0.55, 9, -4], [25, 10, 0.8, 8, -2], [42, 5, 0.5, 10, -6], [54, 9, 0.85, 7.5, -3], [69, 4, 0.5, 9.5, -5], [79, 11, 0.75, 8.5, -7]] as const
 
 /** Soft sunbeams (faint moonbeams at night) fading down from the parent's top. angle > 0: light from the upper right (where the sun is). */
@@ -98,11 +106,22 @@ const FRONDS = (
   ] as const
 ).map(([x0, h, w, amp, waves, lean, ph, back, dur, delay]) => {
   const [d, vein] = frond(x0, h, w, amp, waves, lean, ph)
+  // oxlint-disable-next-line typescript/no-unnecessary-type-assertion -- false positive: without the cast tsc rejects the custom properties in style (TS2559)
   return { d, vein, back: back === 1, style: { '--sway-dur': `${dur}s`, '--sway-delay': `${delay}s` } as Vars }
 })
 
 /** Swaying seaweed on two rocks, pinned to the bottom-left/right of the positioned parent. */
-export function Seaweed({ side = 'left', height = 220, offset = '2%', className }: { side?: 'left' | 'right'; height?: Len; offset?: Len; className?: string }) {
+export function Seaweed({
+  side = 'left',
+  height = 220,
+  offset = '2%',
+  className,
+}: {
+  side?: 'left' | 'right'
+  height?: Len
+  offset?: Len
+  className?: string
+}) {
   return (
     <svg
       className={cx('uw-seaweed', `uw-seaweed--${side}`, className)}
@@ -156,7 +175,10 @@ const Boot = () => (
 
 const Crab = () => (
   <Item name="crab" box="0 0 64 50">
-    <path className="uw-crab__legs" d="M18 36L8 41M20 38L11 46M24 40L19 48M46 36L56 41M44 38L53 46M40 40L45 48M14 32L8 21M50 32L56 21M27 26L25 13M37 26L39 13" />
+    <path
+      className="uw-crab__legs"
+      d="M18 36L8 41M20 38L11 46M24 40L19 48M46 36L56 41M44 38L53 46M40 40L45 48M14 32L8 21M50 32L56 21M27 26L25 13M37 26L39 13"
+    />
     <path className="uw-crab__claw" d="M8 18L13.9 16.9A6 6 0 1 1 10 12.4Z" />
     <path className="uw-crab__claw uw-crab__claw--wave" d="M56 18L50.1 16.9A6 6 0 1 0 54 12.4Z" />
     <path className="uw-crab__body" d="M11 35C11 20 53 20 53 35C53 42 11 42 11 35Z" />
@@ -266,17 +288,35 @@ type SwimLaneProps = {
  * right (or say faces="left"); 'rtl' mirrors the lane. Negative `delay` starts
  * mid-swim. Reduced motion: they rest `rest` % across (default: where the delay puts them).
  */
-export function SwimLane({ children, duration = 40, delay = 0, top = '50%', direction = 'ltr', scale = 1, faces = 'right', bob = true, glow = false, rest, className }: SwimLaneProps) {
+export function SwimLane({
+  children,
+  duration = 40,
+  delay = 0,
+  top = '50%',
+  direction = 'ltr',
+  scale = 1,
+  faces = 'right',
+  bob = true,
+  glow = false,
+  rest,
+  className,
+}: SwimLaneProps) {
   const progress = duration > 0 ? (((-delay % duration) + duration) % duration) / duration : 0.5
   const bobDur = 2.6 + (((duration * 7 + Math.abs(delay) * 3) % 10) / 10) * 1.6
   return (
     <div
       className={cx('uw-lane', `uw-lane--${direction}`, faces === 'left' && 'uw-lane--faces-left', bob && 'uw-lane--bob', glow && 'uw-lane--glow', className)}
       aria-hidden="true"
-      style={{
-        '--swim-dur': `${duration}s`, '--swim-delay': `${delay}s`, '--swim-top': len(top), '--swim-scale': scale,
-        '--swim-rest': `${r1(rest ?? 12 + progress * 76)}%`, '--swim-bob-dur': `${r1(bobDur)}s`,
-      } as Vars}
+      style={
+        {
+          '--swim-dur': `${duration}s`,
+          '--swim-delay': `${delay}s`,
+          '--swim-top': len(top),
+          '--swim-scale': scale,
+          '--swim-rest': `${r1(rest ?? 12 + progress * 76)}%`,
+          '--swim-bob-dur': `${r1(bobDur)}s`,
+        } as Vars
+      }
     >
       <div className="uw-lane__track">
         <div className="uw-lane__body">

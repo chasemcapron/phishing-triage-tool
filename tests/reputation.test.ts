@@ -77,7 +77,15 @@ describe('applyReputation', () => {
     const r = await email('04-legit-newsletter.eml')
     const mk = (malicious: number): LookupResponse => {
       const res = empty()
-      res.virusTotal.results = [{ kind: 'domain', indicator: 'contoso.example', found: true, stats: { malicious, suspicious: 0, harmless: 70, undetected: 5 }, link: 'https://www.virustotal.com/gui/domain/contoso.example' }]
+      res.virusTotal.results = [
+        {
+          kind: 'domain',
+          indicator: 'contoso.example',
+          found: true,
+          stats: { malicious, suspicious: 0, harmless: 70, undetected: 5 },
+          link: 'https://www.virustotal.com/gui/domain/contoso.example',
+        },
+      ]
       return res
     }
     expect(applyReputation(r, mk(3), buildLookupRequest(r)).verdict).toBe('high')
@@ -94,7 +102,9 @@ describe('applyReputation', () => {
     const r = await email('03-invoice-attachments.eml')
     const exe = r.email!.attachments[1]!.sha256
     const res = empty()
-    res.urlhaus.results = [{ kind: 'payload', indicator: exe, listed: true, threat: 'malware_download', reference: 'https://urlhaus.abuse.ch/browse.php?search=x' }]
+    res.urlhaus.results = [
+      { kind: 'payload', indicator: exe, listed: true, threat: 'malware_download', reference: 'https://urlhaus.abuse.ch/browse.php?search=x' },
+    ]
     const once = applyReputation(r, res, buildLookupRequest(r))
     const twice = applyReputation(once, res, buildLookupRequest(r))
     expect(once.email!.attachments[1]!.urlhaus?.threat).toBe('malware_download')
@@ -182,6 +192,8 @@ describe('fetchLookup', () => {
     const down = vi.fn(async () => {
       throw new TypeError('network')
     })
-    await expect(fetchLookup({ urls: [], domains: ['a.example'], hashes: [] }, { fetchImpl: down as unknown as typeof fetch })).rejects.toBeInstanceOf(LookupError)
+    await expect(fetchLookup({ urls: [], domains: ['a.example'], hashes: [] }, { fetchImpl: down as unknown as typeof fetch })).rejects.toBeInstanceOf(
+      LookupError,
+    )
   })
 })

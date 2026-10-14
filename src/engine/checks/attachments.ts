@@ -1,6 +1,4 @@
-import {
-  ARCHIVE_EXTS, DISK_IMAGE_EXTS, DOC_EXTS, EXEC_EXTS, HTML_EXTS, MACRO_EXTS, ONENOTE_EXTS,
-} from '../data/lists'
+import { ARCHIVE_EXTS, DISK_IMAGE_EXTS, DOC_EXTS, EXEC_EXTS, HTML_EXTS, MACRO_EXTS, ONENOTE_EXTS } from '../data/lists'
 import type { FindingSet } from '../findings'
 import type { AttachmentInfo } from '../types'
 
@@ -32,12 +30,16 @@ export function detectFileType(b: Uint8Array): string | null {
   return null
 }
 
+// prettier-ignore
+// prettier-ignore
 const FAMILY_BY_EXT: Record<string, string> = {
   pdf: 'pdf', docx: 'zip', xlsx: 'zip', pptx: 'zip', docm: 'zip', xlsm: 'zip', pptm: 'zip', zip: 'zip', jar: 'zip',
   odt: 'zip', ods: 'zip', doc: 'ole', xls: 'ole', ppt: 'ole', msg: 'ole', png: 'png', jpg: 'jpeg', jpeg: 'jpeg',
   gif: 'gif', exe: 'exe', dll: 'exe', scr: 'exe', rar: 'rar', '7z': '7z', gz: 'gzip', tgz: 'gzip', iso: 'iso',
   html: 'html', htm: 'html',
 }
+// prettier-ignore
+// prettier-ignore
 const FAMILY_BY_MIME: Record<string, string> = {
   'application/pdf': 'pdf', 'application/zip': 'zip', 'application/x-zip-compressed': 'zip',
   'application/msword': 'ole', 'application/vnd.ms-excel': 'ole', 'application/vnd.ms-powerpoint': 'ole',
@@ -90,9 +92,15 @@ export async function analyzeAttachments(raw: RawAttachment[], findings: Finding
   for (const a of raw) {
     const filename = a.filename ?? '(unnamed)'
     const info: AttachmentInfo = {
-      filename, mimeType: a.mimeType, size: a.content.byteLength, sha256: await sha256Hex(a.content),
-      disposition: a.disposition, detectedType: detectFileType(a.content), archiveEntries: null,
-      encryptedArchive: false, flags: [],
+      filename,
+      mimeType: a.mimeType,
+      size: a.content.byteLength,
+      sha256: await sha256Hex(a.content),
+      disposition: a.disposition,
+      detectedType: detectFileType(a.content),
+      archiveEntries: null,
+      encryptedArchive: false,
+      flags: [],
     }
     const add = (kind: Parameters<FindingSet['add']>[0], explanation: string, evidence: string) => {
       findings.add(kind, explanation, evidence)
@@ -138,9 +146,17 @@ export async function analyzeAttachments(raw: RawAttachment[], findings: Finding
     const actual = info.detectedType
     if (expected && actual && expected !== actual) {
       if (actual === 'exe' || actual === 'elf') {
-        add('att-signature-exec', `"${filename}" claims to be ${expected.toUpperCase()} but its contents are actually a Windows/Linux program.`, `declared ${a.mimeType}, file signature: ${actual}`)
+        add(
+          'att-signature-exec',
+          `"${filename}" claims to be ${expected.toUpperCase()} but its contents are actually a Windows/Linux program.`,
+          `declared ${a.mimeType}, file signature: ${actual}`,
+        )
       } else {
-        add('att-signature-mismatch', `"${filename}" claims to be ${expected.toUpperCase()} but its contents are ${actual.toUpperCase()}.`, `declared ${a.mimeType}, file signature: ${actual}`)
+        add(
+          'att-signature-mismatch',
+          `"${filename}" claims to be ${expected.toUpperCase()} but its contents are ${actual.toUpperCase()}.`,
+          `declared ${a.mimeType}, file signature: ${actual}`,
+        )
       }
     }
     out.push(info)

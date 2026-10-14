@@ -15,12 +15,17 @@ if (!csv || !listId) throw new Error('usage: node scripts/make-popular-sites.mjs
 const TARGETS = 1000
 const KNOWN = 10000
 // Mirrors RISKY_TLDS in src/engine/data/lists.ts: junk domains climb rankings on these too.
+// prettier-ignore
+// prettier-ignore
 const RISKY_TLDS = new Set(['shop', 'store', 'online', 'site', 'website', 'top', 'xyz', 'icu', 'cyou', 'sbs', 'cfd', 'bond', 'buzz', 'vip', 'click', 'lat', 'rest', 'monster', 'cam', 'boutique', 'sale', 'deals', 'win', 'fun', 'space'])
 const INFRA = /cdn|static|adsystem|adservice|adnxs|doubleclick|analytics|metric|tracking|pixel|dns|edge|cloudfront|akamai|syndication|telemetry/
 // Sites named after a plain word ("service.gov.uk", "action.com") would make every
 // "pik-service" or "action-media" look like an imitation.
+// prettier-ignore
+// prettier-ignore
 const GENERIC = new Set(['service', 'services', 'platform', 'action', 'online', 'mobile', 'nature', 'cloud', 'archive', 'independent', 'clever', 'office', 'news', 'video', 'media', 'today', 'weather', 'search', 'translate', 'usercontent', 'mail', 'games', 'music', 'shopping', 'travel', 'health', 'science', 'energy', 'digital', 'apple-cloudkit'])
-const ADULT = /porn|xxx|xvideo|xhamster|xnxx|redtube|youporn|onlyfans|chaturbate|stripchat|bongacams|spankbang|livejasmin|brazzers|\bsex|sexy|hentai|camsoda|eporner|txxx/i
+const ADULT =
+  /porn|xxx|xvideo|xhamster|xnxx|redtube|youporn|onlyfans|chaturbate|stripchat|bongacams|spankbang|livejasmin|brazzers|\bsex|sexy|hentai|camsoda|eporner|txxx/i
 
 const domains = []
 const seen = new Set()

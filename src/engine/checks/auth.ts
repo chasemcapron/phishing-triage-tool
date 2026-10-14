@@ -54,7 +54,12 @@ function findGateway(all: AuthResultsHeader[], hops: Hop[], provider: AuthResult
   const gateway: GatewayAuth = {
     name: vendor?.name ?? registrable(entry.by)!,
     host: entry.by,
-    downstream: { provider: providerName(provider), spf: methodResult(provider, 'spf'), dkim: methodResult(provider, 'dkim'), dmarc: methodResult(provider, 'dmarc') },
+    downstream: {
+      provider: providerName(provider),
+      spf: methodResult(provider, 'spf'),
+      dkim: methodResult(provider, 'dkim'),
+      dmarc: methodResult(provider, 'dmarc'),
+    },
   }
   return { header, gateway }
 }
@@ -102,7 +107,11 @@ export function checkAuth(summary: AuthSummary, findings: FindingSet, fromDomain
   }
   const ev = (m: string) => {
     const r = t.methods.find((x) => x.method === m)
-    return r ? `${m}=${r.result} ${Object.entries(r.props).map(([k, v]) => `${k}=${v}`).join(' ')}`.trim() : `${m}: no result`
+    return r
+      ? `${m}=${r.result} ${Object.entries(r.props)
+          .map(([k, v]) => `${k}=${v}`)
+          .join(' ')}`.trim()
+      : `${m}: no result`
   }
   const { spf, dkim, dmarc } = summary
   const from = fromDomain ?? 'the sender'
@@ -119,17 +128,27 @@ export function checkAuth(summary: AuthSummary, findings: FindingSet, fromDomain
   }
 
   if (dmarc === 'fail') {
-    findings.add('auth-dmarc-fail', `The sender's domain (${from}) did not approve this message: it failed DMARC, the main check against spoofed senders.`, ev('dmarc'))
+    findings.add(
+      'auth-dmarc-fail',
+      `The sender's domain (${from}) did not approve this message: it failed DMARC, the main check against spoofed senders.`,
+      ev('dmarc'),
+    )
   } else if (!dmarc || WEAK.has(dmarc)) {
     findings.add('auth-dmarc-none', `${from} has no working DMARC protection, so nothing stops others from sending mail in its name.`, ev('dmarc'))
   }
 
   if (dmarc !== 'pass') {
     if (spf === 'fail') findings.add('auth-spf-fail', `The server that sent this is not allowed to send mail for its claimed domain (SPF failed).`, ev('spf'))
-    else if (spf === 'softfail') findings.add('auth-spf-softfail', `The sending server is not on the domain's list of approved senders (SPF soft-failed).`, ev('spf'))
+    else if (spf === 'softfail')
+      findings.add('auth-spf-softfail', `The sending server is not on the domain's list of approved senders (SPF soft-failed).`, ev('spf'))
     else if (!spf || WEAK.has(spf)) findings.add('auth-spf-none', 'There was no usable SPF result for the sending server.', ev('spf'))
 
-    if (dkim === 'fail') findings.add('auth-dkim-fail', 'The message carries a digital signature that does not check out (DKIM failed), so it may have been altered or forged.', ev('dkim'))
+    if (dkim === 'fail')
+      findings.add(
+        'auth-dkim-fail',
+        'The message carries a digital signature that does not check out (DKIM failed), so it may have been altered or forged.',
+        ev('dkim'),
+      )
     else if (!dkim || WEAK.has(dkim)) findings.add('auth-dkim-none', 'The message is not digitally signed by its sender (no DKIM).', ev('dkim'))
   }
 

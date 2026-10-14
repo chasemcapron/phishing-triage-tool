@@ -1,0 +1,84 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  // Oxlint instead of ESLint: the project builds with TypeScript 7, whose package no longer
+  // ships the JavaScript compiler API that typescript-eslint needs. Oxlint ports the same
+  // rule sets (eslint, typescript-eslint, react-hooks, react-refresh, jsx-a11y, vitest) and
+  // runs type-aware rules through tsgolint, which uses the TypeScript 7 compiler.
+  "plugins": ["eslint", "typescript", "unicorn", "oxc", "react", "jsx-a11y", "vitest", "import"],
+  "categories": {
+    "correctness": "error"
+  },
+  "options": {
+    "typeAware": true,
+    "denyWarnings": true,
+    "reportUnusedDisableDirectives": "error"
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2024": true
+  },
+  "ignorePatterns": ["dist/**", "src/engine/data/popular.ts"],
+  "rules": {
+    // React: hooks rules and fast-refresh boundaries (eslint-plugin-react-hooks, eslint-plugin-react-refresh).
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "error",
+    // A few modules export a helper or layout constant next to their components; editing those
+    // falls back to a full reload in dev instead of fast refresh, which is acceptable.
+    "react/only-export-components": [
+      "error",
+      { "allowConstantExport": true, "allowExportNames": ["formatBytes", "SASH", "useOnline", "useReport", "FISHER_VIEWBOX", "BOBBER_VIEWBOX"] }
+    ],
+    "react/jsx-key": "error",
+    "react/no-array-index-key": "off",
+
+    // Accessibility. Scrollable table wrappers are labelled role="region" with tabIndex={0} so
+    // keyboard users can scroll them (axe: scrollable-region-focusable).
+    "jsx-a11y/no-noninteractive-tabindex": ["error", { "roles": ["region", "tabpanel"] }],
+    // A div with an ARIA role is as accessible as the equivalent element; not worth churn.
+    "jsx-a11y/prefer-tag-over-role": "off",
+
+    // Vitest: expect(value, message) is valid in Vitest. The sample suites are data-driven, so
+    // they generate tests and assertions per sample; the rest are stylistic.
+    "vitest/valid-expect": ["error", { "maxArgs": 2 }],
+    "vitest/no-conditional-expect": "off",
+    "vitest/no-conditional-tests": "off",
+    "vitest/require-to-throw-message": "off",
+    "vitest/require-mock-type-parameters": "off",
+
+    // Preallocating with new Array(length) is deliberate (edit-distance matrix, ordered results).
+    "unicorn/no-new-array": "off",
+
+    // Type-aware rules (typescript-eslint's recommended-type-checked core).
+    "typescript/no-floating-promises": "error",
+    "typescript/no-misused-promises": "error",
+    "typescript/await-thenable": "error",
+    "typescript/no-base-to-string": "error",
+    "typescript/restrict-template-expressions": ["error", { "allowNumber": true }],
+    "typescript/no-unnecessary-type-assertion": "error",
+    "typescript/no-unsafe-enum-comparison": "error",
+    "typescript/no-for-in-array": "error",
+    "typescript/no-implied-eval": "error",
+    "typescript/only-throw-error": "error",
+    "typescript/prefer-promise-reject-errors": "error",
+    "typescript/switch-exhaustiveness-check": "error",
+
+    // General hygiene.
+    "eslint/no-console": ["error", { "allow": ["warn", "error"] }],
+    "eslint/eqeqeq": ["error", "smart"],
+    "eslint/no-var": "error",
+    "eslint/prefer-const": "error"
+  },
+  "overrides": [
+    {
+      // Node build/QA scripts print progress to the terminal.
+      "files": ["scripts/**"],
+      "rules": {
+        "eslint/no-console": "off",
+        // Untyped .mjs: inferred types are too loose for these type-aware checks.
+        "typescript/no-base-to-string": "off",
+        "typescript/restrict-template-expressions": "off"
+      }
+    }
+  ]
+}

@@ -56,7 +56,5 @@ export function topReasons(findings: Finding[], max = 3): string[] {
     if (chosen.length >= max) break
     if (!chosen.includes(f) && !redundant(f, chosen)) chosen.push(f)
   }
-  return chosen
-    .sort((a, b) => Number(Boolean(b.forceHigh)) - Number(Boolean(a.forceHigh)) || b.weight - a.weight)
-    .map((f) => f.explanation)
+  return chosen.sort((a, b) => Number(Boolean(b.forceHigh)) - Number(Boolean(a.forceHigh)) || b.weight - a.weight).map((f) => f.explanation)
 }

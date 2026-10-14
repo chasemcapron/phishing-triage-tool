@@ -95,11 +95,19 @@ describe('Safe Browsing v5', () => {
   it('decodes the protobuf response (v5 has no JSON output)', async () => {
     const body = encodeSearchUrlsResponse([{ url: 'testsafebrowsing.appspot.com/s/malware.html', types: [1, 0] }], 300)
     const f = mockFetch(() => new Response(body as unknown as BodyInit, { status: 200, headers: { 'content-type': 'application/x-protobuf' } }))
-    const r = await lookupSafeBrowsing(['https://testsafebrowsing.appspot.com/s/malware.html', 'https://www.google.com/'], { fetch: f, apiKey: 'k', cache: new TtlCache() })
+    const r = await lookupSafeBrowsing(['https://testsafebrowsing.appspot.com/s/malware.html', 'https://www.google.com/'], {
+      fetch: f,
+      apiKey: 'k',
+      cache: new TtlCache(),
+    })
     expect(r).toEqual({ status: 'ok', results: [{ url: 'https://testsafebrowsing.appspot.com/s/malware.html', threatTypes: ['MALWARE'] }] })
     expect(decodeSearchUrlsResponse(new Uint8Array()).threats).toEqual([])
     expect(() => decodeSearchUrlsResponse(new Uint8Array([0x0a, 0x05, 0x01]))).toThrow()
-    const bad = await lookupSafeBrowsing(['https://x.example/'], { fetch: mockFetch(() => new Response(new Uint8Array([0x0a, 0x09]) as unknown as BodyInit, { status: 200 })), apiKey: 'k', cache: new TtlCache() })
+    const bad = await lookupSafeBrowsing(['https://x.example/'], {
+      fetch: mockFetch(() => new Response(new Uint8Array([0x0a, 0x09]), { status: 200 })),
+      apiKey: 'k',
+      cache: new TtlCache(),
+    })
     expect(bad.status).toBe('error')
   })
 
@@ -107,7 +115,10 @@ describe('Safe Browsing v5', () => {
     const f = mockFetch((url) => {
       expect(url).toContain('/v5/urls:search?alt=proto&urls=')
       expect(url).not.toContain('KEY123')
-      return jsonRes(200, { threats: [{ url: 'testsafebrowsing.appspot.com/s/phishing.html', threatTypes: ['SOCIAL_ENGINEERING', 'THREAT_TYPE_UNSPECIFIED'] }], cacheDuration: '300s' })
+      return jsonRes(200, {
+        threats: [{ url: 'testsafebrowsing.appspot.com/s/phishing.html', threatTypes: ['SOCIAL_ENGINEERING', 'THREAT_TYPE_UNSPECIFIED'] }],
+        cacheDuration: '300s',
+      })
     })
     const deps = { fetch: f, apiKey: 'KEY123', cache: new TtlCache<string[]>(), now: () => 0 }
     const urls = ['https://testsafebrowsing.appspot.com/s/phishing.html', 'https://www.google.com/']
@@ -122,19 +133,27 @@ describe('Safe Browsing v5', () => {
     expect((await lookupSafeBrowsing(['https://a.example/'], { fetch: mockFetch(() => jsonRes(200, {})), apiKey: undefined })).status).toBe('not_configured')
     const limited = await lookupSafeBrowsing(['https://b.example/'], { fetch: mockFetch(() => jsonRes(429, {})), apiKey: 'k', cache: new TtlCache() })
     expect(limited.status).toBe('rate_limited')
-    const err = await lookupSafeBrowsing(['https://c.example/'], { fetch: mockFetch(() => jsonRes(403, { error: { message: 'secret detail' } })), apiKey: 'k', cache: new TtlCache() })
+    const err = await lookupSafeBrowsing(['https://c.example/'], {
+      fetch: mockFetch(() => jsonRes(403, { error: { message: 'secret detail' } })),
+      apiKey: 'k',
+      cache: new TtlCache(),
+    })
     expect(err).toEqual({ status: 'error', message: 'Google Safe Browsing is unavailable right now (HTTP 403).', results: [] })
   })
 
   it('times out', async () => {
-    const hang = vi.fn((_u: string, init?: RequestInit) => new Promise<Response>((_, rej) => init?.signal?.addEventListener('abort', () => rej(new Error('aborted')))))
+    const hang = vi.fn(
+      (_u: string, init?: RequestInit) => new Promise<Response>((_, rej) => init?.signal?.addEventListener('abort', () => rej(new Error('aborted')))),
+    )
     const r = await lookupSafeBrowsing(['https://d.example/'], { fetch: hang, apiKey: 'k', cache: new TtlCache(), timeoutMs: 20 })
     expect(r.status).toBe('timeout')
   })
 })
 
 describe('VirusTotal', () => {
-  const report = (malicious: number) => ({ data: { id: 'f'.repeat(64), attributes: { last_analysis_stats: { malicious, suspicious: 0, harmless: 60, undetected: 10 }, reputation: -5 } } })
+  const report = (malicious: number) => ({
+    data: { id: 'f'.repeat(64), attributes: { last_analysis_stats: { malicious, suspicious: 0, harmless: 60, undetected: 10 }, reputation: -5 } },
+  })
 
   it('looks up hashes first, then domains, then at most two URLs, within budget', async () => {
     const seen: string[] = []
@@ -145,10 +164,19 @@ describe('VirusTotal', () => {
       return url.includes('/files/') ? jsonRes(404, { error: { code: 'NotFoundError' } }) : jsonRes(200, report(3))
     })
     const r = await lookupVirusTotal(
-      { hashes: ['a'.repeat(64)], domains: ['one.example', 'two.example'], urls: ['https://one.example/x', 'https://two.example/y', 'https://three.example/z'] },
+      {
+        hashes: ['a'.repeat(64)],
+        domains: ['one.example', 'two.example'],
+        urls: ['https://one.example/x', 'https://two.example/y', 'https://three.example/z'],
+      },
       { fetch: f, apiKey: 'vt', cache: new TtlCache(), budget: new QuotaBudget(4, 500), now: () => 0 },
     )
-    expect(seen).toEqual([`/files/${'a'.repeat(64)}`, '/domains/one.example', '/domains/two.example', `/urls/${Buffer.from('https://one.example/x').toString('base64url')}`])
+    expect(seen).toEqual([
+      `/files/${'a'.repeat(64)}`,
+      '/domains/one.example',
+      '/domains/two.example',
+      `/urls/${Buffer.from('https://one.example/x').toString('base64url')}`,
+    ])
     expect(r.status).toBe('rate_limited')
     expect(r.message).toBe(VT_LIMIT_MESSAGE)
     expect(r.skipped).toEqual(['https://two.example/y'])
@@ -159,7 +187,10 @@ describe('VirusTotal', () => {
 
   it('stops after an upstream 429 and never submits for scanning', async () => {
     const f = mockFetch(() => jsonRes(429, { error: { code: 'QuotaExceededError' } }))
-    const r = await lookupVirusTotal({ hashes: [], domains: ['a.example', 'b.example'], urls: [] }, { fetch: f, apiKey: 'vt', cache: new TtlCache(), budget: new QuotaBudget(4, 500) })
+    const r = await lookupVirusTotal(
+      { hashes: [], domains: ['a.example', 'b.example'], urls: [] },
+      { fetch: f, apiKey: 'vt', cache: new TtlCache(), budget: new QuotaBudget(4, 500) },
+    )
     expect(r).toMatchObject({ status: 'rate_limited', skipped: ['a.example', 'b.example'] })
     expect(f).toHaveBeenCalledTimes(1)
     expect(f.mock.calls.every(([, init]) => init?.method === 'GET')).toBe(true)
@@ -179,7 +210,9 @@ describe('VirusTotal', () => {
   })
 
   it('is not configured without a key', async () => {
-    expect((await lookupVirusTotal({ hashes: [], domains: ['a.example'], urls: [] }, { fetch: mockFetch(() => jsonRes(200, {})), apiKey: '' })).status).toBe('not_configured')
+    expect((await lookupVirusTotal({ hashes: [], domains: ['a.example'], urls: [] }, { fetch: mockFetch(() => jsonRes(200, {})), apiKey: '' })).status).toBe(
+      'not_configured',
+    )
   })
 })
 
@@ -188,16 +221,46 @@ describe('URLhaus', () => {
     // (Host lookups are supported by the client but not used by runLookup; see server/lookup.ts.)
     const f = mockFetch((url, init) => {
       expect((init!.headers as Record<string, string>)['Auth-Key']).toBe('uh')
-      const body = new URLSearchParams(String(init!.body))
-      if (url.endsWith('/host/')) return jsonRes(200, { query_staus: 'ok', urls: [{ url_status: 'online', threat: 'malware_download', tags: null, urlhaus_reference: 'https://urlhaus.abuse.ch/url/1/' }] })
-      if (url.endsWith('/url/')) return jsonRes(200, { query_status: body.get('url') === 'https://bad.example/x' ? 'ok' : 'no_results', url_status: 'offline', threat: 'malware_download', tags: ['exe'], urlhaus_reference: 'https://urlhaus.abuse.ch/url/2/' })
+      const body = new URLSearchParams(init!.body as string)
+      if (url.endsWith('/host/'))
+        return jsonRes(200, {
+          query_staus: 'ok',
+          urls: [{ url_status: 'online', threat: 'malware_download', tags: null, urlhaus_reference: 'https://urlhaus.abuse.ch/url/1/' }],
+        })
+      if (url.endsWith('/url/'))
+        return jsonRes(200, {
+          query_status: body.get('url') === 'https://bad.example/x' ? 'ok' : 'no_results',
+          url_status: 'offline',
+          threat: 'malware_download',
+          tags: ['exe'],
+          urlhaus_reference: 'https://urlhaus.abuse.ch/url/2/',
+        })
       return jsonRes(200, { query_status: 'no_results' })
     })
-    const r = await lookupUrlhaus({ urls: ['https://bad.example/x', 'https://ok.example/'], hosts: ['bad.example'], hashes: ['b'.repeat(64)] }, { fetch: f, authKey: 'uh', cache: new TtlCache() })
+    const r = await lookupUrlhaus(
+      { urls: ['https://bad.example/x', 'https://ok.example/'], hosts: ['bad.example'], hashes: ['b'.repeat(64)] },
+      { fetch: f, authKey: 'uh', cache: new TtlCache() },
+    )
     expect(r.status).toBe('ok')
     expect(r.results).toEqual([
-      { kind: 'host', indicator: 'bad.example', listed: true, urlStatus: 'online', threat: 'malware_download', tags: undefined, reference: 'https://urlhaus.abuse.ch/url/1/' },
-      { kind: 'url', indicator: 'https://bad.example/x', listed: true, urlStatus: 'offline', threat: 'malware_download', tags: ['exe'], reference: 'https://urlhaus.abuse.ch/url/2/' },
+      {
+        kind: 'host',
+        indicator: 'bad.example',
+        listed: true,
+        urlStatus: 'online',
+        threat: 'malware_download',
+        tags: undefined,
+        reference: 'https://urlhaus.abuse.ch/url/1/',
+      },
+      {
+        kind: 'url',
+        indicator: 'https://bad.example/x',
+        listed: true,
+        urlStatus: 'offline',
+        threat: 'malware_download',
+        tags: ['exe'],
+        reference: 'https://urlhaus.abuse.ch/url/2/',
+      },
     ])
   })
 
@@ -214,13 +277,25 @@ describe('RDAP', () => {
     const now = Date.parse('2026-10-13T00:00:00Z')
     const f = mockFetch((url, init) => {
       expect((init!.headers as Record<string, string>)['user-agent']).toMatch(/^GonePhishing/)
-      if (url === 'https://data.iana.org/rdap/dns.json') return jsonRes(200, { services: [[['com', 'net'], ['https://rdap.verisign.com/com/v1/']], [['top'], ['http://insecure.example/', 'https://rdap.nic.top/']]] })
-      if (url === 'https://rdap.verisign.com/com/v1/domain/new-login.com') return jsonRes(200, { events: [{ eventAction: 'registration', eventDate: new Date(now - 3 * day).toISOString() }] })
+      if (url === 'https://data.iana.org/rdap/dns.json')
+        return jsonRes(200, {
+          services: [
+            [['com', 'net'], ['https://rdap.verisign.com/com/v1/']],
+            [['top'], ['http://insecure.example/', 'https://rdap.nic.top/']],
+          ],
+        })
+      if (url === 'https://rdap.verisign.com/com/v1/domain/new-login.com')
+        return jsonRes(200, { events: [{ eventAction: 'registration', eventDate: new Date(now - 3 * day).toISOString() }] })
       if (url === 'https://rdap.verisign.com/com/v1/domain/gone.com') return jsonRes(404, {})
       if (url === 'https://rdap.nic.top/domain/promo.top') return jsonRes(200, { events: [{ eventAction: 'expiration', eventDate: '2027-01-01T00:00:00Z' }] })
       return jsonRes(500, {})
     })
-    const r = await lookupRdap(['new-login.com', 'gone.com', 'promo.top', 'nordap.de'], { fetch: f, cache: new TtlCache(), now: () => now, freshBootstrap: true })
+    const r = await lookupRdap(['new-login.com', 'gone.com', 'promo.top', 'nordap.de'], {
+      fetch: f,
+      cache: new TtlCache(),
+      now: () => now,
+      freshBootstrap: true,
+    })
     expect(r.status).toBe('ok')
     expect(r.results).toEqual([
       { domain: 'new-login.com', status: 'ok', registered: new Date(now - 3 * day).toISOString(), ageDays: 3 },

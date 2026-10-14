@@ -41,13 +41,16 @@ export function findLookalike(rawHost: string): LookalikeHit | null {
   if (info.isIp || !info.domain || !info.label) return null
   if (officialBrand(info.domain)) return null
 
-  const label = info.unicodeHost.split('.').slice(-(info.domain.split('.').length))[0] ?? info.label
+  const label = info.unicodeHost.split('.').slice(-info.domain.split('.').length)[0] ?? info.label
   const isIdn = info.domain.split('.').some((l) => l.startsWith('xn--'))
   const labelSk = skeleton(label)
   const labelFlatSk = skeleton(label.replace(/[-_]/g, ''))
   const labelTokens = tokensOf(label)
   const subLabels = info.subdomain
-    ? hostInfo(info.subdomain).unicodeHost.split('.').flatMap(tokensOf).filter((t) => t !== 'www')
+    ? hostInfo(info.subdomain)
+        .unicodeHost.split('.')
+        .flatMap(tokensOf)
+        .filter((t) => t !== 'www')
     : []
 
   const hits: LookalikeHit[] = []
@@ -118,6 +121,7 @@ interface Target {
   sk: string
 }
 
+// prettier-ignore
 const BAIT = new Set([
   'login', 'log', 'signin', 'sign', 'verify', 'verification', 'secure', 'security', 'account', 'accounts', 'support',
   'help', 'helpdesk', 'update', 'auth', 'wallet', 'recovery', 'recover', 'billing', 'pay', 'payment', 'unlock',
@@ -154,8 +158,8 @@ export function isClassicTypo(candidate: string, target: string): boolean {
     return false
   }
   if (candidate.length === target.length && candidate !== target) {
-    const diff = [...candidate].flatMap((c, i) => (c === target[i] ? [] : [i]))
-    return diff.length === 2 && diff[1] === diff[0]! + 1 && candidate[diff[0]!] === target[diff[1]!] && candidate[diff[1]!] === target[diff[0]!]
+    const diff = candidate.split('').flatMap((c, i) => (c === target[i] ? [] : [i]))
+    return diff.length === 2 && diff[1] === diff[0]! + 1 && candidate[diff[0]!] === target[diff[1]] && candidate[diff[1]] === target[diff[0]!]
   }
   return false
 }
@@ -168,7 +172,7 @@ export function findPopularLookalike(rawHost: string): PopularHit | null {
   const { targets, known } = popularIndex()
   if (known.has(info.domain) || officialBrand(info.domain)) return null
 
-  const label = info.unicodeHost.split('.').slice(-(info.domain.split('.').length))[0] ?? info.label
+  const label = info.unicodeHost.split('.').slice(-info.domain.split('.').length)[0] ?? info.label
   const flat = label.replace(/[-_]/g, '')
   const flatSk = skeleton(flat)
   const tokens = tokensOf(label)

@@ -2,7 +2,21 @@
   "name": "phishing-triage-tool",
   "private": true,
   "version": "0.1.0",
+  "description": "Paste a suspicious link or text message and get an explainable phishing verdict: lookalike domains, link tricks, SMS scam patterns and live reputation checks.",
+  "homepage": "https://gonefishing-app.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chasemcapron/phishing-triage-tool.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chasemcapron/phishing-triage-tool/issues"
+  },
+  "license": "MIT",
+  "author": "Chase Capron",
   "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -11,7 +25,11 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "qa": "node scripts/qa-screens.mjs http://localhost:4173 qa-out",
-    "qa:flows": "node scripts/qa-flows.mjs http://localhost:4173"
+    "qa:flows": "node scripts/qa-flows.mjs http://localhost:4173",
+    "lint": "oxlint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run lint && npm run format:check && npm run build && npm test"
   },
   "dependencies": {
     "@fontsource-variable/fredoka": "^5.3.0",
@@ -26,11 +44,11 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "happy-dom": "^21.0.1",
+    "oxlint": "^1.88.0",
+    "oxlint-tsgolint": "^7.0.2004",
+    "prettier": "^3.9.10",
     "typescript": "^7.0.2",
     "vite": "^8.3.4",
     "vitest": "^5.0.4"
-  },
-  "engines": {
-    "node": "24.x"
   }
 }

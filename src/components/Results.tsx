@@ -24,10 +24,7 @@ const MOUTH: Record<Report['verdict'], [number, number, number]> = {
   none: [0.16, 0.58, 124 / 150],
 }
 
-export const VerdictCard = forwardRef<HTMLHeadingElement, { report: Report; analyst: boolean }>(function VerdictCard(
-  { report, analyst },
-  headingRef,
-) {
+export const VerdictCard = forwardRef<HTMLHeadingElement, { report: Report; analyst: boolean }>(function VerdictCard({ report, analyst }, headingRef) {
   const [mouthX, mouthY, ratio] = MOUTH[report.verdict]
   const sash = SASH[report.verdict]
   // "No red flags found" has no sub-line, and as one long line the band shrank it to half the
@@ -106,7 +103,9 @@ export function WhatToDo({ report }: { report: Report }) {
       {advice.report.length > 0 && (
         <div className="todo-report">
           <h3>Report it</h3>
-          <p className="small">Reporting gets the site blocked faster for everyone. These open the official forms in a new tab; Google's comes with the link filled in.</p>
+          <p className="small">
+            Reporting gets the site blocked faster for everyone. These open the official forms in a new tab; Google's comes with the link filled in.
+          </p>
           <div className="todo-actions">
             {advice.report.map((r) => (
               <a key={r.href} className="btn btn-secondary btn-sm" href={r.href} target="_blank" rel="noopener noreferrer">

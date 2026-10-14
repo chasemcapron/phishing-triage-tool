@@ -18,15 +18,15 @@ const kinds = (r: { findings: { kind: string }[] }) => r.findings.map((f) => f.k
 const AD = 'Summer Fridays end of season sale! Up to 80% off, today only: www.summrfrideays.shop'
 
 describe('fake online stores', () => {
-  it('spots a misspelled retail brand on a cheap domain ending', async () => {
-    const r = await analyzeText(AD)
+  it('spots a misspelled retail brand on a cheap domain ending', () => {
+    const r = analyzeText(AD)
     expect(kinds(r)).toEqual(expect.arrayContaining(['link-lookalike', 'domain-risky-tld', 'content-deal']))
     expect(r.findings.find((f) => f.kind === 'link-lookalike')?.explanation).toMatch(/misspelling of Summer Fridays/)
     expect(r.verdict).not.toBe('none')
   })
 
-  it('reaches High once the domain turns out to be weeks old (longer window for risky endings)', async () => {
-    const r = await analyzeText('www.summrfrideays.shop')
+  it('reaches High once the domain turns out to be weeks old (longer window for risky endings)', () => {
+    const r = analyzeText('www.summrfrideays.shop')
     const res = empty()
     res.rdap.results = [{ domain: 'summrfrideays.shop', status: 'ok', registered: '2026-09-19T07:54:22.000Z', ageDays: 50 }]
     const out = applyReputation(r, res, buildLookupRequest(r))
@@ -34,23 +34,23 @@ describe('fake online stores', () => {
     expect(out.verdict).toBe('high')
   })
 
-  it('does not call a .com of the same age new', async () => {
-    const r = await analyzeText('https://www.example-bakery.com/')
+  it('does not call a .com of the same age new', () => {
+    const r = analyzeText('https://www.example-bakery.com/')
     const res = empty()
     res.rdap.results = [{ domain: 'example-bakery.com', status: 'ok', registered: '2026-08-24T00:00:00.000Z', ageDays: 50 }]
     expect(kinds(applyReputation(r, res, buildLookupRequest(r)))).not.toContain('domain-new')
   })
 
-  it('leaves the real retailer sites alone', async () => {
+  it('leaves the real retailer sites alone', () => {
     for (const url of ['https://www.summerfridays.com/', 'https://shop.lululemon.com/', 'https://www.nike.com/', 'https://www.ray-ban.com/usa']) {
-      const r = await analyzeText(url)
+      const r = analyzeText(url)
       expect(r.verdict, url).toBe('none')
     }
   })
 
-  it('does not treat everyday words as brands', async () => {
+  it('does not treat everyday words as brands', () => {
     for (const url of ['https://pinecrest-target-practice.org/', 'https://www.cosco-shipping.com/', 'https://stanleyparkvancouver.com/']) {
-      const r = await analyzeText(url)
+      const r = analyzeText(url)
       expect(kinds(r), url).not.toContain('link-lookalike')
       expect(kinds(r), url).not.toContain('link-combosquat')
     }

@@ -31,13 +31,7 @@ const cls = (...c: (string | undefined)[]) => c.filter(Boolean).join(' ')
 
 function Art(p: { className?: string; viewBox?: string; fit?: string; children: ReactNode }) {
   return (
-    <svg
-      className={cls('pond-art', p.className)}
-      viewBox={p.viewBox}
-      preserveAspectRatio={p.fit}
-      aria-hidden="true"
-      focusable="false"
-    >
+    <svg className={cls('pond-art', p.className)} viewBox={p.viewBox} preserveAspectRatio={p.fit} aria-hidden="true" focusable="false">
       {p.children}
     </svg>
   )
@@ -46,11 +40,15 @@ function Art(p: { className?: string; viewBox?: string; fit?: string; children: 
 /* ---------- Sky ---------- */
 
 // Night star field [x%, y%, r, wide-only]: % positions, fixed-px radius; kept clear of hero text.
+// prettier-ignore
+// prettier-ignore
 const STARS: [number, number, number, number?][] = [
   [3, 30, 1.4], [22, 4, 1.8], [19, 32, 1.1], [29, 11, 1], [38, 30, 1.1], [44, 8, 1.3], [47, 58, 1],
   [53, 31, 1.7], [58, 12, 1.1], [62, 50, 1.2], [67, 22, 1], [72, 64, 1.4, 1], [76, 38, 1.1], [95, 16, 1.2],
   [96, 50, 1.5], [88, 70, 1, 1], [80, 6, 1.1], [50, 80, 1.1, 1], [4, 92, 1], [13, 6, 1.2], [84, 46, 1], [59, 72, 1.2, 1],
 ]
+// prettier-ignore
+// prettier-ignore
 const SPARKLES: N3[] = [[30, 3, 1], [56, 22, 0.8], [69, 9, 0.9], [78, 30, 0.75], [97, 70, 0.7]]
 const SPARKLE = 'M0-6Q1-1 6 0Q1 1 0 6Q-1 1-6 0Q-1-1 0-6Z'
 
@@ -92,6 +90,8 @@ function SunMoon() {
 }
 
 // Cloud = union of circles + a pill; drawn twice (shade offset down, then body).
+// prettier-ignore
+// prettier-ignore
 const CLOUDS = {
   a: { vb: '24 8 168 88', c: [[52, 62, 26], [92, 44, 34], [136, 50, 28], [170, 64, 20]], p: [30, 58, 160, 30] },
   b: { vb: '20 4 90 62', c: [[40, 40, 18], [66, 30, 24], [92, 42, 16]], p: [24, 38, 84, 20] },
@@ -109,7 +109,9 @@ function Cloud({ v, n }: { v: keyof typeof CLOUDS; n: number }) {
   )
   return (
     <Art className={`pond-cloud pond-cloud--${n}`} viewBox={vb}>
-      <g className="pc-shade" transform="translate(0 6)">{shape}</g>
+      <g className="pc-shade" transform="translate(0 6)">
+        {shape}
+      </g>
       <g className="pc-body">{shape}</g>
     </Art>
   )
@@ -118,6 +120,8 @@ function Cloud({ v, n }: { v: keyof typeof CLOUDS; n: number }) {
 /* ---------- Land ---------- */
 
 // Round tree clusters on the far hills: [cx, cy, r]; their bases sink into TREE_BAND.
+// prettier-ignore
+// prettier-ignore
 const TREES: N3[] = [
   [262, 86, 16], [288, 78, 21], [317, 84, 15], [340, 90, 12],
   [700, 76, 14], [726, 68, 20], [754, 74, 16], [779, 80, 12],
@@ -125,8 +129,18 @@ const TREES: N3[] = [
 ]
 const TREE_BAND =
   'M0 134C120 134 200 92 262 90L340 94C400 98 460 134 560 134C620 134 660 80 700 80L780 84C830 88 880 130 960 130C1040 130 1090 76 1128 76L1208 80C1260 84 1300 128 1440 128V170H0Z'
+// prettier-ignore
+// prettier-ignore
 const PINES: N3[] = [[372, 104, 30], [812, 92, 32], [1232, 88, 28], [244, 96, 24]]
-const FLOWERS = [[140, 134, 'a'], [168, 140, 'b'], [520, 136, 'a'], [604, 131, 'b'], [1010, 141, 'a'], [1290, 128, 'b'], [1330, 134, 'a']] as const
+const FLOWERS = [
+  [140, 134, 'a'],
+  [168, 140, 'b'],
+  [520, 136, 'a'],
+  [604, 131, 'b'],
+  [1010, 141, 'a'],
+  [1290, 128, 'b'],
+  [1330, 134, 'a'],
+] as const
 
 function Hills() {
   return (
@@ -153,6 +167,8 @@ const blade = (x: number, b: number, h: number, l: number) =>
   `M${x - 3.2} ${b}Q${x + l * 0.35 - 1} ${b - h * 0.6} ${x + l} ${b - h}Q${x + l * 0.4 + 2} ${b - h * 0.5} ${x + 3.2} ${b}Z`
 
 type Reed = readonly [x: number, h: number, lean: number]
+// prettier-ignore
+// prettier-ignore
 const BANKS: Record<'l' | 'r', { back: Reed[]; front: Reed[]; cat: Reed[]; flies: [number, number][] }> = {
   l: {
     back: [[70, 70, -6], [96, 96, 8], [122, 84, -10], [150, 112, 12], [176, 88, 18], [200, 70, 22]],
@@ -171,8 +187,7 @@ const W = 192 // bank waterline (viewBox y)
 
 function Bank({ side }: { side: 'l' | 'r' }) {
   const b = BANKS[side]
-  const reeds = (list: Reed[], k: string) =>
-    list.map(([x, h, l]) => <path key={k + x} className="pb-reed" d={blade(x, W, h, l)} />)
+  const reeds = (list: Reed[], k: string) => list.map(([x, h, l]) => <path key={k + x} className="pb-reed" d={blade(x, W, h, l)} />)
   return (
     <Art className={`pond-bank pond-bank--${side}`} viewBox="0 0 300 200">
       <path className="pk-back" d="M0 64C54 56 112 70 160 104S240 170 270 192H0Z" />
@@ -205,6 +220,8 @@ function wave(len: number, amp: number, y: number) {
 }
 const WAVE_BACK = wave(56, 3, 6)
 const WAVE_FRONT = wave(56, 3, 10)
+// prettier-ignore
+// prettier-ignore
 const GLINTS: N3[] = [[9, 58, 26], [24, 76, 14], [38, 52, 30], [52, 74, 18], [64, 54, 24], [79, 72, 16], [90, 50, 12]]
 
 function Water() {

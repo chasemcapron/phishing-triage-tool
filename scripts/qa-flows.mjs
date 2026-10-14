@@ -104,8 +104,14 @@ check('empty submit shows error', ((await ev(`return document.querySelector('#te
 await click('.chip', 'Unpaid toll text')
 await sleep(800)
 check('text sample chip → High', (await verdict()) === 'High risk — likely phishing')
-check('high result offers official report links', (await ev(`return [...document.querySelectorAll('.todo-report a')].map(a => a.href).join(' ')`)).includes('reportfraud.ftc.gov'))
-check('summary to send someone is offered', (await ev(`return [...document.querySelectorAll('.todo-share button')].some(b => b.textContent.includes('Copy a summary'))`)) === true)
+check(
+  'high result offers official report links',
+  (await ev(`return [...document.querySelectorAll('.todo-report a')].map(a => a.href).join(' ')`)).includes('reportfraud.ftc.gov'),
+)
+check(
+  'summary to send someone is offered',
+  (await ev(`return [...document.querySelectorAll('.todo-share button')].some(b => b.textContent.includes('Copy a summary'))`)) === true,
+)
 await click('.chip', 'Normal text')
 await sleep(1200)
 check('normal text chip → No red flags', (await verdict()) === 'No red flags — nothing matched')
@@ -126,40 +132,46 @@ await setValue('#text-input', 'Received: from a.example by b.example; Tue, 13 Oc
 await sleep(300)
 check('email-looking text shows a notice', (await ev(`return !!document.querySelector('.notice')`)) === true)
 if (!emailTab) {
-  check('email mode paused: single tab, no email panel', (await ev(`return document.querySelectorAll('[role=tab]').length === 1 && !document.querySelector('#panel-email')`)) === true)
+  check(
+    'email mode paused: single tab, no email panel',
+    (await ev(`return document.querySelectorAll('[role=tab]').length === 1 && !document.querySelector('#panel-email')`)) === true,
+  )
   await ev(`location.hash = '#email/fake-recruiter'; return 1`)
   await sleep(800)
   check('#email deep link falls back to text mode', (await ev(`return document.querySelector('#tab-text').getAttribute('aria-selected')`)) === 'true')
 } else {
-check('email-looking text shows handoff notice', (await ev(`return !!document.querySelector('.notice .link-btn')`)) === true)
-await click('.notice .link-btn')
-await sleep(300)
-check('handoff switches to email tab', (await ev(`return document.querySelector('#tab-email').getAttribute('aria-selected')`)) === 'true')
-check('handoff carries the text', (await ev(`return document.querySelector('#email-input').value.startsWith('Received:')`)) === true)
-await click('button[type=submit]')
-await sleep(1200)
-check('handed-off email analyzes (PayPal from gmail → flagged)', ['High risk — likely phishing', 'Suspicious — be careful'].includes(await verdict()))
-await click('.chip', 'Normal newsletter')
-await sleep(1200)
-check('email sample chip → No red flags', (await verdict()) === 'No red flags — nothing matched')
-// Non-email input in email mode
-await setValue('#email-input', 'hello there')
-await click('button[type=submit]')
-await sleep(800)
-check('non-email input shows friendly error', ((await ev(`return document.querySelector('#email-error')?.textContent ?? ''`)) || '').includes('No email headers'))
-await sleep(1000)
-check('line returns to the input card when there is no result', ((await lineGap('.tabs')) ?? 99) <= 2)
-// Keyboard tabs
-await ev(`document.querySelector('#tab-email').focus(); return 1`)
-await key('ArrowLeft', 'ArrowLeft', 37)
-await sleep(300)
-check('ArrowLeft moves to text tab', (await ev(`return document.activeElement?.id + ' ' + location.hash`)) === 'tab-text #text')
-await key('End', 'End', 35)
-await sleep(200)
-check('End moves to email tab', (await ev(`return document.activeElement?.id`)) === 'tab-email')
-await key('Home', 'Home', 36)
-await sleep(200)
-check('Home moves to text tab', (await ev(`return document.activeElement?.id`)) === 'tab-text')
+  check('email-looking text shows handoff notice', (await ev(`return !!document.querySelector('.notice .link-btn')`)) === true)
+  await click('.notice .link-btn')
+  await sleep(300)
+  check('handoff switches to email tab', (await ev(`return document.querySelector('#tab-email').getAttribute('aria-selected')`)) === 'true')
+  check('handoff carries the text', (await ev(`return document.querySelector('#email-input').value.startsWith('Received:')`)) === true)
+  await click('button[type=submit]')
+  await sleep(1200)
+  check('handed-off email analyzes (PayPal from gmail → flagged)', ['High risk — likely phishing', 'Suspicious — be careful'].includes(await verdict()))
+  await click('.chip', 'Normal newsletter')
+  await sleep(1200)
+  check('email sample chip → No red flags', (await verdict()) === 'No red flags — nothing matched')
+  // Non-email input in email mode
+  await setValue('#email-input', 'hello there')
+  await click('button[type=submit]')
+  await sleep(800)
+  check(
+    'non-email input shows friendly error',
+    ((await ev(`return document.querySelector('#email-error')?.textContent ?? ''`)) || '').includes('No email headers'),
+  )
+  await sleep(1000)
+  check('line returns to the input card when there is no result', ((await lineGap('.tabs')) ?? 99) <= 2)
+  // Keyboard tabs
+  await ev(`document.querySelector('#tab-email').focus(); return 1`)
+  await key('ArrowLeft', 'ArrowLeft', 37)
+  await sleep(300)
+  check('ArrowLeft moves to text tab', (await ev(`return document.activeElement?.id + ' ' + location.hash`)) === 'tab-text #text')
+  await key('End', 'End', 35)
+  await sleep(200)
+  check('End moves to email tab', (await ev(`return document.activeElement?.id`)) === 'tab-email')
+  await key('Home', 'Home', 36)
+  await sleep(200)
+  check('Home moves to text tab', (await ev(`return document.activeElement?.id`)) === 'tab-text')
 }
 // Theme toggle: light → dark, persists across reload, then back
 await click('.site-header .btn-icon')
@@ -181,7 +193,10 @@ if (emailTab) {
 await send('Page.navigate', { url: base + '/#text/smishing-toll' })
 await sleep(1800)
 check('#text/<id> deep link loads text sample', (await verdict()) === 'High risk — likely phishing')
-check('skip link targets main', (await ev(`return document.querySelector('.skip-link').getAttribute('href') === '#main' && !!document.querySelector('main#main')`)) === true)
+check(
+  'skip link targets main',
+  (await ev(`return document.querySelector('.skip-link').getAttribute('href') === '#main' && !!document.querySelector('main#main')`)) === true,
+)
 check('no console errors', errors.length === 0)
 
 console.log(results.join('\n'))

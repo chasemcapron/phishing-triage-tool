@@ -14,7 +14,18 @@ const frames = mkdtempSync(join(tmpdir(), 'gp-frames-'))
 mkdirSync(shots, { recursive: true })
 
 const port = 9700 + Math.floor(Math.random() * 100)
-const chrome = spawn(chromePath, ['--headless=new', `--remote-debugging-port=${port}`, '--no-first-run', '--hide-scrollbars', `--user-data-dir=${mkdtempSync(join(tmpdir(), 'gp-media-'))}`, 'about:blank'], { stdio: 'ignore' })
+const chrome = spawn(
+  chromePath,
+  [
+    '--headless=new',
+    `--remote-debugging-port=${port}`,
+    '--no-first-run',
+    '--hide-scrollbars',
+    `--user-data-dir=${mkdtempSync(join(tmpdir(), 'gp-media-'))}`,
+    'about:blank',
+  ],
+  { stdio: 'ignore' },
+)
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 let version
 for (let i = 0; i < 50 && !version; i++) {
@@ -60,7 +71,9 @@ async function open(path, theme, metrics) {
 }
 /** Element (plus a margin) in page coordinates, so it can be captured even when taller than the viewport. */
 const box = (sel, pad = 16) =>
-  ev(`(() => { const r = document.querySelector(${JSON.stringify(sel)}).getBoundingClientRect(); return { x: Math.max(0, r.left - ${pad}), y: Math.max(0, r.top + scrollY - ${pad}), width: r.width + ${pad * 2}, height: r.height + ${pad * 2}, scale: 1 } })()`)
+  ev(
+    `(() => { const r = document.querySelector(${JSON.stringify(sel)}).getBoundingClientRect(); return { x: Math.max(0, r.left - ${pad}), y: Math.max(0, r.top + scrollY - ${pad}), width: r.width + ${pad * 2}, height: r.height + ${pad * 2}, scale: 1 } })()`,
+  )
 async function shoot(name, clip) {
   const shot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: Boolean(clip), ...(clip ? { clip } : {}) })
   writeFileSync(join(shots, `${name}.png`), Buffer.from(shot.data, 'base64'))
@@ -113,7 +126,9 @@ for (let i = 1; i <= 8; i++) {
 }
 const link = 'www.summrfrideays.shop'
 for (let i = 2; i <= link.length; i += 2) {
-  await ev(`(() => { const ta = document.querySelector('#text-input'); Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set.call(ta, ${JSON.stringify(link)}.slice(0, ${i})); ta.dispatchEvent(new Event('input', { bubbles: true })); return 1 })()`)
+  await ev(
+    `(() => { const ta = document.querySelector('#text-input'); Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set.call(ta, ${JSON.stringify(link)}.slice(0, ${i})); ta.dispatchEvent(new Event('input', { bubbles: true })); return 1 })()`,
+  )
   await frame()
 }
 await frame(8)

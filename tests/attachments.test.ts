@@ -13,16 +13,25 @@ function makeZip(names: string[], encrypted = false): Uint8Array {
   for (const name of names) {
     const nb = [...enc.encode(name)]
     const offset = local.length
+    // prettier-ignore
+    // prettier-ignore
     local.push(...u32(0x04034b50), ...u16(20), ...u16(flags), ...u16(0), ...u16(0), ...u16(0), ...u32(0), ...u32(0), ...u32(0), ...u16(nb.length), ...u16(0), ...nb)
+    // prettier-ignore
+    // prettier-ignore
     central.push(...u32(0x02014b50), ...u16(20), ...u16(20), ...u16(flags), ...u16(0), ...u16(0), ...u16(0), ...u32(0), ...u32(0), ...u32(0),
       ...u16(nb.length), ...u16(0), ...u16(0), ...u16(0), ...u16(0), ...u32(0), ...u32(offset), ...nb)
   }
+  // prettier-ignore
+  // prettier-ignore
   const eocd = [...u32(0x06054b50), ...u16(0), ...u16(0), ...u16(names.length), ...u16(names.length), ...u32(central.length), ...u32(local.length), ...u16(0)]
   return new Uint8Array([...local, ...central, ...eocd])
 }
 
 const att = (filename: string, mimeType: string, content: Uint8Array | string): RawAttachment => ({
-  filename, mimeType, disposition: 'attachment', content: typeof content === 'string' ? new TextEncoder().encode(content) : content,
+  filename,
+  mimeType,
+  disposition: 'attachment',
+  content: typeof content === 'string' ? new TextEncoder().encode(content) : content,
 })
 
 async function kindsFor(a: RawAttachment) {
