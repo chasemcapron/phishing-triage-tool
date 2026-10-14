@@ -18,6 +18,7 @@
  *  Duck         viewBox 0 0 64 48, waterline y = 40 (0.833).
  */
 import type { ReactNode } from 'react'
+import { JackOLantern } from './Seasonal'
 import './scene.css'
 
 type ArtProps = { className?: string }
@@ -290,6 +291,10 @@ export function Fisher({ className }: ArtProps) {
       <path className="pf-bucket" d="M131 112H153L150.5 128H133.5Z" />
       <rect className="pf-bucket-dk" x="130" y="110" width="24" height="4" rx="2" />
       <path className="pf-handle" d="M133 112Q142 96 151 112" />
+      {/* Halloween only (seasonal.css) */}
+      <g className="season-only season-only--halloween">
+        <JackOLantern x={112} y={121} s={0.72} />
+      </g>
       {/* back arm + leg */}
       <path className="pf-s-shirt-dk" d="M188 94L205 115" strokeWidth="10" />
       <circle className="pf-skin-dk" cx="205" cy="115" r="5.2" />
@@ -377,8 +382,11 @@ export function LogoMark({ className }: ArtProps) {
 
 /* ---------- Extras ---------- */
 
-/** Two lily pads, a lotus and a tiny frog. viewBox 0 0 120 48; waterline y = 36. */
-export function LilyPads({ className }: ArtProps) {
+/**
+ * Two lily pads, a lotus and a tiny frog. viewBox 0 0 120 48; waterline y = 36.
+ * onFrogClick: an easter egg (mouse/touch only; the season picker is the accessible control).
+ */
+export function LilyPads({ className, onFrogClick, hop }: ArtProps & { onFrogClick?: () => void; hop?: boolean }) {
   return (
     <Art className={cls('pond-lily', className)} viewBox="0 0 120 48">
       <ellipse className="pond-ripple-o" cx="44" cy="39" rx="34" ry="5" />
@@ -393,7 +401,14 @@ export function LilyPads({ className }: ArtProps) {
         <ellipse cx="96" cy="32" rx="3.2" ry="7" />
       </g>
       <circle className="pp-lotus-c" cx="96" cy="36" r="2.2" />
-      <g className="pp-frog">
+      {/* Halloween only (seasonal.css): jack-o'-lanterns ride the pads in place of the lotus. */}
+      <g className="season-only season-only--halloween">
+        <JackOLantern x={95} y={31} s={0.78} />
+        <JackOLantern x={61} y={33.6} s={0.5} />
+      </g>
+      <g className={cls('pp-frog', onFrogClick && 'pp-frog--egg', hop ? 'is-hopping' : undefined)} onClick={onFrogClick}>
+        {/* Invisible, larger hit area: the frog itself is only ~12px wide on screen. */}
+        {onFrogClick && <circle className="pp-frog-hit" cx="40" cy="27" r="22" />}
         <path className="pp-frog-b" d="M30 35Q28 22 40 21Q52 22 50 35Z" />
         <circle className="pp-frog-b" cx="34.4" cy="20.6" r="4.4" />
         <circle className="pp-frog-b" cx="45.6" cy="20.6" r="4.4" />

@@ -1,0 +1,336 @@
+/* Gone Phishing: seasonal overlays. Active season on :root[data-season] (absent = none).
+   Day palette first, night under [data-theme='dark']. Motion is transform/opacity only. */
+:root {
+  --leaf-0: #e8743b;
+  --leaf-1: #f2b134;
+  --leaf-2: #cf4f3a;
+  --leaf-3: #dd9a3e;
+  --leaf-vein: rgba(120, 52, 18, 0.45);
+  --flake: #ffffff;
+  --flake-edge: rgba(92, 142, 186, 0.5);
+  --bat: #3a2c55;
+  --bat-wing: #4a3a6a;
+  --bat-eye: #ffd166;
+  --daymoon: #fff6e6;
+  --daymoon-crater: #f6e3c6;
+  --jack: #f28c28;
+  --jack-dk: #d96f12;
+  --jack-rib: rgba(150, 64, 6, 0.5);
+  --jack-stem: #6b7a3a;
+  --jack-face: #5a2a0a;
+  --jack-glow: rgba(255, 196, 80, 0);
+  --hat-witch: #3d2b63;
+  --hat-witch-dk: #2a1d47;
+  --hat-witch-hi: rgba(255, 255, 255, 0.16);
+  --hat-band: #ff8c42;
+  --hat-buckle: #ffd166;
+  --hat-red: #e23d3d;
+  --hat-red-dk: #b82a33;
+  --hat-fur: #ffffff;
+  --hat-fur-dk: #dbe8f2;
+}
+:root[data-theme='dark'] {
+  --leaf-0: #c9632f;
+  --leaf-1: #d39a2c;
+  --leaf-2: #b4432f;
+  --leaf-3: #be8434;
+  --leaf-vein: rgba(40, 16, 4, 0.45);
+  --flake-edge: rgba(126, 240, 255, 0.35);
+  --bat: #0a0716;
+  --bat-wing: #150f2a;
+  --jack-face: #ffd166;
+  --jack-glow: rgba(255, 190, 80, 0.2);
+  --hat-witch: #4a3577;
+  --hat-witch-dk: #33245a;
+  --hat-witch-hi: rgba(255, 255, 255, 0.14);
+  --hat-red: #d23a3d;
+  --hat-red-dk: #a3262f;
+  --hat-fur: #eef4fa;
+  --hat-fur-dk: #c3d3e2;
+}
+
+/* ---------- Autumn landscape (fall and Halloween) ---------- */
+:root[data-season='fall'],
+:root[data-season='halloween'] {
+  --hill-far: #d6e2a4;
+  --hill-tree: #f0a443;
+  --hill-pine: #6fae7a;
+  --hill-near: #b4cf7c;
+  --grass: #98c46a;
+  --grass-dark: #84b05a;
+  --grass-tuft: #c4d67c;
+  --flower-a: #ffb347;
+  --flower-b: #e8743b;
+  --reed: #9a9444;
+  --reed-dark: #847a36;
+  --cattail: #7a4a2c;
+  --lily: #96bf5c;
+  --lily-dark: #79a248;
+  --lily-vein: #bcd88a;
+}
+:root[data-theme='dark'][data-season='fall'],
+:root[data-theme='dark'][data-season='halloween'] {
+  --hill-far: #263a50;
+  --hill-tree: #7a4b2a;
+  --hill-pine: #1b3a44;
+  --hill-near: #29454d;
+  --grass: #2a5143;
+  --grass-dark: #22453a;
+  --grass-tuft: #3a6050;
+  --flower-a: #a8673a;
+  --flower-b: #9c4f36;
+  --reed: #4f6440;
+  --reed-dark: #405336;
+  --cattail: #4f3424;
+  --lily: #3a6a4a;
+  --lily-dark: #2d573c;
+  --lily-vein: #4c805a;
+}
+:root[data-season='fall'] circle.ph-tree:nth-of-type(3n + 1),
+:root[data-season='halloween'] circle.ph-tree:nth-of-type(3n + 1) { fill: var(--leaf-2); }
+:root[data-season='fall'] circle.ph-tree:nth-of-type(3n),
+:root[data-season='halloween'] circle.ph-tree:nth-of-type(3n) { fill: var(--leaf-1); }
+:root[data-theme='dark'][data-season='fall'] circle.ph-tree:nth-of-type(3n + 1),
+:root[data-theme='dark'][data-season='halloween'] circle.ph-tree:nth-of-type(3n + 1) { fill: color-mix(in srgb, var(--leaf-2) 70%, var(--hill-tree)); }
+:root[data-theme='dark'][data-season='fall'] circle.ph-tree:nth-of-type(3n),
+:root[data-theme='dark'][data-season='halloween'] circle.ph-tree:nth-of-type(3n) { fill: color-mix(in srgb, var(--leaf-1) 62%, var(--hill-tree)); }
+
+/* Halloween night: a purple dusk and a big orange harvest moon. */
+:root[data-theme='dark'][data-season='halloween'] {
+  --sky-top: #161236;
+  --sky-mid: #251d50;
+  --sky-horizon: #382b66;
+  --cloud: #2e2a5e;
+  --cloud-shade: #262250;
+  --moon: #ffa64a;
+  --moon-crater: #f08a2c;
+}
+/* Bigger on wide screens only: on phones the moon already sits beside the title. */
+@container pond (min-width: 720px) {
+  :root[data-theme='dark'][data-season='halloween'] .pond-sun { scale: 1.35; transform-origin: 50% 50%; }
+}
+:root[data-theme='dark'][data-season='halloween'] .pm-glow { opacity: 0.2; }
+:root[data-theme='dark'][data-season='halloween'] .pm-glow2 { opacity: 0.1; }
+
+/* ---------- Winter: snowy banks, a frosty waterline, snow on the dock ---------- */
+:root[data-season='winter'] {
+  --hill-far: #d3e6f2;
+  --hill-tree: #8fc3b0;
+  --hill-pine: #5f9f8a;
+  --hill-near: #eef6fb;
+  --grass: #f8fcff;
+  --grass-dark: #dcebf5;
+  --grass-tuft: #ffffff;
+  --flower-a: #e23d3d;
+  --flower-b: #c42d47;
+  --reed: #7aa48c;
+  --reed-dark: #5f8a74;
+  --rock: #c4d6e2;
+  --water-rim: #f2fbff;
+  --dock-light: #ffffff;
+  --lily: #86bfa0;
+  --lily-dark: #6aa688;
+  --lily-vein: #b6dcc8;
+}
+:root[data-theme='dark'][data-season='winter'] {
+  --hill-far: #2b4570;
+  --hill-tree: #1e4560;
+  --hill-pine: #173b4f;
+  --hill-near: #40618e;
+  --grass: #5a7ca6;
+  --grass-dark: #48688f;
+  --grass-tuft: #7b9cc4;
+  --flower-a: #c74652;
+  --flower-b: #a8384a;
+  --reed: #2f6058;
+  --reed-dark: #275049;
+  --rock: #4a6688;
+  --water-rim: #8cc0e6;
+  --dock-light: #b8cde6;
+  --lily: #2f6658;
+  --lily-dark: #255448;
+  --lily-vein: #3f7c6c;
+}
+/* Frost: a pale icy rim along the waterline, fading into the water below. */
+:root[data-season='winter'] .water-column {
+  box-shadow:
+    inset 0 2px 0 color-mix(in srgb, var(--water-rim) 70%, transparent),
+    inset 0 12px 14px -10px color-mix(in srgb, var(--water-rim) 55%, transparent);
+}
+
+/* ---------- Season-only pieces drawn inside the main scene ---------- */
+.season-only,
+.season-hat > g { display: none; }
+:root[data-season='halloween'] .season-only--halloween,
+:root[data-season='halloween'] .season-hat__witch,
+:root[data-season='winter'] .season-hat__santa { display: inline; }
+:root[data-season='halloween'] .pp-lotus,
+:root[data-season='halloween'] .pp-lotus-c { display: none; }
+
+.sj-glow { fill: var(--jack-glow); }
+.sj-stem { fill: var(--jack-stem); }
+.sj-rind { fill: var(--jack); }
+.sj-rind-dk { fill: var(--jack-dk); }
+.sj-rib { fill: none; stroke: var(--jack-rib); stroke-width: 1; stroke-linecap: round; }
+.sj-face { fill: var(--jack-face); }
+.sj-tooth { fill: var(--jack); }
+
+.sh-brim { fill: var(--hat-witch); }
+.sh-brim-dk { fill: var(--hat-witch-dk); }
+.sh-cone { fill: var(--hat-witch); stroke: var(--hat-witch-dk); stroke-width: 1.2; stroke-linejoin: round; }
+.sh-cone-hi { fill: var(--hat-witch-hi); }
+.sh-band { fill: var(--hat-band); }
+.sh-buckle { fill: var(--hat-buckle); }
+.sh-buckle-in { fill: var(--hat-band); }
+.sh-red { fill: var(--hat-red); }
+.sh-red-dk { fill: var(--hat-red-dk); }
+.sh-fur { fill: var(--hat-fur); }
+.sh-fur-dk { fill: var(--hat-fur-dk); }
+
+/* ---------- Sky overlay ---------- */
+.season-sky {
+  position: absolute;
+  inset: 0;
+  z-index: 1; /* above the backdrop, below hero text (2), fisher (2) and header (3) */
+  overflow: hidden;
+  pointer-events: none;
+  container: season / size;
+}
+.season-sky svg { display: block; overflow: visible; }
+
+.season-p {
+  position: absolute;
+  top: -24px;
+  left: var(--x);
+  width: calc(16px * var(--s));
+  height: calc(16px * var(--s));
+  opacity: 0;
+  will-change: transform;
+}
+.season-flake {
+  width: calc(11px * var(--s));
+  height: calc(11px * var(--s));
+}
+.season-p svg { width: 100%; height: 100%; }
+@container season (min-width: 720px) {
+  .season-leaf { width: calc(22px * var(--s)); height: calc(22px * var(--s)); }
+  .season-flake { width: calc(16px * var(--s)); height: calc(16px * var(--s)); }
+}
+
+.sl-body { stroke-linejoin: round; stroke-width: 1.2; }
+.season-leaf--c0 { fill: var(--leaf-0); stroke: var(--leaf-0); }
+.season-leaf--c1 { fill: var(--leaf-1); stroke: var(--leaf-1); }
+.season-leaf--c2 { fill: var(--leaf-2); stroke: var(--leaf-2); }
+.season-leaf--c3 { fill: var(--leaf-3); stroke: var(--leaf-3); }
+.sl-vein { fill: none; stroke: var(--leaf-vein); stroke-width: 1.1; stroke-linecap: round; }
+.sf-dot { fill: var(--flake); stroke: var(--flake-edge); stroke-width: 1.2; }
+.sf-star-edge { fill: none; stroke: var(--flake-edge); stroke-width: 4.6; stroke-linecap: round; }
+.sf-star { fill: none; stroke: var(--flake); stroke-width: 2.4; stroke-linecap: round; }
+
+/* Leaves resting on the water. */
+.season-floaters {
+  position: absolute;
+  left: 30%;
+  width: clamp(120px, 16cqw, 220px);
+  aspect-ratio: 240 / 20;
+  bottom: calc(var(--pond-waterline) - 9px);
+}
+
+/* Halloween sky */
+.season-daymoon {
+  position: absolute;
+  left: 5cqw;
+  top: 16px;
+  width: clamp(34px, 5cqw, 64px);
+  aspect-ratio: 1;
+  opacity: 0.85;
+}
+@container season (min-width: 720px) {
+  .season-daymoon { left: 12cqw; top: 13cqh; }
+}
+.sdm-glow { fill: var(--daymoon); opacity: 0.35; }
+.sdm-disc { fill: var(--daymoon); }
+.sdm-crater { fill: var(--daymoon-crater); }
+:root[data-theme='dark'] .season-daymoon { display: none; }
+
+.season-bat {
+  position: absolute;
+  width: clamp(30px, 3.4cqw, 50px);
+  aspect-ratio: 48 / 26;
+}
+.sb-body { fill: var(--bat); }
+.sb-wing { fill: var(--bat-wing); stroke: var(--bat-wing); stroke-width: 0.8; stroke-linejoin: round; }
+.sb-eye { fill: var(--bat-eye); }
+:root[data-theme='dark'] .season-bat { filter: drop-shadow(0 0 1.5px rgba(255, 176, 96, 0.6)); }
+.season-bat--1 { left: 16cqw; top: 9cqh; }
+/* Crossing the harvest moon (the moon's box is mirrored from .pond-sun). */
+.season-bat--2 {
+  right: calc(clamp(14px, 8cqw, 190px) + clamp(66px, 26cqh, 128px) * 0.47);
+  top: calc(clamp(46px, 11cqh, 70px) + clamp(66px, 26cqh, 128px) * 0.3);
+}
+.season-bat--3 { left: 22cqw; top: 46cqh; width: clamp(24px, 2.6cqw, 38px); }
+/* Phones: the moon sits beside the title, so its bat moves to the clear band above the hills. */
+@container season (max-width: 719px) {
+  .season-sky .season-bat--1 { left: 25cqw; top: 18px; }
+  .season-sky .season-bat--2 { display: none; }
+  .season-sky .season-bat--3 { left: 8cqw; top: 63cqh; }
+  .season-sky .season-daymoon { left: 4cqw; top: 14px; }
+}
+
+/* ---------- Motion ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .season-p {
+    animation: season-fall var(--d) linear var(--dl) infinite;
+  }
+  .season-flake {
+    animation-name: season-snow;
+  }
+  .season-bat {
+    animation: season-bat-drift 7s ease-in-out infinite alternate;
+  }
+  .season-bat--2 { animation-duration: 9s; animation-delay: -3s; }
+  .season-bat--3 { animation-duration: 6s; animation-delay: -1s; }
+  .sb-wing { transform-box: fill-box; animation: season-flap 0.42s ease-in-out infinite alternate; }
+  .sb-wing--l { transform-origin: 100% 40%; }
+  .sb-wing--r { transform-origin: 0% 40%; animation-name: season-flap-r; }
+  .season-bat--2 .sb-wing { animation-duration: 0.5s; }
+  :root[data-theme='dark'] .sj-glow {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: pond-flicker 2.6s ease-in-out infinite;
+  }
+  .season-sky.is-paused *,
+  .season-sky.is-paused { animation-play-state: paused; }
+}
+/* Reduced motion: nothing falls; leaves and flakes hang still, scattered across the sky. */
+@media (prefers-reduced-motion: reduce) {
+  .season-p {
+    opacity: 0.9;
+    transform: translate(var(--sway), var(--rest)) rotate(calc(var(--spin) * 0.1));
+  }
+}
+
+@keyframes season-fall {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0); }
+  8% { opacity: 1; }
+  25% { transform: translate(var(--sway), 26cqh) rotate(calc(var(--spin) * 0.25)); }
+  50% { transform: translate(0, 52cqh) rotate(calc(var(--spin) * 0.5)); }
+  75% { transform: translate(var(--sway), 78cqh) rotate(calc(var(--spin) * 0.75)); }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translate(0, calc(100cqh - 20px)) rotate(var(--spin)); }
+}
+@keyframes season-snow {
+  0% { opacity: 0; transform: translate(0, 0); }
+  8% { opacity: 0.95; }
+  33% { transform: translate(var(--sway), 34cqh); }
+  66% { transform: translate(calc(var(--sway) * -0.6), 68cqh); }
+  88% { opacity: 0.95; }
+  100% { opacity: 0; transform: translate(0, calc(100cqh - 16px)); }
+}
+@keyframes season-bat-drift {
+  0% { transform: translate(0, 0) rotate(-4deg); }
+  50% { transform: translate(12px, -8px) rotate(3deg); }
+  100% { transform: translate(-6px, 6px) rotate(-2deg); }
+}
+@keyframes season-flap { from { transform: rotate(-16deg) scaleY(1); } to { transform: rotate(18deg) scaleY(0.7); } }
+@keyframes season-flap-r { from { transform: rotate(16deg) scaleY(1); } to { transform: rotate(-18deg) scaleY(0.7); } }

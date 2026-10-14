@@ -421,3 +421,16 @@
     transition: none !important;
   }
 }
+
+/* Frog easter egg: tapping it turns the seasonal decorations off (or back on). The scene
+   layers ignore the pointer, so the frog opts back in. */
+.pp-frog--egg { pointer-events: auto; cursor: pointer; transform-box: fill-box; transform-origin: 50% 100%; }
+.pp-frog-hit { fill: transparent; pointer-events: all; }
+.pp-frog.is-hopping { animation: pp-frog-hop 0.5s ease-out; }
+@keyframes pp-frog-hop {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-9px) scale(1.05, 0.95); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pp-frog.is-hopping { animation: none; }
+}

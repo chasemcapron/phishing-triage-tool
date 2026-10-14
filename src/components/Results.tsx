@@ -48,7 +48,7 @@ export const VerdictCard = forwardRef<HTMLHeadingElement, { report: Report; anal
       <div className="catch" style={catchVars}>
         <span className="catch-cord" aria-hidden="true" />
         <div className="catch-fish">
-          <VerdictFish verdict={report.verdict} sash className="catch-fish__art" />
+          <VerdictFish verdict={report.verdict} sash hat className="catch-fish__art" />
           <svg className="catch-hook" viewBox="0 0 24 36" aria-hidden="true" focusable="false">
             <circle className="fishing-hook__eye" cx="16" cy="4.5" r="3" />
             <path className="fishing-hook__metal" d="M16 7.5V26A5 5 0 0 1 6 26V20.5L9.4 23.6" />
