@@ -16,16 +16,40 @@ const TARGETS = 1000
 const KNOWN = 10000
 // Mirrors RISKY_TLDS in src/engine/data/lists.ts: junk domains climb rankings on these too.
 // prettier-ignore
-// prettier-ignore
 const RISKY_TLDS = new Set(['shop', 'store', 'online', 'site', 'website', 'top', 'xyz', 'icu', 'cyou', 'sbs', 'cfd', 'bond', 'buzz', 'vip', 'click', 'lat', 'rest', 'monster', 'cam', 'boutique', 'sale', 'deals', 'win', 'fun', 'space'])
 const INFRA = /cdn|static|adsystem|adservice|adnxs|doubleclick|analytics|metric|tracking|pixel|dns|edge|cloudfront|akamai|syndication|telemetry/
 // Sites named after a plain word ("service.gov.uk", "action.com") would make every
 // "pik-service" or "action-media" look like an imitation.
 // prettier-ignore
-// prettier-ignore
 const GENERIC = new Set(['service', 'services', 'platform', 'action', 'online', 'mobile', 'nature', 'cloud', 'archive', 'independent', 'clever', 'office', 'news', 'video', 'media', 'today', 'weather', 'search', 'translate', 'usercontent', 'mail', 'games', 'music', 'shopping', 'travel', 'health', 'science', 'energy', 'digital', 'apple-cloudkit'])
+// Adult sites never ship, as targets or as known names. Tranco's top ranks are full of them (and
+// of mirrors like "xhaccess"), so a pattern alone isn't enough: DENY lists what a manual review of
+// the generated target list found.
 const ADULT =
-  /porn|xxx|xvideo|xhamster|xnxx|redtube|youporn|onlyfans|chaturbate|stripchat|bongacams|spankbang|livejasmin|brazzers|\bsex|sexy|hentai|camsoda|eporner|txxx/i
+  /porn|xxx|xvideo|xhamster|xnxx|redtube|youporn|onlyfans|chaturbate|stripchat|bongacams|spankbang|livejasmin|brazzers|\bsex|sexy|hentai|camsoda|eporner|txxx|fap|jizz|nude|nsfw|pimp|tnaflix|fetlife|boyfriendtv|thisvid|devilz|missav|jable|videoxx|erome|noodlemagazine|^xh[a-z]{3,}\.|pussy|upskirt|prn|jav|escort|manga18|18\.|hitomi|readingmanga|tokyomotion|shahvani|qorno|listcrawler|fatalmodel|cityheaven|joyclub|ladies\.de|simpcity|luxuretv|theblowers|hotornot|eroterest|beeg|fansly|paheal|anal\.|7mmtv|redwap|avple|av-th|avj-th|av19t|av380|doujin|xdate|51cg|nya5|manwa|x-video|xorgasmo|xpaja|arabtnt|kgirls|bokep|swing|erotic|libertine|skokka|skipthegames|anybunny|hotxv|wnacg|imgsrc|leaktube|tgtube|darkero/i
+// Reviewed by hand against list N26LW: adult-adjacent, piracy and downloader sites, DNS and
+// registrar infrastructure, and opaque ad, tracking or device-telemetry domains nobody would type
+// or be phished with.
+// prettier-ignore
+const DENY = new Set([
+  // adult-adjacent
+  'janitorai.com', 'polybuzz.ai', 'donmai.us', 'dlsite.com', 'furaffinity.net', 'tsyndicate.com', 'toyhou.se',
+  // piracy and downloaders
+  'asurascans.com', 'comix.to', 'mangabuff.ru', 'savefrom.net', 'fdown.net', 'sotwe.com', 'liteapks.com', 'ssstik.io', 'snaptik.app',
+  'fastdl.app', 'croxyproxy.com', 'musicdel.ir', 'mangago.me', 'czbooks.net', 'freewebnovel.com', 'goojara.to', 'nontondrama.my',
+  'taktube.net', 'twkan.com', 'indown.io',
+  // infrastructure and reserved
+  'example.com', 'root-servers.net', 'gtld-servers.net', 'domaincontrol.com', 'registrar-servers.com', 'akahost.net',
+  // opaque ad, tracking, telemetry and parked domains
+  'hicloudcam.com', 'triplinkintl.com', 'ailawandorder.com', 'wsdvs.com', 'imcmdb.net', 'mangosip.ru', 'tagomi.com', 'allawnos.com',
+  'shalltry.com', 'dotaplabs.net', 'rwwsje.com', 'zenecn.net', 'ueiwsp.com', 'feinidi.com', 'kslawin.com', 'mythad.com', 'salthasher.com',
+  'wscvip.cn', 'inkuai.com', 'queniuaa.com', 'vtwenty.com', 'platorelay.com', 'dyingbirds.com', 'vedsalb.com', 'technorail.com',
+  'beyondwickedmapping.org', 'rayjump.com', 'adaether.com', 'luugy.com', 'nmrodam.com', 'supertms.com', 'cmediahub.ru', 'geobasket.ru',
+  'stbid.ru', 'loobygamesonline.com', 'cootlogix.com', 'kueezrtb.com', 'alphonso.tv', 'iscorp.com', 'wswebpic.com', 'evo-games.com',
+  'adgrx.com', 'vidaahub.com', 'shiabank.com', 'yellowblue.io', 'rings.solutions', 'internetwarriors.net', 'bblaa.com', 'luticlip.com',
+  'therapservices.net', 'search-start.org', 'wshifen.com', 'admanmedia.com', 'cpmstar.com', 'verify.hn',
+])
+const excluded = (d) => ADULT.test(d) || DENY.has(d) || d.endsWith('.arpa')
 
 const domains = []
 const seen = new Set()
@@ -34,7 +58,7 @@ for (const line of readFileSync(csv, 'utf8').split(/\r?\n/)) {
   const host = line.split(',')[1]?.trim().toLowerCase()
   if (!host) continue
   const domain = getDomain(host)
-  if (!domain || seen.has(domain) || ADULT.test(domain)) continue
+  if (!domain || seen.has(domain) || excluded(domain)) continue
   seen.add(domain)
   domains.push(domain)
 }

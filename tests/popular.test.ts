@@ -10,7 +10,29 @@ describe('popular-site data (Tranco)', () => {
     expect(POPULAR_TARGETS[0]).toBe('google.com')
     expect(POPULAR_KNOWN.length).toBeGreaterThan(500)
     expect(POPULAR_KNOWN.length).toBeLessThan(3000)
-    expect([...POPULAR_TARGETS, ...POPULAR_KNOWN].some((d) => /porn|xvideo/.test(d))).toBe(false)
+  })
+
+  it('ships no adult, piracy or infrastructure names (the generator filters them)', () => {
+    const shipped = new Set([...POPULAR_TARGETS, ...POPULAR_KNOWN])
+    // A sample of what list N26LW contains and the filters must keep out.
+    for (const d of [
+      'xvideos.com',
+      'youjizz.com',
+      'xhaccess.com',
+      'fetlife.com',
+      'beeg.com',
+      'skipthegames.com',
+      'savefrom.net',
+      'root-servers.net',
+      'example.com',
+      'resolver.arpa',
+      'rwwsje.com',
+    ]) {
+      expect(shipped.has(d), d).toBe(false)
+    }
+    expect([...shipped].filter((d) => /porn|xxx|fap|jizz|nude|hentai|escort|^xh[a-z]{3,}\./.test(d))).toEqual([])
+    // ...without losing ordinary popular sites.
+    for (const d of ['youtube.com', 'rutube.ru', 'github.com', 'dropbox.com']) expect(POPULAR_TARGETS, d).toContain(d)
   })
 })
 
