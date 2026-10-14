@@ -17,6 +17,8 @@ export interface Advice {
 
 const TOLL = ['E-ZPass', 'SunPass', 'FasTrak', 'TxTag']
 const DELIVERY = ['USPS', 'UPS', 'FedEx', 'DHL']
+// prettier-ignore
+// prettier-ignore
 const RETAIL = [
   'Summer Fridays', 'Lululemon', 'Walmart', 'Costco', 'Best Buy', 'The Home Depot', 'Sephora', 'Ulta Beauty', 'Shein', 'Temu',
   'Nike', 'Adidas', 'Stanley', 'Skims', 'Dyson', 'Crocs', 'UGG', 'Ray-Ban', 'The North Face', 'Le Creuset', 'LEGO', 'Ticketmaster',

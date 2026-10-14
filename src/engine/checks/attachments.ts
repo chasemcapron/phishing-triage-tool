@@ -32,12 +32,16 @@ export function detectFileType(b: Uint8Array): string | null {
   return null
 }
 
+// prettier-ignore
+// prettier-ignore
 const FAMILY_BY_EXT: Record<string, string> = {
   pdf: 'pdf', docx: 'zip', xlsx: 'zip', pptx: 'zip', docm: 'zip', xlsm: 'zip', pptm: 'zip', zip: 'zip', jar: 'zip',
   odt: 'zip', ods: 'zip', doc: 'ole', xls: 'ole', ppt: 'ole', msg: 'ole', png: 'png', jpg: 'jpeg', jpeg: 'jpeg',
   gif: 'gif', exe: 'exe', dll: 'exe', scr: 'exe', rar: 'rar', '7z': '7z', gz: 'gzip', tgz: 'gzip', iso: 'iso',
   html: 'html', htm: 'html',
 }
+// prettier-ignore
+// prettier-ignore
 const FAMILY_BY_MIME: Record<string, string> = {
   'application/pdf': 'pdf', 'application/zip': 'zip', 'application/x-zip-compressed': 'zip',
   'application/msword': 'ole', 'application/vnd.ms-excel': 'ole', 'application/vnd.ms-powerpoint': 'ole',

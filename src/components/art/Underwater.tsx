@@ -17,6 +17,7 @@ const r1 = (n: number) => Math.round(n * 10) / 10
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(' ')
 
 // [left %, size px, rise s, delay s, wobble px, resting height 0..1]
+// prettier-ignore
 const BUBBLES = [
   [5, 16, 13, -2, 7, 0.72], [12, 9, 10, -7, 5, 0.34], [19, 22, 17, -11, 9, 0.55], [27, 12, 12, -4, 6, 0.16],
   [34, 8, 9, -6, 4, 0.84], [42, 18, 18, -14, 8, 0.42], [50, 10, 11, -3, 5, 0.63], [58, 24, 20, -9, 10, 0.26],
@@ -46,6 +47,7 @@ export function Bubbles({ count = 14, speed = 1, seed = 0, className }: { count?
 }
 
 // [left %, width %, strength 0..1, shimmer s, delay s]
+// prettier-ignore
 const RAYS = [[2, 8, 0.9, 7, -1], [15, 4, 0.55, 9, -4], [25, 10, 0.8, 8, -2], [42, 5, 0.5, 10, -6], [54, 9, 0.85, 7.5, -3], [69, 4, 0.5, 9.5, -5], [79, 11, 0.75, 8.5, -7]] as const
 
 /** Soft sunbeams (faint moonbeams at night) fading down from the parent's top. angle > 0: light from the upper right (where the sun is). */

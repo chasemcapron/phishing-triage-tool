@@ -118,6 +118,7 @@ interface Target {
   sk: string
 }
 
+// prettier-ignore
 const BAIT = new Set([
   'login', 'log', 'signin', 'sign', 'verify', 'verification', 'secure', 'security', 'account', 'accounts', 'support',
   'help', 'helpdesk', 'update', 'auth', 'wallet', 'recovery', 'recover', 'billing', 'pay', 'payment', 'unlock',

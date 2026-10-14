@@ -1,0 +1,21 @@
+# Build output and dependencies
+dist
+node_modules
+package-lock.json
+
+# Hand-packed data tables and the generated Tranco list: one entry per line would
+# make them thousands of lines long without making them easier to review.
+src/engine/data/
+
+# Byte-for-byte test inputs, binary assets and hand-written prose.
+samples/
+tests/fixtures/
+public/
+docs/
+*.md
+
+# Scene art stylesheets keep one sprite per line (position, size, timing) so the
+# layout reads like a table.
+src/components/art/fish.css
+src/components/art/scene.css
+src/components/art/seasonal.css
