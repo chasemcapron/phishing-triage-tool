@@ -5,7 +5,7 @@ import { FishSmall } from './art/Fish'
 import { Bubbles, LightRays, SwimLane } from './art/Underwater'
 
 /** What the line is hooked to: the verdict card once there is a result, otherwise the input card's top. */
-const TARGETS = ['[role=tabpanel]:not([hidden]) .verdict', '.tabs']
+const TARGETS = ['[id^=panel-]:not([hidden]) .verdict', '.tabs']
 
 /**
  * A positioned line from the rod tip (top-right corner of `.fisher-wrap`) straight down to a hook

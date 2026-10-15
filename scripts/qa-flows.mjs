@@ -57,7 +57,7 @@ await send('Page.enable')
 
 const results = []
 const check = (name, cond) => results.push(`${cond ? 'ok  ' : 'FAIL'} ${name}`)
-const verdict = () => ev(`return document.querySelector('[role=tabpanel]:not([hidden]) .verdict-label')?.textContent ?? null`)
+const verdict = () => ev(`return document.querySelector('[id^=panel-]:not([hidden]) .verdict-label')?.textContent ?? null`)
 const click = (sel, text) =>
   ev(
     `const els=[...document.querySelectorAll(${JSON.stringify(sel)})].filter(e=>!e.closest('[hidden]')); const el=${text ? `els.find(e=>e.textContent.trim()===${JSON.stringify(text)})` : 'els[0]'}; if(!el) return 'missing'; el.click(); return 'clicked'`,
@@ -119,7 +119,7 @@ check('five sample buttons', (await ev(`return document.querySelectorAll('#panel
 check('focus moved to verdict', (await ev(`return document.activeElement?.id`)) === 'verdict-heading')
 check('verdict fish is decorative', (await ev(`return document.querySelector('.verdict .fish')?.getAttribute('aria-hidden')`)) === 'true')
 await sleep(1000)
-check('fishing line moves down to the verdict card', ((await lineGap('[role=tabpanel]:not([hidden]) .verdict')) ?? 99) <= 2)
+check('fishing line moves down to the verdict card', ((await lineGap('[id^=panel-]:not([hidden]) .verdict')) ?? 99) <= 2)
 await click('.segmented button', 'Analyst')
 await sleep(300)
 check(
@@ -133,12 +133,13 @@ await sleep(300)
 check('email-looking text shows a notice', (await ev(`return !!document.querySelector('.notice')`)) === true)
 if (!emailTab) {
   check(
-    'email mode paused: single tab, no email panel',
-    (await ev(`return document.querySelectorAll('[role=tab]').length === 1 && !document.querySelector('#panel-email')`)) === true,
+    'email mode paused: a card title instead of tabs, no email panel',
+    (await ev(`return !document.querySelector('[role=tablist]') && !!document.querySelector('h2#tab-text') && !document.querySelector('#panel-email')`)) ===
+      true,
   )
   await ev(`location.hash = '#email/fake-recruiter'; return 1`)
   await sleep(800)
-  check('#email deep link falls back to text mode', (await ev(`return document.querySelector('#tab-text').getAttribute('aria-selected')`)) === 'true')
+  check('#email deep link falls back to text mode', (await ev(`return document.querySelector('#panel-text').hidden`)) === false)
 } else {
   check('email-looking text shows handoff notice', (await ev(`return !!document.querySelector('.notice .link-btn')`)) === true)
   await click('.notice .link-btn')
