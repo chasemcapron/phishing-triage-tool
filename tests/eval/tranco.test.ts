@@ -22,6 +22,7 @@ describe.skipIf(!CSV)('Tranco false-positive sweep', () => {
 
   it('flags under 0.5% of ranks 10,001 to 20,000', () => {
     const hits = flagged(10_001, 20_000)
+    // oxlint-disable-next-line no-console
     console.log(`Ranks 10,001-20,000: ${hits.length}/10,000 flagged\n${hits.join('\n')}`)
     expect(hits.length).toBeLessThan(50)
   })

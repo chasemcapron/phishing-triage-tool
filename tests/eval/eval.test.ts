@@ -17,6 +17,8 @@ describe('offline detection eval', () => {
   for (const set of SETS) {
     it(`${set.name}: ${set.scams.length} scams, ${set.legit.length} legitimate texts`, () => {
       const s = summarize(`${set.name} (${set.scams.length} scams, ${set.legit.length} legitimate)`, set.scams, set.legit)
+      // The eval exists to print these tables.
+      // oxlint-disable-next-line no-console
       console.log(formatSummary(s))
       expect(s.detected.k, 'scams flagged').toBeGreaterThanOrEqual(set.minFlagged)
       expect(s.falsePositives.k, 'legitimate texts flagged').toBeLessThanOrEqual(set.maxFalsePositives)
