@@ -157,4 +157,16 @@ describe('summary to send someone', () => {
     expect(withoutOurs).not.toMatch(/https?:\/\//)
     expect(withoutOurs).not.toMatch(/\b[a-z0-9-]+\.(shop|com|test)\b/i)
   })
+
+  it('defangs raw IP addresses too', () => {
+    const s = friendSummary(analyzeText('Your package is held: http://203.0.113.77/usps'))
+    expect(s).toContain('203[.]0[.]113[.]77')
+    expect(s).not.toMatch(/\d+\.\d+\.\d+\.\d+/)
+  })
+
+  it('gives one reason per problem, not the same domain twice', () => {
+    const r = analyzeText('E-ZPass: unpaid toll of $4.15. Pay now to avoid a fine: https://ezpass-tolls.info/pay')
+    const naming = r.reasons.filter((x) => x.includes('ezpass-tolls.info'))
+    expect(naming).toHaveLength(1)
+  })
 })

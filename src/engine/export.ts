@@ -17,6 +17,7 @@ export function defangText(s: string): string {
   return s
     .replace(/\bhttp(s?):\/\//gi, 'hxxp$1[://]')
     .replace(/\b(?:[\p{L}\p{N}](?:[\p{L}\p{N}-]*[\p{L}\p{N}])?\.)+\p{L}{2,63}\b/gu, (host) => host.replace(/\./g, '[.]'))
+    .replace(/\b(?:\d{1,3}\.){3}\d{1,3}\b/g, (ip) => ip.replace(/\./g, '[.]'))
 }
 
 /** Inline code span that can't be broken out of, whatever backticks the text contains. */
