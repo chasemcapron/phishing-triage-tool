@@ -18,15 +18,24 @@ export function scoreFindings(findings: Finding[]): { score: number; verdict: Ve
   return { score, verdict, verdictLabel: VERDICT_LABELS[verdict] }
 }
 
-const LINK_LOOKALIKES = new Set(['link-lookalike', 'link-combosquat', 'link-brand-subdomain', 'link-brand-tld'])
+const LINK_LOOKALIKES = new Set(['link-lookalike', 'link-combosquat', 'link-brand-subdomain', 'link-brand-tld', 'link-popular-lookalike'])
 
-/** A link-lookalike reason that only repeats the sender-domain lookalike adds nothing. */
+/** The destination named in a "claims to be X, but its link goes to Y" reason. */
+const mentionDest = (f: Finding) => (f.kind === 'link-brand-mention' ? /link goes to ([^\s,]+),/.exec(f.explanation)?.[1] : undefined)
+
+/**
+ * A reason that repeats one already chosen adds nothing: a link lookalike that only restates the
+ * sender-domain lookalike, or "claims to be E-ZPass, but links to X" next to "X imitates E-ZPass".
+ */
 function redundant(candidate: Finding, chosen: Finding[]): boolean {
-  if (!LINK_LOOKALIKES.has(candidate.kind)) return false
   return chosen.some((c) => {
-    if (c.kind !== 'sender-lookalike-domain') return false
-    const domain = /@([^\s)>]+)/.exec(c.evidence[0] ?? '')?.[1]
-    return Boolean(domain && candidate.explanation.includes(domain))
+    if (c.kind === 'sender-lookalike-domain' && LINK_LOOKALIKES.has(candidate.kind)) {
+      const domain = /@([^\s)>]+)/.exec(c.evidence[0] ?? '')?.[1]
+      return Boolean(domain && candidate.explanation.includes(domain))
+    }
+    const [mention, lookalike] = candidate.kind === 'link-brand-mention' ? [candidate, c] : [c, candidate]
+    const dest = mentionDest(mention)
+    return Boolean(dest && LINK_LOOKALIKES.has(lookalike.kind) && lookalike.explanation.includes(dest))
   })
 }
 

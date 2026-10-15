@@ -26,7 +26,7 @@ The demo uses a real fake store that took a friend's card details at checkout in
 - **Report it in one tap.** Official forms open in a new tab: Google Safe Browsing (with the link pre-filled), the FTC, and the FBI's IC3 for scams that can cost money.
 - **Send it to someone.** "Copy a summary to send someone" gives a plain-English summary. Every link in it is defanged so the other person's phone can't make it tappable.
 - **Analyst view.** Every finding with its weight, severity, evidence and MITRE ATT&CK techniques, plus a links table, defanged IOCs, JSON export and a Markdown ticket summary.
-- **Day or night.** It opens in day mode, with a night-fishing toggle that is remembered. Dark was the original plan; day was chosen in design review because it suits the cartoon pond.
+- **Day or night.** It opens in day mode, with a night-fishing toggle that is remembered. Day suits the cartoon pond best, so it's the default.
 - **Seasons.** The pond dresses up by month: Halloween in October (bats, harvest moon, jack-o'-lanterns, a witch hat on the verdict fish), falling leaves in November, snow and a Santa hat in December. It changes on its own through the year (`?season=` previews one), and decorations never sit over the verdict. Tap the frog to get the plain pond back.
 
 ## Architecture

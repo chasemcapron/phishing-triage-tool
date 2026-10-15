@@ -23,7 +23,7 @@ function readPref(): boolean {
   }
 }
 
-/** Remembers whether reputation lookups are on (default on; the brief asks for a visible off switch). */
+/** Remembers whether reputation lookups are on (on by default, with a visible off switch so nothing has to leave the device). */
 export function OnlineProvider({ children }: { children: ReactNode }) {
   const [online, setOnlineState] = useState(readPref)
   const setOnline = useCallback((v: boolean) => {

@@ -4,7 +4,7 @@ import { runLookup, type LookupEnv } from './lookup.js'
 import { SlidingWindowLimiter } from './rateLimit.js'
 import { validateLookupRequest } from './validate.js'
 
-// Best-effort per-instance limits (user chose in-memory over a third-party store).
+// Best-effort limits kept in memory per function instance: no external store to run or trust.
 const limiter = new SlidingWindowLimiter([
   { windowMs: 60_000, max: 30 },
   { windowMs: 3_600_000, max: 300 },
