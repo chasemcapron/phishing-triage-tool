@@ -6,9 +6,9 @@
 
 Paste a suspicious link or text message *before you tap it* and get a clear, explainable verdict: what's wrong with it, in plain English, and what to do next. Everything is analyzed in your browser. Only links and domains are looked up online, and the tool never opens a link.
 
-<p align="center"><img src="docs/demo.gif" alt="Typing the real fake-store link www.summrfrideays.shop, casting it in, and the hooked fish showing High risk: a misspelling of Summer Fridays, registered 24 days ago, followed by advice and report buttons" width="360"></p>
+<p align="center"><img src="docs/demo.gif" alt="Typing the real fake-store link www.summrfrideays.shop, casting it in, and the hooked fish showing High risk: a misspelling of Summer Fridays, registered 26 days ago, followed by advice and report buttons" width="360"></p>
 
-The demo uses a real fake store that took a friend's card details at checkout in October 2026. No blocklist knew it yet. The tool catches it from the brand misspelling, the cheap `.shop` ending and the domain age, which comes from a live registry lookup (24 days old when the demo was recorded; by design the age signal stops counting at 90 days for cheap endings, so the same link rates Suspicious after mid-December 2026).
+The demo uses a real fake store that took a friend's card details at checkout in October 2026. No blocklist knew it yet. The tool catches it from the brand misspelling, the cheap `.shop` ending and the domain age, which comes from a live registry lookup (26 days old when the demo was recorded; by design the age signal stops counting at 90 days for cheap endings, so the same link rates Suspicious after mid-December 2026).
 
 | Landing page | The catch | A real Google Safe Browsing hit (night) |
 | --- | --- | --- |

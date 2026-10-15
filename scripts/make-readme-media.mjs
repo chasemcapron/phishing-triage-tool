@@ -62,7 +62,9 @@ async function open(path, theme, metrics) {
   await send('Emulation.setDeviceMetricsOverride', metrics)
   await send('Emulation.setTouchEmulationEnabled', { enabled: metrics.mobile })
   await send('Page.navigate', { url: 'about:blank' })
-  await send('Page.navigate', { url: `${base}${path}` })
+  // ?season=none keeps the original pond, whatever the month.
+  const [pagePath, hash] = path.split('#')
+  await send('Page.navigate', { url: `${base}${pagePath}?season=none${hash ? `#${hash}` : ''}` })
   await sleep(1200)
   // The theme is read at startup, and a hash-only navigation doesn't restart the app: reload.
   await ev(`localStorage.setItem('theme', '${theme}'); localStorage.setItem('onlineChecks', 'on'); 1`)
@@ -110,12 +112,34 @@ await ev(`window.scrollTo(0, document.querySelector('#findings-heading').getBoun
 await sleep(600)
 await shoot('analyst-desktop')
 
-// Demo GIF: type the real fake-store link, cast it, watch the live checks lift it to High.
+// Demo GIF: type the real fake-store link and cast it. The link is checked once off camera first,
+// so the page's lookup cache answers instantly and the recording shows one verdict, not the offline
+// verdict being lifted a moment later.
 await open('/', 'light', { ...phone, deviceScaleFactor: 1 })
+const link = 'www.summrfrideays.shop'
+const typeLink = (text) =>
+  ev(
+    `(() => { const ta = document.querySelector('#text-input'); Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set.call(ta, ${JSON.stringify(text)}); ta.dispatchEvent(new Event('input', { bubbles: true })); return 1 })()`,
+  )
+await typeLink(link)
+await ev(`document.querySelector('#text-input').form.requestSubmit(); 1`)
+for (let i = 0; i < 100 && !(await ev(`!!document.querySelector('.verdict') && !document.querySelector('.verdict-checking')`)); i++) await sleep(200)
+await sleep(500)
+const warmed = await ev(`document.querySelector('.verdict').className`)
+console.log('warm-up verdict:', warmed)
+// An empty submit clears the result; hide the "paste something first" hint it shows (the CSSOM is CSP-safe).
+await typeLink('')
+await ev(`document.querySelector('#text-input').form.requestSubmit(); 1`)
+await sleep(300)
+await ev(`document.querySelector('#text-empty').style.display = 'none'; document.activeElement.blur(); window.scrollTo(0, 0); 1`)
+await sleep(1500)
 let n = 0
+const labels = new Set()
 const frame = async (hold = 1) => {
   const shot = await send('Page.captureScreenshot', { format: 'png' })
   writeFileSync(join(frames, `${String(n++).padStart(4, '0')}-${hold}.png`), Buffer.from(shot.data, 'base64'))
+  const label = await ev(`document.querySelector('.verdict')?.className.replace('verdict ', '') ?? ''`)
+  if (label) labels.add(label)
 }
 await frame(12)
 const cardTop = await ev(`document.querySelector('.tabs').getBoundingClientRect().top + scrollY - 40`)
@@ -124,11 +148,8 @@ for (let i = 1; i <= 8; i++) {
   await sleep(60)
   await frame()
 }
-const link = 'www.summrfrideays.shop'
 for (let i = 2; i <= link.length; i += 2) {
-  await ev(
-    `(() => { const ta = document.querySelector('#text-input'); Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set.call(ta, ${JSON.stringify(link)}.slice(0, ${i})); ta.dispatchEvent(new Event('input', { bubbles: true })); return 1 })()`,
-  )
+  await typeLink(link.slice(0, i))
   await frame()
 }
 await frame(8)
@@ -146,6 +167,7 @@ for (let i = 1; i <= 10; i++) {
   await frame()
 }
 await frame(25)
+console.log('verdicts shown in the GIF:', [...labels].join(' -> '))
 
 ws.close()
 chrome.kill()
