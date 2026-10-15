@@ -187,6 +187,19 @@ export function applyReputation(report: Report, res: LookupResponse, req: Lookup
   // Domain age: newly registered domains are a strong phishing signal.
   const senderDomain = registrable(domainOfEmail(r.email?.from?.address))
   for (const d of res.rdap.results) {
+    // A link to a domain that no longer exists or was suspended: scam sites are often taken down after reports.
+    const gone = linksForDomain(d.domain)
+    if ((d.status === 'not_registered' || d.hold) && gone.length) {
+      gone.forEach((l) => flag(l, 'domain-gone'))
+      fs.add(
+        'domain-gone',
+        d.hold
+          ? `The link goes to ${d.domain}, which has been suspended. That usually happens after reports of fraud or abuse.`
+          : `The link goes to ${d.domain}, a domain that isn't registered. Scam sites are often deleted soon after they're reported, and real businesses don't send links to addresses that don't exist.`,
+        `${defangHost(d.domain)} ${d.hold ? 'on hold' : 'not registered'} (RDAP)`,
+        { source: 'rdap' },
+      )
+    }
     if (d.status !== 'ok' || d.ageDays === undefined) continue
     const ls = linksForDomain(d.domain)
     ls.forEach((l) => {

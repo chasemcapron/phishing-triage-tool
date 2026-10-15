@@ -60,6 +60,8 @@ export interface RdapResult {
   /** ISO registration date, when the registry publishes one. */
   registered?: string
   ageDays?: number
+  /** The registry or registrar has suspended the domain ("client hold" / "server hold"), usually after abuse reports. */
+  hold?: boolean
 }
 
 export interface ProviderResult<T> {
@@ -92,6 +94,9 @@ export function rdapFromBody(domain: string, body: unknown, now: number): RdapRe
   const events = (body as { events?: { eventAction?: unknown; eventDate?: unknown }[] } | null)?.events
   const reg = Array.isArray(events) ? events.find((e) => e?.eventAction === 'registration')?.eventDate : undefined
   const t = typeof reg === 'string' ? Date.parse(reg) : NaN
-  if (Number.isNaN(t)) return { domain, status: 'unknown' }
-  return { domain, status: 'ok', registered: new Date(t).toISOString(), ageDays: Math.max(0, Math.floor((now - t) / 86_400_000)) }
+  const statuses = (body as { status?: unknown } | null)?.status
+  const hold = Array.isArray(statuses) && statuses.some((s) => s === 'client hold' || s === 'server hold')
+  const held = hold ? { hold } : {}
+  if (Number.isNaN(t)) return { domain, status: 'unknown', ...held }
+  return { domain, status: 'ok', registered: new Date(t).toISOString(), ageDays: Math.max(0, Math.floor((now - t) / 86_400_000)), ...held }
 }

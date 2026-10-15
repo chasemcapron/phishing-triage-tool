@@ -9,6 +9,8 @@
 //   (e.g. every .gov domain for government services).
 // countryDomains: the brand owns this name on every country ending ("google.de", "amazon.co.jp").
 // mentions: regex fragments that mean a message or display name claims to be the brand.
+// storeOnly: the name is an everyday word ("coach", "yeti"), so domains only match it on a cheap
+//   ending (.shop, .top, ...) or next to a store word ("coach-outlet").
 
 export interface Brand {
   name: string
@@ -18,6 +20,7 @@ export interface Brand {
   officialSuffixes?: string[]
   countryDomains?: string
   mentions: string[]
+  storeOnly?: boolean
 }
 
 export const BRANDS: Brand[] = [
@@ -336,6 +339,19 @@ export const BRANDS: Brand[] = [
     domains: ['lego.com'],
     mentions: ['\\blego\\b'],
   },
+  ...(
+    [
+      ['Coach', ['coach'], ['coach.com', 'coachoutlet.com'], ['coach (?:outlet|bags?|purses?|handbags?)']],
+      ['Kate Spade', ['katespade'], ['katespade.com', 'katespadeoutlet.com'], ['kate ?spade']],
+      ['Michael Kors', ['michaelkors'], ['michaelkors.com'], ['michael ?kors']],
+      ['Hoka', ['hoka'], ['hoka.com'], ['hoka (?:shoes|sneakers|running|clifton|bondi)']],
+      ['Yeti', ['yeti'], ['yeti.com'], ['yeti (?:coolers?|tumblers?|ramblers?|mugs?)']],
+      ['Pandora', ['pandora'], ['pandora.net', 'pandora.com'], ['pandora (?:jewel(?:le)?ry|charms?|bracelets?|rings?)']],
+      ['Zara', ['zara'], ['zara.com'], ['zara (?:sale|clearance|outlet|order)']],
+      ['Oura', ['oura', 'ouraring'], ['ouraring.com', 'oura.com'], ['oura ring']],
+      ['Birkenstock', ['birkenstock'], ['birkenstock.com'], ['birkenstocks?']],
+    ] as const
+  ).map(([name, keywords, domains, mentions]): Brand => ({ name, keywords: [...keywords], domains: [...domains], mentions: [...mentions], storeOnly: true })),
   {
     name: 'Ticketmaster',
     keywords: ['ticketmaster'],

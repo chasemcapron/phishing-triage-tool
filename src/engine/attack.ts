@@ -77,7 +77,7 @@ export function techniquesFor(f: Finding, report: Pick<Report, 'mode' | 'finding
     if (k.startsWith('link-') || k.startsWith('sms-') || k.startsWith('rep-') || k === 'content-credentials' || k === 'content-sensitive-info') {
       return ['T1660']
     }
-    if (k === 'domain-new' && any(DECEPTION)) return ['T1583.001']
+    if ((k === 'domain-new' || k === 'domain-gone') && any(DECEPTION)) return ['T1583.001']
     return []
   }
 
@@ -106,7 +106,7 @@ export function techniquesFor(f: Finding, report: Pick<Report, 'mode' | 'finding
     const malware = f.evidence.some((e) => /MALWARE|UNWANTED_SOFTWARE|malware_download|POTENTIALLY_HARMFUL/i.test(e))
     return malware ? ['T1566.002', 'T1204.001'] : linkTech
   }
-  if (k === 'domain-new' && any(DECEPTION)) return ['T1583.001']
+  if ((k === 'domain-new' || k === 'domain-gone') && any(DECEPTION)) return ['T1583.001']
   return []
 }
 

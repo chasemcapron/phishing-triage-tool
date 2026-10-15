@@ -137,6 +137,7 @@ export const CHECKS = {
   'rep-virustotal-malicious': { weight: 45, category: 'reputation', title: 'Flagged malicious on VirusTotal' },
   'rep-virustotal-suspicious': { weight: 20, category: 'reputation', title: 'Flagged by a few VirusTotal engines' },
   'domain-new': { weight: 30, category: 'reputation', title: 'Newly registered domain' },
+  'domain-gone': { weight: 25, category: 'reputation', title: 'Domain removed or suspended' },
 } as const satisfies Record<string, CheckDef>
 
 export type FindingKind = keyof typeof CHECKS

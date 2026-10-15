@@ -1,4 +1,5 @@
 import { BRANDS, type Brand } from '../data/brands'
+import { RISKY_TLDS } from '../data/lists'
 import { POPULAR_KNOWN, POPULAR_TARGETS } from '../data/popular'
 import { hostInfo } from '../util/domain'
 import { editDistance, skeleton } from '../util/text'
@@ -38,6 +39,13 @@ export function isOfficialFor(brand: Brand, domain: string | null): boolean {
 
 const tokensOf = (s: string) => s.split(/[-_]+/).filter(Boolean)
 
+/** A long name (8+) with the same first letter and up to a quarter of its letters changed (a third from 12 letters). */
+const looseMatch = (sk: string, kwSk: string) =>
+  kwSk.length >= 8 &&
+  sk[0] === kwSk[0] &&
+  Math.abs(sk.length - kwSk.length) <= 3 &&
+  editDistance(sk, kwSk) <= Math.floor(kwSk.length / (kwSk.length >= 12 ? 3 : 4))
+
 /**
  * Checks a hostname against the brand list. Returns the strongest lookalike signal,
  * or null when the host is unrelated or genuinely belongs to the brand.
@@ -54,6 +62,10 @@ export function findLookalike(rawHost: string): LookalikeHit | null {
   const labelSk = skeleton(label)
   const labelFlatSk = skeleton(label.replace(/[-_]/g, ''))
   const labelTokens = tokensOf(label)
+  // Fake stores on cheap endings mangle long names harder than phishing kits do ("summrfriseay.shop").
+  const cheapEnding = RISKY_TLDS.has(info.domain.slice(info.domain.lastIndexOf('.') + 1))
+  // Short-name typos and everyday-word brands ("venom", "chasse", "coach") need a cheap ending or a sales/bait word too.
+  const storeContext = cheapEnding || labelTokens.some((t) => BAIT.has(t) || STORE_WORDS.has(t))
   const subLabels = info.subdomain
     ? hostInfo(info.subdomain)
         .unicodeHost.split('.')
@@ -66,6 +78,7 @@ export function findLookalike(rawHost: string): LookalikeHit | null {
     hits.push({ type, brand: brand.name, matched, domain: info.domain!, unicodeHost: info.unicodeHost })
 
   for (const brand of BRANDS) {
+    if (brand.storeOnly && !storeContext) continue
     for (const kw of brand.keywords) {
       const kwSk = skeleton(kw)
       const substringOk = kw.length >= 6 && !brand.tokenOnly?.includes(kw)
@@ -76,6 +89,11 @@ export function findLookalike(rawHost: string): LookalikeHit | null {
         // Typos keep the first letter: "cloud" and "pcloud" are other names, not iCloud misspelled.
       } else if (kw.length >= 6 && labelFlatSk[0] === kwSk[0] && editDistance(labelFlatSk, kwSk) <= (kw.length >= 9 ? 2 : 1)) {
         hit('typo', brand, label)
+        // Short names only count a classic typo ("nikee", "temuu"); a plain one-letter change is usually another word.
+      } else if (kw.length >= 4 && storeContext && isClassicTypo(labelFlatSk, kwSk)) {
+        hit('typo', brand, label)
+      } else if (cheapEnding && looseMatch(labelFlatSk, kwSk)) {
+        hit('typo', brand, label)
       }
 
       // Hyphen-separated tokens ("brand-secure-login").
@@ -84,6 +102,8 @@ export function findLookalike(rawHost: string): LookalikeHit | null {
           const tSk = skeleton(t)
           if (tSk === kwSk) hit(t === kw ? 'combosquat' : 'homoglyph', brand, t)
           else if (kw.length >= 6 && t.length >= 6 && editDistance(tSk, kwSk) === 1) hit('homoglyph', brand, t)
+          else if (kw.length >= 4 && storeContext && isClassicTypo(tSk, kwSk)) hit('typo', brand, t)
+          else if (cheapEnding && looseMatch(tSk, kwSk)) hit('typo', brand, t)
         }
       }
       if (substringOk && labelFlatSk !== kwSk && labelFlatSk.includes(kwSk)) hit('combosquat', brand, label)
@@ -138,6 +158,12 @@ const BAIT = new Set([
   'restore', 'reset', 'password', 'id', 'team', 'service', 'center', 'centre', 'official', 'online', 'web', 'app',
   'customer', 'care', 'live', 'chat', 'portal', 'access', 'session', 'validate', 'check', 'invoice', 'prize', 'share', 'shared', 'file', 'files', 'doc', 'docs',
   'document', 'drive', 'meeting', 'invite', 'download',
+])
+
+// prettier-ignore
+const STORE_WORDS = new Set([
+  'outlet', 'outlets', 'sale', 'sales', 'store', 'stores', 'shop', 'shops', 'clearance', 'discount', 'deal', 'deals',
+  'factory', 'warehouse', 'mall', 'market', 'us', 'usa', 'uk', 'au', 'ca', 'off', 'cheap', 'buy',
 ])
 
 let targets: Target[] | null = null
