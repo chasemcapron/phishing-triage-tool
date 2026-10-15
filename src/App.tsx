@@ -174,30 +174,41 @@ export default function App() {
         <main id="main" className="pond water-column">
           <PondAmbient />
           <div className="container pond-content">
-            {/* The tablist is a composite widget: its tabs take focus (roving tabindex), not the list itself. */}
-            {/* oxlint-disable-next-line jsx-a11y/interactive-supports-focus */}
-            <div className={MODES.length > 1 ? 'tabs' : 'tabs tabs-single'} role="tablist" aria-label="What do you want to check?" onKeyDown={onTabKey}>
-              {MODES.map(([m, label]) => (
-                <button
-                  key={m}
-                  ref={(el) => {
-                    tabRefs.current[m] = el
-                  }}
-                  id={`tab-${m}`}
-                  role="tab"
-                  type="button"
-                  aria-selected={mode === m}
-                  aria-controls={`panel-${m}`}
-                  tabIndex={mode === m ? 0 : -1}
-                  className="tab"
-                  onClick={() => select(m)}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+            {MODES.length > 1 ? (
+              <>
+                {/* The tablist is a composite widget: its tabs take focus (roving tabindex), not the list itself. */}
+                {/* oxlint-disable-next-line jsx-a11y/interactive-supports-focus */}
+                <div className="tabs" role="tablist" aria-label="What do you want to check?" onKeyDown={onTabKey}>
+                  {MODES.map(([m, label]) => (
+                    <button
+                      key={m}
+                      ref={(el) => {
+                        tabRefs.current[m] = el
+                      }}
+                      id={`tab-${m}`}
+                      role="tab"
+                      type="button"
+                      aria-selected={mode === m}
+                      aria-controls={`panel-${m}`}
+                      tabIndex={mode === m ? 0 : -1}
+                      className="tab"
+                      onClick={() => select(m)}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              // One mode only: a card title, not a tab bar with a single tab.
+              <div className="tabs tabs-single">
+                <h2 id="tab-text" className="tab">
+                  {MODES[0]![1]}
+                </h2>
+              </div>
+            )}
 
-            <div id="panel-text" role="tabpanel" aria-labelledby="tab-text" hidden={mode !== 'text'}>
+            <div id="panel-text" role={MODES.length > 1 ? 'tabpanel' : 'region'} aria-labelledby="tab-text" hidden={mode !== 'text'}>
               <TextMode
                 sample={sample}
                 onSwitchToEmail={

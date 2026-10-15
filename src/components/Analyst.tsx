@@ -173,6 +173,8 @@ export function RelayTimeline({ hops }: { hops: Hop[] }) {
 
 export function LinksTable({ links }: { links: LinkInfo[] }) {
   if (!links.length) return null
+  // Plain-text messages have no link text, so the column would only be dashes squeezing the rest.
+  const shownAs = links.some((l) => l.displayTexts.length)
   return (
     <section className="panel" aria-labelledby="links-table-heading">
       <div className="panel-head">
@@ -180,12 +182,12 @@ export function LinksTable({ links }: { links: LinkInfo[] }) {
         <CopyButton text={links.map((l) => l.defanged).join('\n')} label="Copy all" />
       </div>
       {/* Focusable so keyboard users can scroll the table sideways on narrow screens. */}
-      <div className="table-wrap" role="region" tabIndex={0} aria-labelledby="links-table-heading">
+      <div className="table-wrap" role="region" tabIndex={0} aria-label="Links table (scrolls sideways)">
         <table>
           <thead>
             <tr>
               <th scope="col">Destination (defanged)</th>
-              <th scope="col">Shown as</th>
+              {shownAs && <th scope="col">Shown as</th>}
               <th scope="col">Domain</th>
               <th scope="col">Flags</th>
               <th scope="col">
@@ -199,8 +201,8 @@ export function LinksTable({ links }: { links: LinkInfo[] }) {
                 <td className="break">
                   <code>{l.defanged}</code>
                 </td>
-                <td className="break">{l.displayTexts.length ? l.displayTexts.join(' · ') : <span className="muted">—</span>}</td>
-                <td>
+                {shownAs && <td className="break">{l.displayTexts.length ? l.displayTexts.join(' · ') : <span className="muted">—</span>}</td>}
+                <td className="domain">
                   <code>{l.registrableDomain ?? l.host ?? '—'}</code>
                   {l.unicodeHost !== l.host && (
                     <div className="small muted">

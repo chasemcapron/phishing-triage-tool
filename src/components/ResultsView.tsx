@@ -43,7 +43,7 @@ export function ResultsView({
       </div>
       <div className={wide ? 'results-grid' : 'results-stack'}>
         <div className="results-main">
-          <VerdictCard ref={headingRef} report={report} analyst={analyst} />
+          <VerdictCard ref={headingRef} report={report} analyst={analyst} checking={checking} />
           <WhatToDo report={report} />
           <ReputationStatus report={report} checking={checking} />
           {analyst ? (

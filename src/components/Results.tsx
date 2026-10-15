@@ -24,7 +24,10 @@ const MOUTH: Record<Report['verdict'], [number, number, number]> = {
   none: [0.16, 0.58, 124 / 150],
 }
 
-export const VerdictCard = forwardRef<HTMLHeadingElement, { report: Report; analyst: boolean }>(function VerdictCard({ report, analyst }, headingRef) {
+export const VerdictCard = forwardRef<HTMLHeadingElement, { report: Report; analyst: boolean; checking?: boolean }>(function VerdictCard(
+  { report, analyst, checking = false },
+  headingRef,
+) {
   const [mouthX, mouthY, ratio] = MOUTH[report.verdict]
   const sash = SASH[report.verdict]
   // "No red flags found" has no sub-line, and as one long line the band shrank it to half the
@@ -71,6 +74,12 @@ export const VerdictCard = forwardRef<HTMLHeadingElement, { report: Report; anal
         </div>
       </div>
       <p className="verdict-summary">{VERDICT_SUMMARY[report.verdict]}</p>
+      {/* Online results can raise the verdict (Suspicious to High), so say so instead of letting it jump unannounced. */}
+      {checking && (
+        <p className="verdict-checking small muted">
+          <span className="rep-spinner" aria-hidden="true" /> Still checking online, so this may go up.
+        </p>
+      )}
       {report.reasons.length > 0 && (
         <ul className="reasons" aria-label="Why">
           {report.reasons.map((r) => (
@@ -92,6 +101,7 @@ export const VerdictCard = forwardRef<HTMLHeadingElement, { report: Report; anal
 export function WhatToDo({ report }: { report: Report }) {
   const advice = adviceFor(report)
   const link = reportUrl(report)
+  const google = advice.report.some((r) => r.href.startsWith('https://safebrowsing.google.com/'))
   return (
     <section className={report.verdict === 'none' ? 'todo todo-none' : 'todo'} aria-labelledby="todo-heading">
       <h2 id="todo-heading">What to do</h2>
@@ -104,7 +114,8 @@ export function WhatToDo({ report }: { report: Report }) {
         <div className="todo-report">
           <h3>Report it</h3>
           <p className="small">
-            Reporting gets the site blocked faster for everyone. These open the official forms in a new tab; Google's comes with the link filled in.
+            {link ? 'Reporting gets the site blocked faster for everyone.' : 'Reporting helps catch the people behind it.'} These open the official forms in a
+            new tab{google ? "; Google's comes with the link filled in." : '.'}
           </p>
           <div className="todo-actions">
             {advice.report.map((r) => (
@@ -119,7 +130,9 @@ export function WhatToDo({ report }: { report: Report }) {
       <div className="todo-share">
         <ShareButton text={friendSummary(report)} label="Send a summary to someone" />
         <CopyButton text={friendSummary(report)} label="Copy a summary to send someone" />
-        <span className="small muted">Plain English, with the link made safe so it can't be tapped.</span>
+        <span className="small muted">
+          {link ? "Plain English, with the link made safe so it can't be tapped." : 'Plain English, ready to paste into a text.'}
+        </span>
       </div>
     </section>
   )

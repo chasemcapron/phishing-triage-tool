@@ -458,7 +458,12 @@ code {
 .tabs-single .tab:hover,
 .tabs-single .tab[aria-selected='true'] {
   /* A heading, not a pill: a filled pill here looked like a second "Check it" button. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
   background: transparent;
+  box-shadow: none;
   color: var(--text);
   font-size: 1.2rem;
   cursor: default;
@@ -1351,6 +1356,9 @@ td.break {
   min-width: 14rem;
   max-width: 28rem;
 }
+td.domain {
+  min-width: 9rem;
+}
 td.hash {
   white-space: nowrap;
 }
@@ -1631,6 +1639,13 @@ td.hash {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+.verdict-checking {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 4px 0 0;
 }
 .rep-spinner {
   width: 16px;
