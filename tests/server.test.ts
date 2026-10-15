@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it, vi } from 'vitest'
 import { TtlCache } from '../server/cache'
-import { handleLookup } from '../server/handler'
+import { handleLookup, limitKey } from '../server/handler'
 import { lookupRdap } from '../server/providers/rdap'
 import { lookupSafeBrowsing, threatMatchesInput } from '../server/providers/safeBrowsing'
 import { decodeSearchUrlsResponse, encodeSearchUrlsResponse } from '../server/protobuf'
@@ -360,5 +360,16 @@ describe('handleLookup', () => {
     expect(res.status).toBe(429)
     expect(Number(res.headers.get('retry-after'))).toBeGreaterThan(0)
     expect((await run(req({ domains: ['a.example'] }, { 'x-forwarded-for': '198.51.100.9' }), limiter)).status).toBe(200)
+  })
+})
+
+describe('rate-limit key', () => {
+  it('groups IPv6 clients by /64 and leaves IPv4 alone', () => {
+    expect(limitKey('2001:db8:85a3:12:1:2:3:4')).toBe('2001:db8:85a3:12::/64')
+    expect(limitKey('2001:db8:85a3:12::9')).toBe(limitKey('2001:0db8:85a3:0012:ffff::1'))
+    expect(limitKey('2001:db8::1')).toBe('2001:db8:0:0::/64')
+    expect(limitKey('203.0.113.7')).toBe('203.0.113.7')
+    expect(limitKey('::ffff:203.0.113.7')).toBe('::ffff:203.0.113.7')
+    expect(limitKey('unknown')).toBe('unknown')
   })
 })

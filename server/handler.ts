@@ -23,6 +23,22 @@ export function clientIp(headers: Headers): string {
   return xff || headers.get('x-real-ip')?.trim() || 'unknown'
 }
 
+/**
+ * The key rate limits count against. An IPv6 client gets its whole /64 (one home or mobile network
+ * hands out addresses from it), so rotating addresses inside it doesn't reset the limits.
+ */
+export function limitKey(ip: string): string {
+  if (!ip.includes(':') || ip.includes('.')) return ip
+  const [head = '', tail] = ip.toLowerCase().split('::')
+  const h = head ? head.split(':') : []
+  const t = tail ? tail.split(':') : []
+  const groups = tail === undefined ? h : [...h, ...Array<string>(Math.max(0, 8 - h.length - t.length)).fill('0'), ...t]
+  return `${groups
+    .slice(0, 4)
+    .map((g) => g.replace(/^0+(?=.)/, ''))
+    .join(':')}::/64`
+}
+
 /** Rejects cross-site browser requests so other sites can't spend our API quotas. */
 export function isCrossSite(request: Request): boolean {
   const site = request.headers.get('sec-fetch-site')
@@ -46,7 +62,7 @@ export async function handleLookup(request: Request, deps: HandlerDeps): Promise
   const declared = Number(request.headers.get('content-length') ?? '0')
   if (declared > LOOKUP_LIMITS.bodyBytes) return json(413, { error: 'Request too large.' })
 
-  const ip = clientIp(request.headers)
+  const ip = limitKey(clientIp(request.headers))
   const rl = (deps.limiter ?? limiter).check(ip, (deps.now ?? Date.now)())
   if (!rl.ok) {
     return json(429, { error: `Too many checks from your network. Try again in ${rl.retryAfter} seconds.` }, { 'Retry-After': String(rl.retryAfter) })
