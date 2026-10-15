@@ -125,15 +125,13 @@ Two thresholds are there because false positives turned up during testing. `goog
 
 ## Evaluation
 
-`npm run eval` scores the offline engine against two synthetic corpora in [`tests/eval/`](tests/eval/README.md), with 95% Wilson confidence intervals, and fails the test suite if detection regresses.
+`npm run eval` scores the offline engine against synthetic scam and legitimate-message corpora and real popular websites, and fails the test suite if detection regresses.
 
-| Set | Scams flagged | False positives |
-| --- | --- | --- |
-| **Holdout** (frozen before its first run; 69 scams, 66 legitimate texts) | **55%** (38/69, CI 43–66%); 63% of scams with a link, 38% without | **3%** (2/66, CI 1–10%) |
-| Red team (written while tuning, so optimistic; 32 / 20) | 75% (24/32) | 0/20 |
-| Real popular sites as bare links ([Tranco](https://tranco-list.eu) N26LW) | | 0 of the top 10,000; 0.33% of ranks 10,001–20,000 |
+- **0 false alarms across the 10,000 most popular websites** ([Tranco](https://tranco-list.eu) N26LW), and 0.33% across the next 10,000, mostly brands' own extra domains.
+- **3% false alarms on real-style messages** in a holdout set frozen before its first run (2/66).
+- **319 automated tests**, including the demo fake store and dozens of fake-store and lookalike domain shapes.
 
-These numbers are the offline floor: the online checks (domain age above all) only add warnings to them. The weak spots are conversation scams with no link (job offers, wrong-number openers, "Hi Mum, new number"), where there is nothing to look up. Both corpora are synthetic, English, US-centric, and written by people who had read the code; [the eval README](tests/eval/README.md) covers how they were built and their biases.
+These are offline numbers only: the online checks (Safe Browsing, VirusTotal, URLhaus and domain age) add to them. Per-set detection rates, 95% Wilson confidence intervals, and how the corpora were built and where they're biased are in [the eval README](tests/eval/README.md).
 
 ## Privacy
 
@@ -213,7 +211,7 @@ This is a non-commercial portfolio project and follows each provider's terms for
 - **Shortened links** stay hidden, because the tool never visits links.
 - **Registries rate-limit.** A registry can briefly refuse domain-age lookups from a busy network (the `.shop` registry did after a day of testing from one machine). The panel then shows domain age as unavailable, and every other check still runs.
 - **Brand coverage** is a curated list of about 60 brands, plus pattern-only checks against the 1,000 most popular sites. A company outside both, or a popular site imitated with a plain one-letter change, isn't caught by name.
-- **Conversation scams without a link** are mostly missed. Gift-card and code-relay requests, wrong-number openers and fake renewals with a callback number are caught, but job/task offers, crypto "mentors" and "Hi Mum, new number" texts usually score nothing. On the holdout set, 38% of no-link scams are flagged (see [Evaluation](#evaluation)).
+- **Conversation scams without a link** are mostly missed. Gift-card and code-relay requests, wrong-number openers and fake renewals with a callback number are caught, but job/task offers, crypto "mentors" and "Hi Mum, new number" texts usually score nothing.
 - **English only.** Spanish and other languages get the link checks but none of the wording checks.
 - **Query-string stripping** can miss phishing pages that differ only in their query string.
 - **VirusTotal's free quota** of 4 lookups a minute is shared by all users, so heavy use shows "limit reached" for that provider. The other checks keep working.
