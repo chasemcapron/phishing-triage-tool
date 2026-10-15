@@ -8,7 +8,7 @@ Paste a suspicious link or text message *before you tap it* and get a clear, exp
 
 <p align="center"><img src="docs/demo.gif" alt="Typing the real fake-store link www.summrfrideays.shop, casting it in, and the hooked fish showing High risk: a misspelling of Summer Fridays, registered 24 days ago, followed by advice and report buttons" width="360"></p>
 
-The demo uses a real fake store that took a friend's card details at checkout in October 2026. No blocklist knew it yet. The tool catches it from the brand misspelling, the cheap `.shop` ending and the domain age, which comes from a live registry lookup (24 days old).
+The demo uses a real fake store that took a friend's card details at checkout in October 2026. No blocklist knew it yet. The tool catches it from the brand misspelling, the cheap `.shop` ending and the domain age, which comes from a live registry lookup (24 days old when the demo was recorded; by design the age signal stops counting at 90 days for cheap endings, so the same link rates Suspicious after mid-December 2026).
 
 | Landing page | The catch | A real Google Safe Browsing hit (night) |
 | --- | --- | --- |
@@ -77,7 +77,7 @@ Every weight and threshold lives in [`src/engine/config.ts`](src/engine/config.t
 
 | Check | Weight | Example |
 | --- | --- | --- |
-| Lookalike domain (homoglyphs, typos) | 40 | `paypa1-login`, `summrfrideays` |
+| Lookalike domain (homoglyphs, typos) | 40 | `paypa1-login`, `summrfrideays`, `nikee-outlet` |
 | Brand combined with other words | 35 | `ezpass-tollpay-services` |
 | Brand hidden in a subdomain | 35 | `usps.com-redelivery.test` |
 | Imitates one of the 1,000 most popular websites | 30 | `dr0pbox`, `githubb`, `canva-login` |
@@ -96,9 +96,9 @@ Every weight and threshold lives in [`src/engine/config.ts`](src/engine/config.t
 | URL shortener (destination hidden) | 10 | `bit.ly/…` |
 | Punycode domain, excessive subdomains, risky ending | 10, 8, 8 | `xn--…`, `.shop`, `.top`, `.xyz` |
 
-The lookalike checks compare domains against **~50 commonly impersonated brands**: banks, delivery companies, toll agencies, big tech, and retailers copied by fake stores. They use confusable-character normalization and edit distance. Short brand names only match whole words, so "pineapple" never matches Apple.
+The lookalike checks compare domains against **about 60 commonly impersonated brands**: banks, delivery companies, toll agencies, big tech, and retailers copied by fake stores. They use confusable-character normalization and edit distance. Short brand names only match whole words, so "pineapple" never matches Apple. Fake stores mangle names harder than phishing kits do, so on cheap endings like `.shop` a long brand name still matches with up to a third of its letters changed (`summrfriseay.shop`), and a short one with a doubled or swapped letter (`temuu.shop`). Brands whose names are everyday words (Coach, Yeti, Zara) only match on cheap endings or next to store words like `-outlet`, so `life-coach.com` is left alone.
 
-A second, wider net covers the **1,000 most popular websites** from the [Tranco](https://tranco-list.eu) research ranking. Because so many real sites have similar names, it only flags the classic squatting patterns: look-alike characters (`dr0pbox`), a doubled, dropped or swapped letter (`githubb`, `dropbx`, `gogole`), or the exact name plus a bait word such as `-login`, `-verify` or `-share`. Nothing in the Tranco top 10,000 is ever flagged, and the same name on another ending (`spotify.dk`) is left alone. Run against the 10,000 legitimate sites ranked 10,001–20,000, it flags 5 (0.05%). On its own it stops at Suspicious. The list is rebuilt with `scripts/make-popular-sites.mjs`.
+A second, wider net covers the **1,000 most popular websites** from the [Tranco](https://tranco-list.eu) research ranking. Because so many real sites have similar names, it only flags the classic squatting patterns: look-alike characters (`dr0pbox`), a doubled, dropped or swapped letter (`githubb`, `dropbx`, `gogole`), or the exact name plus a bait word such as `-login`, `-verify` or `-share`. Nothing in the Tranco top 10,000 is ever flagged, and the same name on another ending (`spotify.dk`) is left alone. Run against the 10,000 legitimate sites ranked 10,001–20,000, this check flags 5 (0.05%); the whole engine flags 33 (0.33%), mostly brands' own extra domains such as `amazonaws.cn` (see [Evaluation](#evaluation)). On its own it stops at Suspicious. The list is rebuilt with `scripts/make-popular-sites.mjs`.
 
 ### Texts without a link
 
@@ -119,8 +119,21 @@ A second, wider net covers the **1,000 most popular websites** from the [Tranco]
 | VirusTotal: 2+ engines say malicious (and community reputation below 100) | 45, forces High |
 | VirusTotal: 1 engine | 20 |
 | Domain registered in the last 30 days (90 days for cheap endings like `.shop`) | 30 |
+| Domain not registered, or suspended by its registrar or registry (RDAP "client hold" / "server hold"): fake stores are often deleted soon after they're reported | 25 |
 
 Two thresholds are there because false positives turned up during testing. `google.com` has one stray "malicious" vote on VirusTotal, so domains with a high community reputation ignore lone votes. URLhaus lists `github.com` as a host that has served malware, so only **exact URL matches** count, never whole-host listings.
+
+## Evaluation
+
+`npm run eval` scores the offline engine against two synthetic corpora in [`tests/eval/`](tests/eval/README.md), with 95% Wilson confidence intervals, and fails the test suite if detection regresses.
+
+| Set | Scams flagged | False positives |
+| --- | --- | --- |
+| **Holdout** (frozen before its first run; 69 scams, 66 legitimate texts) | **55%** (38/69, CI 43–66%); 63% of scams with a link, 38% without | **3%** (2/66, CI 1–10%) |
+| Red team (written while tuning, so optimistic; 32 / 20) | 75% (24/32) | 0/20 |
+| Real popular sites as bare links ([Tranco](https://tranco-list.eu) N26LW) | | 0 of the top 10,000; 0.33% of ranks 10,001–20,000 |
+
+These numbers are the offline floor: the online checks (domain age above all) only add warnings to them. The weak spots are conversation scams with no link (job offers, wrong-number openers, "Hi Mum, new number"), where there is nothing to look up. Both corpora are synthetic, English, US-centric, and written by people who had read the code; [the eval README](tests/eval/README.md) covers how they were built and their biases.
 
 ## Privacy
 
@@ -128,8 +141,8 @@ Two thresholds are there because false positives turned up during testing. `goog
 - **Why strip queries:** query strings often carry personal tokens, such as password-reset links, tracking IDs and the recipient's email address. The trade-off is that a phishing page identified only by its query string may be missed. The same rule applies to the Google report link.
 - **A visible switch.** The privacy note under the input states exactly what is sent and has an **online checks on/off** switch. With it off, nothing leaves the device.
 - **The domain-age fallback.** Some registries block cloud servers (the `.shop` registry answers Vercel with HTTP 429 every time). When that happens, the browser asks that registry directly for the domain's registration date. Only the domain name is sent. The CSP allows exactly those 17 registry hosts.
-- **Who receives it.** Google Safe Browsing (`urls:search` sends the stripped URL itself; the more private hash-prefix mode needs a local hash database), VirusTotal and URLhaus. VirusTotal is only ever read: the tool never submits a URL for scanning, which would make it public. Credentials in links (`user:pass@`) are removed too.
-- **No storage, no logging.** Nothing submitted is stored or logged by the app. Vercel's platform logs keep standard request metadata (IP, path, status), never request bodies. Responses are `Cache-Control: no-store`. The browser keeps lookup results for 5 minutes, in memory only.
+- **Who receives it.** Google Safe Browsing (`urls:search` sends the stripped URL itself; v5's real-time hash-prefix mode, which sends only 4-byte hash prefixes, would be more private and is the planned upgrade), VirusTotal and URLhaus. VirusTotal is only ever read: the tool never submits a URL for scanning, which would make it public. Credentials in links (`user:pass@`) are removed too.
+- **No database, no logging.** Nothing submitted is written to disk or logged by the app. To save quotas, each server instance keeps provider answers in memory for 30 minutes to 24 hours (per link or domain, not per person), and rate-limit counters keyed on the client's IP for up to 24 hours; all of it disappears when the instance is recycled. Vercel's platform logs keep standard request metadata (IP, path, status), never request bodies. Responses are `Cache-Control: no-store`. The browser keeps lookup results for 5 minutes, in memory only.
 
 ## Security of the app itself
 
@@ -137,9 +150,9 @@ Two thresholds are there because false positives turned up during testing. `goog
 | --- | --- |
 | Content-Security-Policy | `default-src 'self'`, no inline scripts or styles, no third-party scripts, `connect-src 'self'` plus the 17 RDAP registries, `object-src 'none'`, `base-uri 'none'`, `form-action 'none'`, `frame-ancestors 'none'` |
 | Other headers | HSTS (2 years, preload), `nosniff`, `Referrer-Policy: no-referrer`, `X-Frame-Options: DENY`, COOP `same-origin`, Permissions-Policy denying camera, microphone, geolocation, payment and USB |
-| Verified | [Mozilla Observatory](https://developer.mozilla.org/en-US/observatory/analyze?host=phishing-triage-tool.vercel.app): **A+ (130/130, 12/12 tests)**. Lighthouse (mobile): **Performance 96, Accessibility 100, Best Practices 100, SEO 100** (October 14, 2026) |
-| No SSRF | The server never requests a user-supplied URL; it only calls four fixed provider hosts |
-| API abuse | Cross-site browser requests are rejected (`Origin` and `Sec-Fetch-Site`), so other websites can't spend the quotas. That is not authentication: scripts can still call the API, and the per-IP limit is what covers them. Strict validation (http/https URLs, domains and SHA-256 hashes only), 32 KB body cap, per-provider timeouts, per-IP limit of 30/min and 300/hour, and each network's share of VirusTotal capped at 60 uncached lookups a day so one script can't spend the whole key |
+| Verified | [Mozilla Observatory](https://developer.mozilla.org/en-US/observatory/analyze?host=gonefishing-app.vercel.app): **A+ (130/130, 12/12 tests)**. Lighthouse (mobile): **Performance 96, Accessibility 100, Best Practices 100, SEO 100** (October 14, 2026) |
+| No SSRF | The server never requests a user-supplied URL. It only calls fixed hosts: the three reputation APIs, IANA's RDAP bootstrap file, and the registry RDAP servers that file lists |
+| API abuse | Cross-site browser requests are rejected (`Origin` and `Sec-Fetch-Site`), so other websites can't spend the quotas. That is not authentication: scripts can still call the API, and the per-IP limit is what covers them. Strict validation (http/https URLs, domains and SHA-256 hashes only), 32 KB body cap, per-provider timeouts, per-IP limit of 30/min and 300/hour (IPv6 counted per /64, so rotating addresses doesn't reset it), and each network's share of VirusTotal capped at 60 uncached lookups a day so one script can't spend the whole key |
 | Provider quotas | VirusTotal's 4/min and 500/day public quota is budgeted on the server: hashes first, then domains, then at most 2 URLs. Results are cached (Safe Browsing within Google's limits of 30 min for hits and 1 h for misses, URLhaus 30 min, VirusTotal 6–12 h, RDAP 24 h). When a limit is hit, the tool says so ("VirusTotal limit reached, try again in a minute") |
 | Safe rendering | Nothing from the input is ever rendered as HTML; every displayed value is escaped by React. IOC exports and ticket summaries are defanged and Markdown-escaped |
 | Secrets | API keys live only in Vercel environment variables, never with a `VITE_` prefix, so they're never shipped to the browser. `.env*` is gitignored except `.env.example`. A scan of the full git history finds no keys |
@@ -165,7 +178,7 @@ Two thresholds are there because false positives turned up during testing. `goog
 
 The trade-off is that shortened links can't be expanded. The tool says the destination is hidden.
 
-**Abuse of the tool itself.** The lookup API is the only server surface. It accepts only validated indicators, rejects cross-site browser requests, rate-limits per IP, and has nothing to store or leak. The in-memory rate limiter is per server instance, so the limit is approximate when Vercel scales out. That's acceptable for a portfolio project; a shared store such as Upstash Redis would make it exact.
+**Abuse of the tool itself.** The lookup API is the only server surface. It accepts only validated indicators, rejects cross-site browser requests, rate-limits per IP, and keeps nothing beyond short-lived in-memory caches. The in-memory rate limiter is per server instance, so the limit is approximate when Vercel scales out. That's acceptable for a portfolio project; a shared store such as Upstash Redis would make it exact.
 
 ## Email analysis (paused)
 
@@ -199,8 +212,8 @@ This is a non-commercial portfolio project and follows each provider's terms for
 - **Day-zero sites.** Brand-new phishing sites that copy no listed brand, sit on an ordinary `.com` and use neutral wording can come back clean. Domain age helps, but only flags domains younger than 30 or 90 days.
 - **Shortened links** stay hidden, because the tool never visits links.
 - **Registries rate-limit.** A registry can briefly refuse domain-age lookups from a busy network (the `.shop` registry did after a day of testing from one machine). The panel then shows domain age as unavailable, and every other check still runs.
-- **Brand coverage** is a curated list of about 50 brands, plus pattern-only checks against the 1,000 most popular sites. A company outside both, or a popular site imitated with a plain one-letter change, isn't caught by name.
-- **Conversation scams without a link** are mostly missed. Gift-card and code-relay requests, wrong-number openers and fake renewals with a callback number are caught, but job/task offers, crypto "mentors" and "Hi Mum, new number" texts usually score nothing. A red-team set of 32 synthetic scams and 20 legitimate texts flags 24 of the scams and none of the legitimate texts.
+- **Brand coverage** is a curated list of about 60 brands, plus pattern-only checks against the 1,000 most popular sites. A company outside both, or a popular site imitated with a plain one-letter change, isn't caught by name.
+- **Conversation scams without a link** are mostly missed. Gift-card and code-relay requests, wrong-number openers and fake renewals with a callback number are caught, but job/task offers, crypto "mentors" and "Hi Mum, new number" texts usually score nothing. On the holdout set, 38% of no-link scams are flagged (see [Evaluation](#evaluation)).
 - **English only.** Spanish and other languages get the link checks but none of the wording checks.
 - **Query-string stripping** can miss phishing pages that differ only in their query string.
 - **VirusTotal's free quota** of 4 lookups a minute is shared by all users, so heavy use shows "limit reached" for that provider. The other checks keep working.
@@ -220,7 +233,8 @@ This is a non-commercial portfolio project and follows each provider's terms for
 npm install
 npm run dev          # frontend only (online checks show "unavailable")
 npx vercel dev       # frontend + /api functions
-npm test             # 294 Vitest tests: engine, every sample, server, scoring
+npm test             # Vitest: engine, every sample, server, scoring, eval regression floors
+npm run eval         # detection metrics tables (TRANCO_CSV=top-1m.csv adds the popular-sites sweep)
 npm run build        # type-checks app and tests, then builds
 npm run lint         # Oxlint, including type-aware rules
 npm run format       # Prettier (format:check in CI)
@@ -247,7 +261,7 @@ All samples in [`samples/`](samples/) are synthetic. They use reserved domains (
 ```
 src/engine/      detection engine (pure TypeScript, runs in the browser and in tests)
   checks/        links, content, lookalikes, sender, auth, relay, attachments
-  data/          brands, lists (shorteners, free hosts, risky endings, gateways)
+  data/          brands, lists (shorteners, free hosts, risky endings, gateways), popular sites (generated)
   config.ts      every weight, threshold and limit
   reputation.ts  what is sent, and how provider answers become findings
   advice.ts      scam type → next steps and report links
@@ -255,9 +269,11 @@ src/components/  React UI and the hand-drawn SVG art
 server/          the /api/lookup handler, providers, caches, rate limiter
 api/             Vercel Function entry points
 samples/         synthetic samples + manifest of expected results
-tests/           Vitest suites
+tests/           Vitest suites; tests/eval/ holds the detection eval corpora
 scripts/         QA and media scripts
 ```
+
+Built with AI pair-programming (Claude).
 
 ## License
 
