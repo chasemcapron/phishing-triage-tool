@@ -1,0 +1,278 @@
+// The earlier red-team set (32 scams, 20 legitimate texts) that the README's Limitations section
+// cites, copied verbatim so its numbers can be reproduced. It was written while the engine was being
+// tuned, so treat it as a development set; the holdout set in holdout.ts is the independent one.
+// Non-ASCII characters are written as escapes: \u200B is a zero-width space, \u0410 a Cyrillic A.
+import type { EvalCase } from './types'
+
+export const REDTEAM_SCAMS: EvalCase[] = [
+  {
+    id: 'S01-toll-ezpass',
+    category: 'toll',
+    expect: 'flag',
+    text: 'E-ZPass Notice: You have an unpaid toll balance of $4.15. Pay within 24 hours to avoid a $50 late fee: https://ezpass-tollservices.top/pay',
+  },
+  {
+    id: 'S02-toll-generic-state',
+    category: 'toll',
+    expect: 'flag',
+    text: 'NJ Turnpike Authority: Our records show your vehicle has an outstanding toll of $6.99. Settle now to avoid penalties: https://nj-turnpike-pay.com/invoice',
+  },
+  {
+    id: 'S03-usps-redelivery',
+    category: 'delivery',
+    expect: 'flag',
+    text: 'USPS: Your package is held at our warehouse due to an incomplete address. Update here within 12 hours: https://usps.redeliver-track.info/us',
+  },
+  {
+    id: 'S04-ups-noscheme',
+    category: 'delivery',
+    expect: 'flag',
+    text: 'UPS: we attempted delivery of parcel 1Z98A. Reschedule: ups-redelivery-center.com/reschedule',
+  },
+  {
+    id: 'S05-dhl-shortener',
+    category: 'delivery',
+    expect: 'flag',
+    text: 'DHL Express: customs fee of $2.99 is required before your shipment can be released. Pay: https://bit.ly/3xDhLfee',
+  },
+  {
+    id: 'S06-bank-zelle-callback',
+    category: 'bank-alert',
+    expect: 'flag',
+    text: 'Wells Fargo Fraud Alert: Did you attempt a Zelle payment of $1,450.00 to Mark D? Reply YES or NO. If not you, call our fraud team at (877) 555-0142.',
+  },
+  {
+    id: 'S07-venmo-link',
+    category: 'bank-alert',
+    expect: 'flag',
+    text: 'Venmo: A payment of $500.00 is pending. Your account will be restricted unless you confirm your identity: https://venmo-secure-verify.net/login',
+  },
+  {
+    id: 'S08-cashapp',
+    category: 'bank-alert',
+    expect: 'flag',
+    text: 'Cash App: You have received $750 from a refund settlement. Claim it today at https://cashapp-claim.xyz/r/8812',
+  },
+  {
+    id: 'S09-apple-id-locked',
+    category: 'account',
+    expect: 'flag',
+    text: 'Apple ID: your account has been locked for security reasons. Unlock it now at https://appleid.apple.com.secure-session.click/unlock',
+  },
+  {
+    id: 'S10-microsoft-callback',
+    category: 'callback',
+    expect: 'flag',
+    text: 'Microsoft Security: A charge of $399.99 for Microsoft Defender renewal was approved. If you did not authorize this, call 1-844-555-0187 to cancel.',
+  },
+  {
+    id: 'S11-irs-refund',
+    category: 'government',
+    expect: 'flag',
+    text: 'IRS: You are eligible for a tax refund of $1,280.40. Submit your details to receive the deposit: https://irs-gov-refund.org/claim',
+  },
+  {
+    id: 'S12-job-task-telegram',
+    category: 'job',
+    expect: 'flag',
+    text: "Hi! I'm Jessica, recruiter at Talentlink. We saw your resume. Remote part-time job, 60-90 minutes a day, earn $300-$800 daily completing app review tasks. Interested? Add me on Telegram @jess_hr_jobs or WhatsApp +1 415 555 0133",
+  },
+  {
+    id: 'S13-wrong-number-lowercase',
+    category: 'wrong-number',
+    expect: 'flag',
+    text: 'hey is this david? its linda from the yoga class, are we still on for golf saturday',
+  },
+  {
+    id: 'S14-crypto-mentor',
+    category: 'crypto',
+    expect: 'flag',
+    text: 'My uncle is an analyst at a trading firm and he shows me the signals. I made 38% last week on USDT. I can teach you, just open an account on coinvexa-pro.com and deposit $500 to start.',
+  },
+  {
+    id: 'S15-romance-giftcard',
+    category: 'romance',
+    expect: 'flag',
+    text: "My love, I'm stuck at the oil rig and my bank card is blocked. Please buy 4 Apple gift cards of $200 each and send me pictures of the backs so I can pay the shipping fee. I'll pay you back when I'm home.",
+  },
+  {
+    id: 'S16-hi-mum',
+    category: 'family',
+    expect: 'flag',
+    text: 'Hi Mum, this is my new number, I dropped my phone in the toilet. Can you save this one? I need to pay a bill today and my banking app is locked, can you help me out? x',
+  },
+  {
+    id: 'S17-prize',
+    category: 'prize',
+    expect: 'flag',
+    text: "Congratulations! You've been selected as our Walmart shopper of the month. Claim your $1000 gift card: http://wlmrt-rewards.com/claim?id=55821",
+  },
+  {
+    id: 'S18-fake-store',
+    category: 'fake-store',
+    expect: 'flag',
+    text: 'Lululemon outlet store closing sale! Everything 80% off today only. Shop now: https://lulu-outletsale.shop',
+  },
+  {
+    id: 'S19-mfa-code-reply',
+    category: 'code-relay',
+    expect: 'flag',
+    text: "Hey, it's Sam from church. I accidentally sent my Google verification code to your number. Can you send me the 6-digit code you just got?",
+  },
+  { id: 'S20-punycode', category: 'evasion', expect: 'flag', text: 'PayPal: unusual login detected. Review activity: https://xn--pypal-4ve.com/signin' },
+  {
+    id: 'S21-at-trick',
+    category: 'evasion',
+    expect: 'flag',
+    text: 'Your Chase card has been temporarily suspended. Restore access: https://chase.com@203.0.113.45/verify',
+  },
+  {
+    id: 'S22-spanish-toll',
+    category: 'toll',
+    expect: 'flag',
+    text: 'Aviso: Tiene un peaje pendiente de $5.25. Pague hoy para evitar multas y la suspensi\u00F3n de su licencia: https://peaje-pago-txtag.com/es',
+  },
+  {
+    id: 'S23-spanish-bank',
+    category: 'bank-alert',
+    expect: 'flag',
+    text: 'BBVA: Su cuenta ha sido bloqueada por actividad sospechosa. Verifique sus datos en https://bbva-verificacion.top',
+  },
+  {
+    id: 'S24-zero-width-brand',
+    category: 'evasion',
+    expect: 'flag',
+    text: 'Net\u200Bflix: your pay\u200Bment was declined. Update your billing within 24 hours: https://nflx-billing-help.com/update',
+  },
+  { id: 'S25-spaced-letters', category: 'evasion', expect: 'flag', text: 'U S P S: your parcel is suspended. Visit u s p s - track . com to reschedule.' },
+  {
+    id: 'S26-homoglyph-text',
+    category: 'evasion',
+    expect: 'flag',
+    text: '\u0410mazon: your order #112-4459 could not be shipped. Confirm payment: https://amazon-orders-help.net/confirm',
+  },
+  {
+    id: 'S27-hxxp',
+    category: 'evasion',
+    expect: 'flag',
+    text: 'Bank of America alert: sign in to verify recent activity hxxps://bofa-secure-alerts[.]com/login',
+  },
+  {
+    id: 'S28-split-url',
+    category: 'evasion',
+    expect: 'flag',
+    text: 'USPS final notice: package will be returned to sender. Go to https://usps-parcel\n-help.com/track to stop the return.',
+  },
+  {
+    id: 'S29-reply-y',
+    category: 'delivery',
+    expect: 'flag',
+    text: 'The USPS package has arrived at the warehouse but could not be delivered due to incomplete address information. Please reply Y, then exit the SMS and open it again to activate the link. https://uspstrack-hold.com',
+  },
+  {
+    id: 'S30-dmv-ticket',
+    category: 'government',
+    expect: 'flag',
+    text: 'Department of Motor Vehicles: You have an unpaid traffic ticket. Pay before Oct 20 to avoid license suspension and credit impact: https://dmv-ca.gov-ticket.vip',
+  },
+  {
+    id: 'S31-callback-norton',
+    category: 'callback',
+    expect: 'flag',
+    text: 'Your Geek Squad subscription auto-renewed for $289.99 today. To dispute this charge contact billing at +1 (888) 555-0110.',
+  },
+  {
+    id: 'S32-crypto-no-link',
+    category: 'crypto',
+    expect: 'flag',
+    text: 'Your Coinbase wallet has been flagged for an unauthorized withdrawal of 0.42 BTC. If this was not you, reply STOP and our support agent will call you to secure your funds.',
+  },
+]
+
+export const REDTEAM_LEGIT: EvalCase[] = [
+  { id: 'L01-google-2fa', category: 'otp', expect: 'clean', text: 'G-482913 is your Google verification code.' },
+  { id: 'L02-ms-2fa', category: 'otp', expect: 'clean', text: 'Use 739204 as Microsoft account security code' },
+  {
+    id: 'L03-bank-otp',
+    category: 'otp',
+    expect: 'clean',
+    text: 'Chase: Your one-time code is 55120. It expires in 10 minutes. Never share this code. We will never call you to ask for it.',
+  },
+  {
+    id: 'L04-dentist',
+    category: 'appointment',
+    expect: 'clean',
+    text: 'Reminder: You have an appointment with Dr. Patel at Bright Smile Dental on Thu Oct 16 at 2:30 PM. Reply C to confirm or call 555-201-8890 to reschedule.',
+  },
+  {
+    id: 'L05-pharmacy',
+    category: 'appointment',
+    expect: 'clean',
+    text: 'CVS Pharmacy: Your prescription is ready for pickup at 123 Main St. Pickup within 7 days. Reply STOP to opt out.',
+  },
+  {
+    id: 'L06-usps-real',
+    category: 'order',
+    expect: 'clean',
+    text: 'USPS: Your item was delivered in or at the mailbox at 1:12 pm on October 13 in SPRINGFIELD IL 62704. Track: https://tools.usps.com/go/TrackConfirmAction?tLabels=9400111899223344556677',
+  },
+  {
+    id: 'L07-ups-real',
+    category: 'order',
+    expect: 'clean',
+    text: 'UPS: Your package 1Z999AA10123456784 is scheduled for delivery today between 2:00 PM and 6:00 PM. Track at https://www.ups.com/track?tracknum=1Z999AA10123456784',
+  },
+  {
+    id: 'L08-amazon-real',
+    category: 'order',
+    expect: 'clean',
+    text: 'Amazon: Your package with Kindle Paperwhite was delivered. Track at https://amazon.com/gp/your-account/order-history',
+  },
+  {
+    id: 'L09-bank-balance',
+    category: 'bank-bill',
+    expect: 'clean',
+    text: 'Wells Fargo: Available balance in acct ending 4421 is $2,310.55 as of 10/14/2026. Reply HELP for help, STOP to cancel.',
+  },
+  { id: 'L10-friend-youtube', category: 'friend-link', expect: 'clean', text: 'lol you have to watch this https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+  { id: 'L11-friend-maps', category: 'friend-link', expect: 'clean', text: 'Meet us here at 7? https://maps.app.goo.gl/AbCdEf12345 parking is around back' },
+  {
+    id: 'L12-school',
+    category: 'school-civic',
+    expect: 'clean',
+    text: 'Lincoln Elementary: School will dismiss 2 hours early on Friday due to the storm. Buses will run on the early schedule. Please make pickup arrangements.',
+  },
+  {
+    id: 'L13-brand-marketing',
+    category: 'retail',
+    expect: 'clean',
+    text: 'Target Circle: This week only, 20% off fall decor. Shop now at https://www.target.com/circle Reply STOP to opt out',
+  },
+  {
+    id: 'L14-mentions-password',
+    category: 'chat',
+    expect: 'clean',
+    text: "hey what's the wifi password again? also did you remember to update your account on the netflix profile thing",
+  },
+  { id: 'L15-family-money', category: 'chat', expect: 'clean', text: "Mom can you venmo me $20 for the pizza? I'll pay you back friday" },
+  {
+    id: 'L16-delivery-fedex',
+    category: 'order',
+    expect: 'clean',
+    text: 'FedEx: Your package 7788 9900 1122 will arrive today by 8pm. Manage delivery: https://www.fedex.com/fedextrack/?trknbr=778899001122',
+  },
+  { id: 'L17-apple-real', category: 'otp', expect: 'clean', text: 'Your Apple Account code is: 384021. Do not share it with anyone.' },
+  {
+    id: 'L18-doctor-portal',
+    category: 'appointment',
+    expect: 'clean',
+    text: 'Springfield Clinic: You have a new message in your patient portal. Log in at https://mychart.springfieldclinic.com to view it.',
+  },
+  {
+    id: 'L19-card-alert',
+    category: 'bank-bill',
+    expect: 'clean',
+    text: "Capital One: A purchase of $54.21 at TRADER JOES was made on your card ending 1234. If this wasn't you, call the number on the back of your card.",
+  },
+  { id: 'L20-friend-urgent', category: 'chat', expect: 'clean', text: "Call me immediately when you get this, mom fell but she is ok, we are at St. Mary's" },
+]

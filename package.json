@@ -24,6 +24,7 @@
     "typecheck": "tsc -b",
     "test": "vitest run",
     "test:watch": "vitest",
+    "eval": "vitest run tests/eval --reporter=default --silent=false",
     "qa": "node scripts/qa-screens.mjs http://localhost:4173 qa-out",
     "qa:flows": "node scripts/qa-flows.mjs http://localhost:4173",
     "lint": "oxlint",
